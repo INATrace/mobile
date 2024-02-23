@@ -5,20 +5,26 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 import * as Localization from "expo-localization";
-import i18n from "i18n-js";
+import { I18n } from "i18n-js";
 
 import en from "../locales/en.json";
 import es from "../locales/es.json";
 import de from "../locales/de.json";
 import rw from "../locales/rw.json";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
+const i18n = new I18n({
+  ...en,
+  ...es,
+  ...de,
+  ...rw,
+});
+
+i18n.locale = Localization.getLocales()[0].languageCode || "en";
+i18n.enableFallback = true;
+
+export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: "(tabs)",
 };
 
