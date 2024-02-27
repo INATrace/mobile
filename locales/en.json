@@ -1,1 +1,18 @@
-{}
+{
+  "login": {
+    "welcomeBack": "Welcome back!",
+    "welcomeBackSubtitle": "Log in to continue",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "forgotPassword": "Forgot password?",
+    "login": "Log in"
+  },
+  "home": {
+    "title": "Home",
+    "farmers": "Farmers",
+    "newPlot": "New plot",
+    "syncData": "Sync data"
+  }
+}
