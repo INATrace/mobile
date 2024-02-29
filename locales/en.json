@@ -14,5 +14,10 @@
     "farmers": "Farmers",
     "newPlot": "New plot",
     "syncData": "Sync data"
+  },
+  "farmers": {
+    "title": "Farmers",
+    "newFarmer": "New farmer",
+    "search": "Search"
   }
 }
