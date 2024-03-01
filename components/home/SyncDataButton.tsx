@@ -11,13 +11,13 @@ export default function SyncDataButton() {
         {({ pressed }) => (
           <View
             className={cn(
-              pressed ? 'bg-orange/80' : 'bg-orange',
+              pressed ? 'bg-Orange/80' : 'bg-Orange',
               'flex flex-row m-5 p-3 items-center justify-center rounded-md'
             )}
           >
-            <RefreshCw className="text-white" />
+            <RefreshCw className="text-White" />
             <View className="w-2" />
-            <Text className="text-[16px] text-white font-semibold">
+            <Text className="text-[16px] text-White font-semibold">
               {i18n.t('home.syncData')}
             </Text>
           </View>

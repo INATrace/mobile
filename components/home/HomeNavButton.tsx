@@ -18,13 +18,13 @@ export default function HomeNavButton(props: HomeNavButtonProps) {
         {({ pressed }) => (
           <View
             className={cn(
-              pressed ? 'bg-green/80' : 'bg-green',
+              pressed ? 'bg-Green/80' : 'bg-Green',
               'flex flex-row m-5 items-center justify-center rounded-md p-8'
             )}
           >
             <props.icon className="w-[20]" />
             <View className="w-2" />
-            <Text className="text-[16px] text-white font-semibold">
+            <Text className="text-[16px] text-White font-semibold">
               {props.title}
             </Text>
           </View>

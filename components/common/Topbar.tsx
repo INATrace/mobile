@@ -17,7 +17,10 @@ export default function Topbar(props: TopbarProps) {
             <Link href="/" asChild>
               <Pressable>
                 {({ pressed }) => (
-                  <ChevronLeft size={24} color={pressed ? 'blue' : 'black'} />
+                  <ChevronLeft
+                    size={24}
+                    className={cn(pressed ? 'text-black/80' : 'text-black')}
+                  />
                 )}
               </Pressable>
             </Link>
@@ -33,11 +36,11 @@ export default function Topbar(props: TopbarProps) {
           {({ pressed }) => (
             <View
               className={cn(
-                pressed ? 'bg-orange/80' : 'bg-orange',
+                pressed ? 'bg-Orange/80' : 'bg-Orange',
                 'rounded-full p-[6px]'
               )}
             >
-              <User2 size={14} color={'white'} />
+              <User2 size={14} className="text-White" />
             </View>
           )}
         </Pressable>
