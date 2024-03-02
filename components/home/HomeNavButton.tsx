@@ -1,15 +1,15 @@
-import { Href, Link } from 'expo-router'
-import { FC } from 'react'
-import { Pressable, View, Text } from 'react-native'
+import { Href, Link } from 'expo-router';
+import { FC } from 'react';
+import { Pressable, View, Text } from 'react-native';
 
-import { IconProps } from '@/types/svg'
-import cn from '@/utils/cn'
+import { IconProps } from '@/types/svg';
+import cn from '@/utils/cn';
 
 type HomeNavButtonProps = {
-  title: string
-  icon: FC<IconProps>
-  link: string
-}
+  title: string;
+  icon: FC<IconProps>;
+  link: string;
+};
 
 export default function HomeNavButton(props: HomeNavButtonProps) {
   return (
@@ -31,5 +31,5 @@ export default function HomeNavButton(props: HomeNavButtonProps) {
         )}
       </Pressable>
     </Link>
-  )
+  );
 }

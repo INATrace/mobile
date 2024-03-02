@@ -1,14 +1,14 @@
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { View } from 'react-native';
 
-import Topbar from '@/components/common/Topbar'
-import HomeNavButton from '@/components/home/HomeNavButton'
-import FarmerSvg from '@/components/svg/FarmerSvg'
-import PlotSvg from '@/components/svg/PlotSvg'
+import Topbar from '@/components/common/Topbar';
+import HomeNavButton from '@/components/home/HomeNavButton';
+import FarmerSvg from '@/components/svg/FarmerSvg';
+import PlotSvg from '@/components/svg/PlotSvg';
 
-import { i18n } from '../_layout'
-import SyncDataButton from '@/components/home/SyncDataButton'
-import Connection from '@/components/connection/Connection'
+import { i18n } from '../_layout';
+import SyncDataButton from '@/components/home/SyncDataButton';
+import Connection from '@/components/connection/Connection';
 
 export default function Home() {
   return (
@@ -28,5 +28,5 @@ export default function Home() {
       </View>
       <SyncDataButton />
     </SafeAreaView>
-  )
+  );
 }

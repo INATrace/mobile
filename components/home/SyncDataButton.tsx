@@ -1,8 +1,8 @@
-import { Link } from 'expo-router'
-import { Pressable, View, Text } from 'react-native'
-import { RefreshCw } from 'lucide-react-native'
-import cn from '@/utils/cn'
-import { i18n } from '@/app/_layout'
+import { Link } from 'expo-router';
+import { Pressable, View, Text } from 'react-native';
+import { RefreshCw } from 'lucide-react-native';
+import cn from '@/utils/cn';
+import { i18n } from '@/app/_layout';
 
 export default function SyncDataButton() {
   return (
@@ -24,5 +24,5 @@ export default function SyncDataButton() {
         )}
       </Pressable>
     </Link>
-  )
+  );
 }

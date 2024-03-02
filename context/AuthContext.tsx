@@ -1,14 +1,14 @@
-import { createContext, useContext } from 'react'
-import { useStorageState } from './useStorageState'
-import { User } from '@/types/user'
+import { createContext, useContext } from 'react';
+import { useStorageState } from './useStorageState';
+import { User } from '@/types/user';
 
 const AuthContext = createContext<{
-  logIn: (accessToken: string, refreshToken: string, userData: User) => void
-  logOut: () => void
-  accessToken: string | null
-  refreshToken: string | null
-  user: User | null
-  isLoading: boolean
+  logIn: (accessToken: string, refreshToken: string, userData: User) => void;
+  logOut: () => void;
+  accessToken: string | null;
+  refreshToken: string | null;
+  user: User | null;
+  isLoading: boolean;
 }>({
   logIn: () => null,
   logOut: () => null,
@@ -16,40 +16,39 @@ const AuthContext = createContext<{
   refreshToken: null,
   user: null,
   isLoading: false,
-})
+});
 
-// This hook can be used to access the user info.
 export function useSession() {
-  const value = useContext(AuthContext)
+  const value = useContext(AuthContext);
   if (process.env.NODE_ENV !== 'production') {
     if (!value) {
-      throw new Error('useSession must be wrapped in a <SessionProvider />')
+      throw new Error('useSession must be wrapped in a <SessionProvider />');
     }
   }
 
-  return value
+  return value;
 }
 
 export function SessionProvider(props: React.PropsWithChildren<any>) {
-  const [accessToken, setAccessToken] = useStorageState('access_token')
-  const [refreshToken, setRefreshToken] = useStorageState('refresh_token')
-  const [user, setUser] = useStorageState('user_data')
+  const [accessToken, setAccessToken] = useStorageState('access_token');
+  const [refreshToken, setRefreshToken] = useStorageState('refresh_token');
+  const [user, setUser] = useStorageState('user_data');
 
   const logIn = async (
     accessToken: string,
     refreshToken: string,
     userData: User
   ) => {
-    setAccessToken(accessToken)
-    setRefreshToken(refreshToken)
-    setUser(JSON.stringify(userData))
-  }
+    setAccessToken(accessToken);
+    setRefreshToken(refreshToken);
+    setUser(JSON.stringify(userData));
+  };
 
   const logOut = () => {
-    setAccessToken(null)
-    setRefreshToken(null)
-    setUser(null)
-  }
+    setAccessToken(null);
+    setRefreshToken(null);
+    setUser(null);
+  };
 
   return (
     <AuthContext.Provider
@@ -64,5 +63,5 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     >
       {props.children}
     </AuthContext.Provider>
-  )
+  );
 }

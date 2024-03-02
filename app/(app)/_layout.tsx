@@ -1,16 +1,16 @@
-import { Redirect, Stack } from 'expo-router'
+import { Redirect, Stack } from 'expo-router';
 
-import { useSession } from '@/context/AuthContext'
+import { useSession } from '@/context/AuthContext';
 
 export const unstable_settings = {
   initialRouteName: 'index',
-}
+};
 
 export default function AppLayout() {
-  const { user, isLoading } = useSession()
+  const { user, isLoading } = useSession();
 
   if (user) {
-    return <Redirect href="/login" />
+    return <Redirect href="/login" />;
   }
 
   return (
@@ -20,5 +20,5 @@ export default function AppLayout() {
       <Stack.Screen name="(farmers)" options={{ headerShown: false }} />
       <Stack.Screen name="user-settings" options={{ presentation: 'modal' }} />
     </Stack>
-  )
+  );
 }

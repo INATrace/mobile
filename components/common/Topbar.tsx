@@ -1,12 +1,12 @@
-import cn from '@/utils/cn'
-import { Link } from 'expo-router'
-import { ChevronLeft, User2 } from 'lucide-react-native'
-import { View, Text, Pressable } from 'react-native'
+import cn from '@/utils/cn';
+import { Link } from 'expo-router';
+import { ChevronLeft, User2 } from 'lucide-react-native';
+import { View, Text, Pressable } from 'react-native';
 
 export type TopbarProps = {
-  title: string
-  goBack?: boolean
-}
+  title: string;
+  goBack?: boolean;
+};
 
 export default function Topbar(props: TopbarProps) {
   return (
@@ -46,5 +46,5 @@ export default function Topbar(props: TopbarProps) {
         </Pressable>
       </Link>
     </View>
-  )
+  );
 }
