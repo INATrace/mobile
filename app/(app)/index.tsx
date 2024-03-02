@@ -8,7 +8,6 @@ import PlotSvg from '@/components/svg/PlotSvg';
 
 import { i18n } from '../_layout';
 import SyncDataButton from '@/components/home/SyncDataButton';
-import Connection from '@/components/connection/Connection';
 
 export default function Home() {
   return (
