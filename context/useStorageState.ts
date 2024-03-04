@@ -1,41 +1,48 @@
 import { deleteItemAsync, setItemAsync, getItemAsync } from 'expo-secure-store';
 import { useReducer, useEffect, useCallback } from 'react';
 
-type UseStateHook<T> = [T | null, (value: T | null) => void];
+// Define a type that includes both string and object to clarify the hook's capability
+type StorageValue = string | object | null;
 
-function useAsyncState<T>(initialValue: T | null = null): UseStateHook<T> {
+type UseStateHook<T> = [T, (value: T) => void];
+
+function useAsyncState<T>(initialValue: T): UseStateHook<T> {
   return useReducer(
-    (state: T | null, action: T | null = null): T | null => action,
+    (state: T, action: T): T => action,
     initialValue
   ) as UseStateHook<T>;
 }
 
-export async function setStorageItemAsync(key: string, value: string | null) {
-  if (value == null) {
+// This function remains unchanged as it abstracts away the specifics of storage handling
+async function setStorageItemAsync(key: string, value: StorageValue) {
+  if (value === null) {
     await deleteItemAsync(key);
   } else {
-    const valueToStore =
-      typeof value === 'object' ? JSON.stringify(value) : value;
+    // Ensure the value is stored as a string
+    const valueToStore = JSON.stringify(value);
     await setItemAsync(key, valueToStore);
   }
 }
 
-export function useStorageState(key: string): UseStateHook<string> {
-  // Public
-  const [state, setState] = useAsyncState<string>();
+// Adjust the hook to initialize with a generic type which can be a string or an object
+export function useStorageState<T extends StorageValue>(
+  key: string,
+  initialValue: T
+): UseStateHook<T> {
+  const [state, setState] = useAsyncState<T>(initialValue);
 
-  // Get
   useEffect(() => {
     getItemAsync(key).then((value) => {
-      setState(value);
+      // Parse the retrieved value if it exists, otherwise return initialValue
+      const parsedValue = value ? JSON.parse(value) : initialValue;
+      setState(parsedValue);
     });
-  }, [key]);
+  }, [key, initialValue]);
 
-  // Set
   const setValue = useCallback(
-    (value: string | null) => {
+    async (value: T) => {
       setState(value);
-      setStorageItemAsync(key, value);
+      await setStorageItemAsync(key, value);
     },
     [key]
   );

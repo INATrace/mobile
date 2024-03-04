@@ -14,16 +14,23 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { i18n } from './_layout';
 import { Input, InputPassword } from '@/components/common/Input';
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 
-import { useSession } from '@/context/AuthContext';
+import { AuthContext } from '@/context/AuthContext';
+import { router } from 'expo-router';
 
 export default function Login() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
-  const session = useSession();
+  const { logIn, user } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (user) {
+      router.replace('/');
+    }
+  }, [user]);
 
   const resetPassword = async () => {
     const url = 'https://test.inatrace.org/en/reset-password';
@@ -78,7 +85,7 @@ export default function Login() {
             </View>
             <View className="self-end">
               <Pressable
-                onPress={() => session.logIn(username, password)}
+                onPress={() => logIn(username, password)}
                 className="px-5 py-3 rounded-md bg-Orange"
               >
                 <Text className="text-White font-semibold text-[18px]">

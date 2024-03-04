@@ -4,7 +4,7 @@ import { User } from '@/types/user';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import axios from 'axios';
 
-const AuthContext = createContext<{
+export const AuthContext = createContext<{
   logIn: (username: string, password: string) => void;
   logOut: () => void;
   accessToken: string | null;
@@ -22,21 +22,16 @@ const AuthContext = createContext<{
   isLoading: false,
 });
 
-export function useSession() {
-  const value = useContext(AuthContext);
-  if (process.env.NODE_ENV !== 'production') {
-    if (!value) {
-      throw new Error('useSession must be wrapped in a <SessionProvider />');
-    }
-  }
-
-  return value;
-}
-
 export function SessionProvider(props: React.PropsWithChildren<any>) {
-  const [accessToken, setAccessToken] = useStorageState('access_token');
-  const [refreshToken, setRefreshToken] = useStorageState('refresh_token');
-  const [user, setUser] = useStorageState('user_data');
+  const [accessToken, setAccessToken] = useStorageState<string | null>(
+    'access_token',
+    null
+  );
+  const [refreshToken, setRefreshToken] = useStorageState<string | null>(
+    'refresh_token',
+    null
+  );
+  const [user, setUser] = useStorageState<User | null>('user', null);
   const [connection, setConnection] = useState<NetInfoState | null>(null);
 
   const logIn = async (username: string, password: string) => {
@@ -74,12 +69,11 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         );
 
         if (responseUserData.data.status === 'OK') {
-          console.log('setting user, ', responseUserData.data.data);
-          setUser(JSON.stringify(responseUserData.data.data));
+          setUser(responseUserData.data.data as User);
         }
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -106,7 +100,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         logOut,
         accessToken,
         refreshToken,
-        user: user ? JSON.parse(user) : null,
+        user,
         connection,
         isLoading: false,
       }}
