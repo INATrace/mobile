@@ -1,6 +1,7 @@
 import { Redirect, Stack } from 'expo-router';
 
 import { useSession } from '@/context/AuthContext';
+import { useEffect } from 'react';
 
 export const unstable_settings = {
   initialRouteName: 'index',
@@ -8,6 +9,10 @@ export const unstable_settings = {
 
 export default function AppLayout() {
   const { user, isLoading } = useSession();
+
+  useEffect(() => {
+    console.log('user', user);
+  }, [user]);
 
   if (!user) {
     return <Redirect href="/login" />;

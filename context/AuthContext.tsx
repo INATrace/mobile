@@ -2,9 +2,10 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { useStorageState } from './useStorageState';
 import { User } from '@/types/user';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
+import axios from 'axios';
 
 const AuthContext = createContext<{
-  logIn: (accessToken: string, refreshToken: string, userData: User) => void;
+  logIn: (username: string, password: string) => void;
   logOut: () => void;
   accessToken: string | null;
   refreshToken: string | null;
@@ -38,14 +39,48 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   const [user, setUser] = useStorageState('user_data');
   const [connection, setConnection] = useState<NetInfoState | null>(null);
 
-  const logIn = async (
-    accessToken: string,
-    refreshToken: string,
-    userData: User
-  ) => {
-    setAccessToken(accessToken);
-    setRefreshToken(refreshToken);
-    setUser(JSON.stringify(userData));
+  const logIn = async (username: string, password: string) => {
+    try {
+      const responseLogin = await axios.post(
+        'https://test.inatrace.org/api/user/login',
+        {
+          username,
+          password,
+        }
+      );
+
+      const setCookieHeader = responseLogin.headers['set-cookie'];
+
+      if (setCookieHeader) {
+        const accessToken = setCookieHeader[0]
+          .split(',')[0]
+          .split(';')[0]
+          .split('=')[1];
+        const refreshToken = setCookieHeader[0]
+          .split(',')[2]
+          .split(';')[0]
+          .split('=')[1];
+
+        setAccessToken(accessToken);
+        setRefreshToken(refreshToken);
+
+        const responseUserData = await axios.get(
+          'https://test.inatrace.org/api/user/profile',
+          {
+            headers: {
+              Cookie: `inatrace-accessToken=${accessToken}`,
+            },
+          }
+        );
+
+        if (responseUserData.data.status === 'OK') {
+          console.log('setting user, ', responseUserData.data.data);
+          setUser(JSON.stringify(responseUserData.data.data));
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const logOut = () => {
