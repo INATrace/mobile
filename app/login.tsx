@@ -4,15 +4,16 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Pressable,
-  StatusBar,
   Text,
   TouchableWithoutFeedback,
   View,
   Linking,
+  ActivityIndicator,
+  StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { i18n } from './_layout';
+import i18n from '@/locales/i18n';
 import { Input, InputPassword } from '@/components/common/Input';
 import { useState, useContext, useEffect } from 'react';
 
@@ -24,7 +25,7 @@ export default function Login() {
   const [password, setPassword] = useState<string>('');
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
-  const { logIn, user } = useContext(AuthContext);
+  const { logIn, user, isLoading, loginError } = useContext(AuthContext);
 
   useEffect(() => {
     if (user) {
@@ -83,14 +84,23 @@ export default function Login() {
                 </Text>
               </Pressable>
             </View>
+            {loginError && (
+              <View className="mt-3">
+                <Text className="text-red-500">{loginError}</Text>
+              </View>
+            )}
             <View className="self-end">
               <Pressable
                 onPress={() => logIn(username, password)}
                 className="px-5 py-3 rounded-md bg-Orange"
               >
-                <Text className="text-White font-semibold text-[18px]">
-                  {i18n.t('login.login')}
-                </Text>
+                {isLoading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text className="text-White font-semibold text-[18px]">
+                    {i18n.t('login.login')}
+                  </Text>
+                )}
               </Pressable>
             </View>
           </KeyboardAvoidingView>
@@ -99,7 +109,7 @@ export default function Login() {
           <LoginLowerBlobSvg />
         </View>
 
-        <StatusBar barStyle={'dark-content'} />
+        <StatusBar barStyle="dark-content" />
       </View>
     </TouchableWithoutFeedback>
   );

@@ -7,7 +7,9 @@
     "password": "Password",
     "passwordPlaceholder": "Enter your password",
     "forgotPassword": "Forgot password?",
-    "login": "Log in"
+    "login": "Log in",
+    "genericError": "Something went wrong, please try again later",
+    "authError": "Wrong username or password"
   },
   "home": {
     "title": "Home",

@@ -1,6 +1,6 @@
 import { Redirect, Stack } from 'expo-router';
 
-import { useEffect, useContext } from 'react';
+import { useContext } from 'react';
 
 import { AuthContext } from '@/context/AuthContext';
 
@@ -9,7 +9,7 @@ export const unstable_settings = {
 };
 
 export default function AppLayout() {
-  const { user, accessToken, connection, isLoading } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   if (!user) {
     return <Redirect href="/login" />;

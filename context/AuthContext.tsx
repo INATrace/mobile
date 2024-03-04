@@ -4,6 +4,8 @@ import { User } from '@/types/user';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import axios from 'axios';
 
+import i18n from '@/locales/i18n';
+
 export const AuthContext = createContext<{
   logIn: (username: string, password: string) => void;
   logOut: () => void;
@@ -11,6 +13,7 @@ export const AuthContext = createContext<{
   refreshToken: string | null;
   user: User | null;
   connection: NetInfoState | null;
+  loginError: string | null;
   isLoading: boolean;
 }>({
   logIn: () => null,
@@ -19,6 +22,7 @@ export const AuthContext = createContext<{
   refreshToken: null,
   user: null,
   connection: null,
+  loginError: null,
   isLoading: false,
 });
 
@@ -32,10 +36,14 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     null
   );
   const [user, setUser] = useStorageState<User | null>('user', null);
+
   const [connection, setConnection] = useState<NetInfoState | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const logIn = async (username: string, password: string) => {
     try {
+      setIsLoading(true);
       const responseLogin = await axios.post(
         'https://test.inatrace.org/api/user/login',
         {
@@ -72,8 +80,14 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           setUser(responseUserData.data.data as User);
         }
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      if (error.response.data.status === 'AUTH_ERROR') {
+        setLoginError(i18n.t('login.authError'));
+      } else {
+        setLoginError(i18n.t('login.genericError'));
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -102,7 +116,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         refreshToken,
         user,
         connection,
-        isLoading: false,
+        loginError,
+        isLoading,
       }}
     >
       {props.children}

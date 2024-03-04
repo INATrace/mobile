@@ -6,7 +6,7 @@ import HomeNavButton from '@/components/home/HomeNavButton';
 import FarmerSvg from '@/components/svg/FarmerSvg';
 import PlotSvg from '@/components/svg/PlotSvg';
 
-import { i18n } from '../_layout';
+import i18n from '@/locales/i18n';
 import SyncDataButton from '@/components/home/SyncDataButton';
 
 export default function Home() {
