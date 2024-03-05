@@ -1,7 +1,7 @@
 import { deleteItemAsync, setItemAsync, getItemAsync } from 'expo-secure-store';
 import { useReducer, useEffect, useCallback } from 'react';
 
-type StorageValue = string | object | null;
+type StorageValue = string | object | number | null;
 
 type UseStateHook<T> = [T, (value: T) => void];
 

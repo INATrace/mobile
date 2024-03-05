@@ -12,6 +12,7 @@ export const AuthContext = createContext<{
   accessToken: string | null;
   refreshToken: string | null;
   user: User | null;
+  selectedCompany: number | null;
   connection: NetInfoState | null;
   loginError: string | null;
   isLoading: boolean;
@@ -21,6 +22,7 @@ export const AuthContext = createContext<{
   accessToken: null,
   refreshToken: null,
   user: null,
+  selectedCompany: null,
   connection: null,
   loginError: null,
   isLoading: false,
@@ -36,6 +38,10 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     null
   );
   const [user, setUser] = useStorageState<User | null>('user', null);
+  const [selectedCompany, setSelectedCompany] = useStorageState<number | null>(
+    'selected_company',
+    null
+  );
 
   const [connection, setConnection] = useState<NetInfoState | null>(null);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -77,7 +83,9 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         );
 
         if (responseUserData.data.status === 'OK') {
-          setUser(responseUserData.data.data as User);
+          const user = responseUserData.data.data as User;
+          setUser(user);
+          setSelectedCompany(user.companyIds[0]);
         }
       }
     } catch (error: any) {
@@ -115,6 +123,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         accessToken,
         refreshToken,
         user,
+        selectedCompany,
         connection,
         loginError,
         isLoading,
