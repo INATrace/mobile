@@ -1,4 +1,4 @@
-export interface Root {
+export interface Farmer {
   id: number;
   companyId: number;
   farmerCompanyInternalId: string;

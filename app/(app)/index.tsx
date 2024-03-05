@@ -11,7 +11,10 @@ import SyncDataButton from '@/components/home/SyncDataButton';
 
 export default function Home() {
   return (
-    <SafeAreaView className="flex flex-col justify-between h-full">
+    <SafeAreaView
+      className="flex flex-col justify-between h-full bg-Background"
+      edges={{ top: 'maximum' }}
+    >
       <Topbar title={i18n.t('home.title')} />
       <View className="flex flex-col">
         <HomeNavButton
@@ -25,7 +28,9 @@ export default function Home() {
           link="/(farmers)/new-plot"
         />
       </View>
-      <SyncDataButton />
+      <View className="pb-5 border-t bg-White border-t-LightGray">
+        <SyncDataButton />
+      </View>
     </SafeAreaView>
   );
 }

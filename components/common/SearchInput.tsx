@@ -4,38 +4,24 @@ import i18n from '@/locales/i18n';
 import { Picker } from '@react-native-picker/picker';
 import { useState } from 'react';
 import Colors from '@/constants/Colors';
+import { MenuView } from '@react-native-menu/menu';
 
 type SearchInputProps = {
   input: string;
   setInput: (input: string) => void;
+  showSort: boolean;
+  setShowSort: (showSort: boolean) => void;
+  selectedSort: string;
+  setSelectedSort: (selectedSort: string) => void;
+  showFilter: boolean;
+  setShowFilter: (showFilter: boolean) => void;
+  selectedFilter: string;
+  setSelectedFilter: (selectedFilter: string) => void;
+  sortItems: { label: string; value: string }[];
+  filterItems: { label: string; value: string }[];
 };
 
-const sortItems = [
-  { label: i18n.t('farmers.sort.name_asc'), value: 'BY_NAME_ASC' },
-  { label: i18n.t('farmers.sort.name_desc'), value: 'BY_NAME_DESC' },
-  {
-    label: i18n.t('farmers.sort.surname_asc'),
-    value: 'BY_SURNAME_ASC',
-  },
-  {
-    label: i18n.t('farmers.sort.surname_desc'),
-    value: 'BY_SURNAME_DESC',
-  },
-  { label: i18n.t('farmers.sort.id_asc'), value: 'BY_ID_ASC' },
-  { label: i18n.t('farmers.sort.id_desc'), value: 'BY_ID_DESC' },
-];
-
-const filterItems = [
-  { label: i18n.t('farmers.filter.name'), value: 'BY_NAME' },
-  { label: i18n.t('farmers.filter.surname'), value: 'BY_SURNAME' },
-];
-
 export default function SearchInput(props: SearchInputProps) {
-  const [showSort, setShowSort] = useState<boolean>(false);
-  const [selectedSort, setSelectedSort] = useState<string>('BY_NAME');
-  const [showFilter, setShowFilter] = useState<boolean>(false);
-  const [selectedFilter, setSelectedFilter] = useState<string>('BY_NAME');
-
   return (
     <View className="flex flex-row items-center justify-between px-5">
       <View className="relative flex flex-row items-center justify-between h-12 mt-1 border rounded-md border-LightGray bg-White w-[70%]">
@@ -49,19 +35,21 @@ export default function SearchInput(props: SearchInputProps) {
         />
       </View>
       <Pressable
-        onPress={() => setShowSort(!showSort)}
+        onPress={() => props.setShowSort(!props.showSort)}
         className="flex flex-row items-center justify-center w-12 h-12 mt-1 border rounded-md border-LightGray bg-White"
       >
         <ArrowDownUp className="text-LightGray" />
       </Pressable>
-      {showSort && (
+      {props.showSort && (
         <View className="absolute bg-White top-20">
           <Picker
-            selectedValue={selectedSort}
-            onValueChange={(itemValue: string) => setSelectedSort(itemValue)}
+            selectedValue={props.selectedSort}
+            onValueChange={(itemValue: string) =>
+              props.setSelectedSort(itemValue)
+            }
             style={{ width: 300 }}
           >
-            {sortItems.map((item, index) => {
+            {props.sortItems.map((item, index) => {
               return (
                 <Picker.Item
                   key={index}
@@ -74,22 +62,32 @@ export default function SearchInput(props: SearchInputProps) {
         </View>
       )}
       <Pressable
-        onPress={() => setShowFilter(!showFilter)}
+        onPress={() => props.setShowFilter(!props.showFilter)}
         className="flex flex-row items-center justify-center w-12 h-12 mt-1 border rounded-md border-LightGray bg-White"
       >
         <Filter className="text-LightGray" />
       </Pressable>
-      {/* <Picker
-          selectedValue={selectedSort}
-          onValueChange={(itemValue: string) => setSelectedSort(itemValue)}
-          style={{ width: 300 }}
-        >
-          {sortItems.map((item, index) => {
-            return (
-              <Picker.Item key={index} label={item.label} value={item.value} />
-            );
-          })}
-        </Picker> */}
+      {props.showFilter && (
+        <View className="absolute bg-White top-20 right-5">
+          <Picker
+            selectedValue={props.selectedFilter}
+            onValueChange={(itemValue: string) =>
+              props.setSelectedFilter(itemValue)
+            }
+            style={{ width: 300 }}
+          >
+            {props.filterItems.map((item, index) => {
+              return (
+                <Picker.Item
+                  key={index}
+                  label={item.label}
+                  value={item.value}
+                />
+              );
+            })}
+          </Picker>
+        </View>
+      )}
     </View>
   );
 }
