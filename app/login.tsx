@@ -25,13 +25,7 @@ export default function Login() {
   const [password, setPassword] = useState<string>('');
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
-  const { logIn, user, isLoading, loginError } = useContext(AuthContext);
-
-  useEffect(() => {
-    if (user) {
-      router.replace('/');
-    }
-  }, [user]);
+  const { logIn, isLoading, loginError } = useContext(AuthContext);
 
   const resetPassword = async () => {
     const url = 'https://test.inatrace.org/en/reset-password';

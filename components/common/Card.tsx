@@ -1,18 +1,22 @@
 import { View, Text, Pressable } from 'react-native';
 import { Scaling } from 'lucide-react-native';
+import router from 'expo-router';
 
-type CardProps = {
-  items: Array<{
-    type: 'type' | 'select' | 'checkbox';
-    name: string;
-    value: string | null;
-    placeholder: string;
-    editable?: boolean;
-    setValue?: (value: string) => void;
-  }>;
+export type CardProps = {
+  items: Array<ItemProps>;
   title?: string;
   navigationPath?: string;
   navigationParams?: any;
+};
+
+export type ItemProps = {
+  type: 'view' | 'type' | 'select' | 'checkbox';
+  name: string;
+  value: string | null;
+  placeholder?: string;
+  editable?: boolean;
+  selectItems?: Array<{ label: string; value: string }>;
+  setValue?: (value: string) => void;
 };
 
 export default function Card({
@@ -34,12 +38,49 @@ export default function Card({
         </View>
       )}
       {items.map((item, index) => {
-        return (
-          <View key={index}>
-            <Text>{item.name}</Text>
-          </View>
-        );
+        switch (item.type) {
+          case 'view':
+            return <ItemView key={index} item={item} />;
+          case 'type':
+            return <ItemType key={index} item={item} />;
+          case 'select':
+            return <ItemSelect key={index} item={item} />;
+          case 'checkbox':
+            return <ItemCheckbox key={index} item={item} />;
+        }
       })}
     </View>
   );
 }
+
+const ItemView = ({ item }: { item: ItemProps }) => {
+  return (
+    <View>
+      <Text>{item.name}</Text>
+    </View>
+  );
+};
+
+const ItemType = ({ item }: { item: ItemProps }) => {
+  return (
+    <View>
+      <Text>{item.name}</Text>
+    </View>
+  );
+};
+
+const ItemSelect = ({ item }: { item: ItemProps }) => {
+  return (
+    <View>
+      <Text>{item.name}</Text>
+    </View>
+  );
+};
+
+const ItemCheckbox = ({ item }: { item: ItemProps }) => {
+  return (
+    <View>
+      <Text>{item.name}</Text>
+    </View>
+  );
+};

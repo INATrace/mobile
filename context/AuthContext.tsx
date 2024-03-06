@@ -7,20 +7,18 @@ import axios from 'axios';
 import i18n from '@/locales/i18n';
 
 export const AuthContext = createContext<{
-  logIn: (username: string, password: string) => void;
+  logIn: (username: string, password: string) => Promise<void>;
   logOut: () => void;
   accessToken: string | null;
-  refreshToken: string | null;
   user: User | null;
   selectedCompany: number | null;
   connection: NetInfoState | null;
   loginError: string | null;
   isLoading: boolean;
 }>({
-  logIn: () => null,
+  logIn: async () => void 0,
   logOut: () => null,
   accessToken: null,
-  refreshToken: null,
   user: null,
   selectedCompany: null,
   connection: null,
@@ -31,10 +29,6 @@ export const AuthContext = createContext<{
 export function SessionProvider(props: React.PropsWithChildren<any>) {
   const [accessToken, setAccessToken] = useStorageState<string | null>(
     'access_token',
-    null
-  );
-  const [refreshToken, setRefreshToken] = useStorageState<string | null>(
-    'refresh_token',
     null
   );
   const [user, setUser] = useStorageState<User | null>('user', null);
@@ -48,6 +42,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const logIn = async (username: string, password: string) => {
+    console.log(accessToken);
+
     try {
       setIsLoading(true);
       const responseLogin = await axios.post(
@@ -65,13 +61,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           .split(',')[0]
           .split(';')[0]
           .split('=')[1];
-        const refreshToken = setCookieHeader[0]
-          .split(',')[2]
-          .split(';')[0]
-          .split('=')[1];
 
         setAccessToken(accessToken);
-        setRefreshToken(refreshToken);
 
         const responseUserData = await axios.get(
           'https://test.inatrace.org/api/user/profile',
@@ -101,8 +92,21 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
 
   const logOut = () => {
     setAccessToken(null);
-    setRefreshToken(null);
     setUser(null);
+    setSelectedCompany(null);
+  };
+
+  const makeRequest = async (
+    url: string,
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  ) => {
+    return axios.request({
+      url,
+      method,
+      headers: {
+        Cookie: `inatrace-accessToken=${accessToken}`,
+      },
+    });
   };
 
   useEffect(() => {
@@ -121,7 +125,6 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         logIn,
         logOut,
         accessToken,
-        refreshToken,
         user,
         selectedCompany,
         connection,
