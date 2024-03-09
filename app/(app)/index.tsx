@@ -8,8 +8,18 @@ import PlotSvg from '@/components/svg/PlotSvg';
 
 import i18n from '@/locales/i18n';
 import SyncDataButton from '@/components/home/SyncDataButton';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
+  const [locale, setLocale] = useState(i18n.locale);
+  useEffect(() => {
+    const unsubscribe = i18n.onChange(() => {
+      setLocale(i18n.locale);
+    });
+
+    return unsubscribe;
+  }, []);
+
   return (
     <SafeAreaView
       className="flex flex-col justify-between h-full bg-Background"

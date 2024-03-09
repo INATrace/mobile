@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import { View, Text, Pressable, ScrollView, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import i18n from '@/locales/i18n';
 import { Input } from '@/components/common/Input';
 import LanguageSwitcher from '@/components/settings/LanguageSwitcher';
+import { LogOut } from 'lucide-react-native';
 
 export default function UserSettings() {
   const { logOut, user, selectedCompany } = useContext(AuthContext);
@@ -13,6 +14,17 @@ export default function UserSettings() {
   const handleLogOut = () => {
     logOut();
     router.replace('/login');
+  };
+
+  const resetPassword = async () => {
+    const url = 'https://test.inatrace.org/en/reset-password';
+    const canOpen = await Linking.canOpenURL(url);
+
+    if (canOpen) {
+      Linking.openURL(url);
+    } else {
+      console.error('Cannot open URL:', url);
+    }
   };
 
   return (
@@ -51,10 +63,30 @@ export default function UserSettings() {
         <Text className="text-[18px] font-medium mt-5">
           {i18n.t('userSettings.companyInformation')}
         </Text>
+        <Text className="text-[18px] font-medium mt-5 mb-3">
+          {i18n.t('userSettings.language')}
+        </Text>
         <LanguageSwitcher />
-        {/* <Pressable onPress={() => handleLogOut()}>
-          <Text>Log Out</Text>
-        </Pressable> */}
+        <View className="flex flex-row items-center justify-between mt-5">
+          <Pressable
+            onPress={() => resetPassword()}
+            className="w-[55%] px-5 py-3 rounded-md bg-Green flex flex-row items-center justify-center"
+          >
+            <Text className="text-White font-medium text-[18px]">
+              {i18n.t('userSettings.resetPassword')}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => handleLogOut()}
+            className="flex flex-row items-center justify-center w-[40%] px-5 py-3 rounded-md bg-Orange"
+          >
+            <LogOut className="text-White" />
+            <View className="w-2" />
+            <Text className="text-White font-medium text-[18px]">
+              {i18n.t('userSettings.logOut')}
+            </Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

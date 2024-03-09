@@ -2,9 +2,10 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFonts } from 'expo-font';
 import { Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { SessionProvider } from '@/context/AuthContext';
+import i18n from '@/locales/i18n';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -16,6 +17,8 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
+  const [locale, setLocale] = useState(i18n.locale);
+
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -25,6 +28,14 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  useEffect(() => {
+    const unsubscribe = i18n.onChange(() => {
+      setLocale(i18n.locale);
+    });
+
+    return unsubscribe;
+  }, []);
 
   if (!loaded) {
     return null;

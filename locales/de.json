@@ -1,54 +1,54 @@
 {
   "login": {
-    "welcomeBack": "Welcome back!",
-    "welcomeBackSubtitle": "Log in to continue",
-    "username": "Username",
-    "usernamePlaceholder": "Enter your username",
-    "password": "Password",
-    "passwordPlaceholder": "Enter your password",
-    "forgotPassword": "Forgot password?",
-    "login": "Log in",
-    "genericError": "Something went wrong, please try again later",
-    "authError": "Wrong username or password"
+    "welcomeBack": "Willkommen zurück!",
+    "welcomeBackSubtitle": "Loggen Sie sich ein, um fortzufahren",
+    "username": "Benutzername",
+    "usernamePlaceholder": "Geben Sie Ihren Benutzernamen ein",
+    "password": "Passwort",
+    "passwordPlaceholder": "Geben Sie Ihr Passwort ein",
+    "forgotPassword": "Passwort vergessen?",
+    "login": "Einloggen",
+    "genericError": "Etwas ist schief gelaufen, bitte versuchen Sie es später noch einmal",
+    "authError": "Falscher Benutzername oder Passwort"
   },
   "userSettings": {
-    "title": "User settings",
-    "userInformation": "User information",
+    "title": "Benutzereinstellungen",
+    "userInformation": "Benutzerinformationen",
     "name": "Name",
-    "surname": "Surname",
-    "username": "Username",
-    "companyInformation": "Company information",
-    "company": "Company",
-    "language": "Language",
-    "english": "English",
-    "spanish": "Spanish",
-    "german": "German",
+    "surname": "Nachname",
+    "username": "Benutzername",
+    "companyInformation": "Unternehmensinformationen",
+    "company": "Unternehmen",
+    "language": "Sprache",
+    "english": "Englisch",
+    "spanish": "Spanisch",
+    "german": "Deutsch",
     "kinyarwanda": "Kinyarwanda",
-    "resetPassword": "Reset password",
-    "logOut": "Log out"
+    "resetPassword": "Passwort zurücksetzen",
+    "logOut": "Ausloggen"
   },
   "home": {
-    "title": "Home",
-    "farmers": "Farmers",
-    "newPlot": "New plot",
-    "syncData": "Sync data"
+    "title": "Startseite",
+    "farmers": "Landwirte",
+    "newPlot": "Neues Feld",
+    "syncData": "Daten synchronisieren"
   },
   "farmers": {
-    "title": "Farmers",
-    "newFarmer": "New farmer",
-    "search": "Search",
+    "title": "Landwirte",
+    "newFarmer": "Neuer Landwirt",
+    "search": "Suche",
     "sort": {
       "name_asc": "Name ↑",
       "name_desc": "Name ↓",
-      "surname_asc": "Surname ↑",
-      "surname_desc": "Surname ↓",
+      "surname_asc": "Nachname ↑",
+      "surname_desc": "Nachname ↓",
       "id_asc": "ID ↑",
       "id_desc": "ID ↓"
     },
     "filter": {
-      "name": "First name",
-      "surname": "Last name"
+      "name": "Vorname",
+      "surname": "Nachname"
     },
-    "errorFetch": "Error fetching farmers"
+    "errorFetch": "Fehler beim Abrufen der Landwirte"
   }
 }

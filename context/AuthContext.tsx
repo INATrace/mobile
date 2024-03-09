@@ -37,8 +37,6 @@ const isTokenExpired = (token: string): boolean => {
   } catch (error) {
     return false;
   }
-
-  return false;
 };
 
 export function SessionProvider(props: React.PropsWithChildren<any>) {
@@ -121,12 +119,19 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   };
 
   const makeRequest = async ({ url, method, body, headers }: RequestParams) => {
+    if (isTokenExpired(accessToken ?? '')) {
+      logOut();
+      return;
+    }
+
     return await axios.request({
       url,
       method,
       headers: {
-        Cookie: `inatrace-accessToken=${accessToken}`,
-        ...headers,
+        'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
+        Pragma: 'no-cache',
+        Expires: '0',
+        /* Cookie: `; inatrace-accessToken=${accessToken}`, */
       },
       data: body,
     });
