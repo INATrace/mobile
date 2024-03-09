@@ -1,30 +1,45 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { useStorageState } from './useStorageState';
 import { User } from '@/types/user';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import axios from 'axios';
+import { decode as atob } from 'base-64';
 
-import i18n from '@/locales/i18n';
+import { LogInResponse, RequestParams } from '@/types/auth';
 
 export const AuthContext = createContext<{
-  logIn: (username: string, password: string) => Promise<void>;
+  logIn: (username: string, password: string) => Promise<LogInResponse>;
   logOut: () => void;
+  checkAuth: () => Promise<boolean>;
+  makeRequest: ({ url, method, body, headers }: RequestParams) => Promise<any>;
   accessToken: string | null;
   user: User | null;
   selectedCompany: number | null;
-  connection: NetInfoState | null;
-  loginError: string | null;
-  isLoading: boolean;
+  getConnection: Promise<NetInfoState>;
 }>({
-  logIn: async () => void 0,
+  logIn: async () => ({ success: false, errorStatus: '' }),
   logOut: () => null,
+  checkAuth: async () => false,
+  makeRequest: async () => null,
   accessToken: null,
   user: null,
   selectedCompany: null,
-  connection: null,
-  loginError: null,
-  isLoading: false,
+  getConnection: Promise.resolve({ isConnected: false } as NetInfoState),
 });
+
+const isTokenExpired = (token: string): boolean => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const expirationDate = new Date(payload.exp * 1000);
+    const currentDate = new Date();
+
+    return expirationDate < currentDate;
+  } catch (error) {
+    return false;
+  }
+
+  return false;
+};
 
 export function SessionProvider(props: React.PropsWithChildren<any>) {
   const [accessToken, setAccessToken] = useStorageState<string | null>(
@@ -37,15 +52,23 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     null
   );
 
-  const [connection, setConnection] = useState<NetInfoState | null>(null);
-  const [loginError, setLoginError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const checkAuth = async (): Promise<boolean> => {
+    if (!(await NetInfo.fetch()).isConnected) {
+      return true;
+    }
 
-  const logIn = async (username: string, password: string) => {
-    console.log(accessToken);
+    if (accessToken && !isTokenExpired(accessToken)) {
+      return true;
+    }
 
+    return false;
+  };
+
+  const logIn = async (
+    username: string,
+    password: string
+  ): Promise<LogInResponse> => {
     try {
-      setIsLoading(true);
       const responseLogin = await axios.post(
         'https://test.inatrace.org/api/user/login',
         {
@@ -77,17 +100,18 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           const user = responseUserData.data.data as User;
           setUser(user);
           setSelectedCompany(user.companyIds[0]);
+          return { success: true, errorStatus: '' };
         }
       }
     } catch (error: any) {
       if (error.response.data.status === 'AUTH_ERROR') {
-        setLoginError(i18n.t('login.authError'));
+        return { success: false, errorStatus: 'AUTH_ERROR' };
       } else {
-        setLoginError(i18n.t('login.genericError'));
+        return { success: false, errorStatus: 'GENERIC_ERROR' };
       }
-    } finally {
-      setIsLoading(false);
     }
+
+    return { success: false, errorStatus: 'GENERIC_ERROR' };
   };
 
   const logOut = () => {
@@ -96,40 +120,33 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     setSelectedCompany(null);
   };
 
-  const makeRequest = async (
-    url: string,
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE'
-  ) => {
-    return axios.request({
+  const makeRequest = async ({ url, method, body, headers }: RequestParams) => {
+    return await axios.request({
       url,
       method,
       headers: {
         Cookie: `inatrace-accessToken=${accessToken}`,
+        ...headers,
       },
+      data: body,
     });
   };
 
-  useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      setConnection(state);
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  const getConnection = async () => {
+    return await NetInfo.fetch();
+  };
 
   return (
     <AuthContext.Provider
       value={{
         logIn,
         logOut,
+        checkAuth,
+        makeRequest,
         accessToken,
         user,
         selectedCompany,
-        connection,
-        loginError,
-        isLoading,
+        getConnection: getConnection(),
       }}
     >
       {props.children}

@@ -29,7 +29,7 @@ export function useStorageState<T extends StorageValue>(
 
   useEffect(() => {
     getItemAsync(key).then((value) => {
-      const parsedValue = value ? JSON.parse(value) : initialValue;
+      const parsedValue = value ? JSON.parse(value) : 'none';
       setState(parsedValue);
     });
   }, [key, initialValue]);

@@ -21,11 +21,13 @@ import { AuthContext } from '@/context/AuthContext';
 import { router } from 'expo-router';
 
 export default function Login() {
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [username, setUsername] = useState<string>('pece.adzievski@sunesis.si');
+  const [password, setPassword] = useState<string>('wypgih-Kujvot-vypjy4');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
-  const { logIn, isLoading, loginError } = useContext(AuthContext);
+  const { logIn } = useContext(AuthContext);
 
   const resetPassword = async () => {
     const url = 'https://test.inatrace.org/en/reset-password';
@@ -36,6 +38,30 @@ export default function Login() {
     } else {
       console.error('Cannot open URL:', url);
     }
+  };
+
+  const handleLogIn = async () => {
+    setIsLoading(true);
+
+    const logInResult = await logIn(username, password);
+
+    if (logInResult.success) {
+      router.replace('/(app)/');
+    } else {
+      switch (logInResult.errorStatus) {
+        case 'AUTH_ERROR':
+          setLoginError(i18n.t('login.authError'));
+          break;
+        case 'GENERIC_ERROR':
+          setLoginError(i18n.t('login.genericError'));
+          break;
+        default:
+          setLoginError(i18n.t('login.genericError'));
+          break;
+      }
+    }
+
+    setIsLoading(false);
   };
 
   return (
@@ -79,13 +105,13 @@ export default function Login() {
               </Pressable>
             </View>
             {loginError && (
-              <View className="mt-3">
+              <View className="my-3">
                 <Text className="text-red-500">{loginError}</Text>
               </View>
             )}
             <View className="self-end">
               <Pressable
-                onPress={() => logIn(username, password)}
+                onPress={() => handleLogIn()}
                 className="px-5 py-3 rounded-md bg-Orange"
               >
                 {isLoading ? (

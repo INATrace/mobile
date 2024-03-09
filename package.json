@@ -20,6 +20,7 @@
     "@react-navigation/native": "^6.0.2",
     "@shopify/flash-list": "^1.6.3",
     "axios": "^1.6.7",
+    "base-64": "^1.0.0",
     "clsx": "^2.1.0",
     "expo": "~50.0.7",
     "expo-font": "~11.10.3",
@@ -46,6 +47,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/base-64": "^1.0.2",
     "@types/react": "~18.2.45",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",

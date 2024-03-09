@@ -41,15 +41,21 @@ export default function Farmers() {
   const [data, setData] = useState<CardProps[]>([]);
   const [dataCount, setDataCount] = useState<number>(100);
 
-  const { connection, accessToken, selectedCompany } = useContext(AuthContext);
+  const { getConnection, makeRequest, selectedCompany } =
+    useContext(AuthContext);
 
   useEffect(() => {
-    if (connection?.isConnected) {
+    handleFarmers();
+  }, []);
+
+  const handleFarmers = async () => {
+    const connection = await getConnection;
+    if (connection.isConnected) {
       fetchFarmers(10, 0);
     } else {
       loadFarmers();
     }
-  }, []);
+  };
 
   const fetchFarmers = async (limit: number, offset: number) => {
     setIsLoading(true);
@@ -58,14 +64,12 @@ export default function Farmers() {
       const sortBy = sort[0] + '_' + sort[1];
       const sortType = sort[2];
 
-      const response = await axios.get(
-        `https://test.inatrace.org/api/company/userCustomers/${39}/FARMER?limit=${limit}&offset=${offset}&sortBy=${sortBy}&sort=${sortType}&query=${search}&searchBy=${selectedFilter}`,
-        {
-          headers: {
-            Cookie: `inatrace-accessToken=${accessToken}`,
-          },
-        }
-      );
+      const response = await makeRequest({
+        url: `https://test.inatrace.org/api/company/userCustomers/${selectedCompany}/FARMER?limit=${limit}&offset=${offset}&sortBy=${sortBy}&sort=${sortType}&query=${search}&searchBy=${selectedFilter}`,
+        method: 'GET',
+      });
+
+      console.log(response.data);
 
       if (response.data.status === 'OK') {
         console.log(response.data.data);

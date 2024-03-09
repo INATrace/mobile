@@ -3,9 +3,10 @@ import { Pressable, TextInput, View } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 
 type InputProps = {
-  placeholder: string;
+  placeholder?: string;
   value: string;
   onChangeText: (text: string) => void;
+  editable?: boolean;
 };
 
 type InputPasswordProps = {
@@ -21,6 +22,7 @@ export const Input = (props: InputProps) => {
       onChangeText={props.onChangeText}
       className="border border-LightGray w-full h-12 mt-1 px-2 text-[16px] rounded-md"
       placeholderTextColor={Colors.darkGray}
+      editable={props.editable}
     />
   );
 };

@@ -11,6 +11,22 @@
     "genericError": "Something went wrong, please try again later",
     "authError": "Wrong username or password"
   },
+  "userSettings": {
+    "title": "User settings",
+    "userInformation": "User information",
+    "name": "Name",
+    "surname": "Surname",
+    "username": "Username",
+    "companyInformation": "Company information",
+    "company": "Company",
+    "language": "Language",
+    "english": "English",
+    "spanish": "Spanish",
+    "german": "German",
+    "kinyarwanda": "Kinyarwanda",
+    "resetPassword": "Reset password",
+    "logOut": "Log out"
+  },
   "home": {
     "title": "Home",
     "farmers": "Farmers",
