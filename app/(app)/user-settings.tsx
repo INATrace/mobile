@@ -5,6 +5,7 @@ import { AuthContext } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import i18n from '@/locales/i18n';
 import { Input } from '@/components/common/Input';
+import LanguageSwitcher from '@/components/settings/LanguageSwitcher';
 
 export default function UserSettings() {
   const { logOut, user, selectedCompany } = useContext(AuthContext);
@@ -50,6 +51,7 @@ export default function UserSettings() {
         <Text className="text-[18px] font-medium mt-5">
           {i18n.t('userSettings.companyInformation')}
         </Text>
+        <LanguageSwitcher />
         {/* <Pressable onPress={() => handleLogOut()}>
           <Text>Log Out</Text>
         </Pressable> */}
