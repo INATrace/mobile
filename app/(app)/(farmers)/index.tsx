@@ -1,13 +1,20 @@
 import Topbar from '@/components/common/Topbar';
-import { View, Text, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ScrollView,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import i18n from '@/locales/i18n';
 import SearchInput from '@/components/common/SearchInput';
 import { useContext, useEffect, useState } from 'react';
 import { FlashList } from '@shopify/flash-list';
 import { AuthContext } from '@/context/AuthContext';
-import Card, { CardProps } from '@/components/common/Card';
+import Card, { CardProps, ItemProps } from '@/components/common/Card';
 import axios from 'axios';
+import { Farmer } from '@/types/farmer';
 
 const sortItems = [
   { label: i18n.t('farmers.sort.name_asc'), value: 'BY_NAME_ASC' },
@@ -72,7 +79,22 @@ export default function Farmers() {
       console.log(response.data);
 
       if (response.data.status === 'OK') {
-        console.log(response.data.data);
+        const farmers = response.data.data.items.map((farmer: Farmer) => {
+          return {
+            title: `${farmer.name} ${farmer.surname}`,
+            items: [
+              { type: 'view', name: 'Name', value: farmer.name },
+              { type: 'view', name: 'Name', value: farmer.name },
+            ] as ItemProps[],
+            navigationPath: '(app)/(farmers)/(farmer)',
+            navigationParams: {
+              farmerId: farmer.id,
+            },
+          } as CardProps;
+        });
+
+        setData(farmers);
+        console.log(JSON.stringify(response.data.data, null, 2));
       }
     } catch (error) {
       setError(i18n.t('farmers.errorFetch'));
@@ -101,12 +123,14 @@ export default function Farmers() {
           sortItems={sortItems}
           filterItems={filterItems}
         />
-        <FlashList
-          data={data}
-          renderItem={({ item }) => <Card {...item} />}
-          estimatedItemSize={dataCount}
-          className="h-full"
-        />
+        <ScrollView>
+          <FlashList
+            data={data}
+            renderItem={({ item }) => <Card {...item} />}
+            estimatedItemSize={dataCount}
+            className="h-full"
+          />
+        </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

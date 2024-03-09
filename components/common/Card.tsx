@@ -26,9 +26,9 @@ export default function Card({
   navigationParams,
 }: CardProps) {
   return (
-    <View className="flex flex-col rounded-md">
+    <View className="flex flex-col p-5 rounded-md">
       {title && (
-        <View className="flex flex-row items-center justify-between bg-Green">
+        <View className="flex flex-row items-center justify-between p-4 bg-Green rounded-t-md">
           <Text className="text-White">{title}</Text>
           {navigationPath && (
             <Pressable onPress={() => {}}>
@@ -40,20 +40,53 @@ export default function Card({
       {items.map((item, index) => {
         switch (item.type) {
           case 'view':
-            return <ItemView key={index} item={item} />;
+            return (
+              <ItemView
+                key={index}
+                item={item}
+                isLast={index === items.length - 1}
+              />
+            );
           case 'type':
-            return <ItemType key={index} item={item} />;
+            return (
+              <ItemType
+                key={index}
+                item={item}
+                isLast={index === items.length - 1}
+              />
+            );
           case 'select':
-            return <ItemSelect key={index} item={item} />;
+            return (
+              <ItemSelect
+                key={index}
+                item={item}
+                isLast={index === items.length - 1}
+              />
+            );
           case 'checkbox':
-            return <ItemCheckbox key={index} item={item} />;
+            return (
+              <ItemCheckbox
+                key={index}
+                item={item}
+                isLast={index === items.length - 1}
+              />
+            );
         }
       })}
     </View>
   );
 }
 
-const ItemView = ({ item }: { item: ItemProps }) => {
+const ItemView = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
+  return (
+    <View className="flex flex-row items-center justify-between">
+      <Text>{item.name}</Text>
+      <Text>{item.value}</Text>
+    </View>
+  );
+};
+
+const ItemType = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
   return (
     <View>
       <Text>{item.name}</Text>
@@ -61,7 +94,7 @@ const ItemView = ({ item }: { item: ItemProps }) => {
   );
 };
 
-const ItemType = ({ item }: { item: ItemProps }) => {
+const ItemSelect = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
   return (
     <View>
       <Text>{item.name}</Text>
@@ -69,15 +102,13 @@ const ItemType = ({ item }: { item: ItemProps }) => {
   );
 };
 
-const ItemSelect = ({ item }: { item: ItemProps }) => {
-  return (
-    <View>
-      <Text>{item.name}</Text>
-    </View>
-  );
-};
-
-const ItemCheckbox = ({ item }: { item: ItemProps }) => {
+const ItemCheckbox = ({
+  item,
+  isLast,
+}: {
+  item: ItemProps;
+  isLast: boolean;
+}) => {
   return (
     <View>
       <Text>{item.name}</Text>
