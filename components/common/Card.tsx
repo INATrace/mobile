@@ -1,6 +1,7 @@
 import { View, Text, Pressable } from 'react-native';
-import { Scaling } from 'lucide-react-native';
-import router from 'expo-router';
+import { MoveDiagonal } from 'lucide-react-native';
+import { router } from 'expo-router';
+import cn from '@/utils/cn';
 
 export type CardProps = {
   items: Array<ItemProps>;
@@ -25,63 +26,81 @@ export default function Card({
   navigationPath,
   navigationParams,
 }: CardProps) {
+  const navigateToDetails = () => {
+    //router.push(navigationPath);
+  };
+
   return (
-    <View className="flex flex-col p-5 rounded-md">
+    <View className="flex flex-col m-5">
       {title && (
         <View className="flex flex-row items-center justify-between p-4 bg-Green rounded-t-md">
-          <Text className="text-White">{title}</Text>
+          <Text className="text-White text-[18px] font-semibold">{title}</Text>
           {navigationPath && (
             <Pressable onPress={() => {}}>
-              <Scaling className="text-White" />
+              <MoveDiagonal className="text-White" />
             </Pressable>
           )}
         </View>
       )}
-      {items.map((item, index) => {
-        switch (item.type) {
-          case 'view':
-            return (
-              <ItemView
-                key={index}
-                item={item}
-                isLast={index === items.length - 1}
-              />
-            );
-          case 'type':
-            return (
-              <ItemType
-                key={index}
-                item={item}
-                isLast={index === items.length - 1}
-              />
-            );
-          case 'select':
-            return (
-              <ItemSelect
-                key={index}
-                item={item}
-                isLast={index === items.length - 1}
-              />
-            );
-          case 'checkbox':
-            return (
-              <ItemCheckbox
-                key={index}
-                item={item}
-                isLast={index === items.length - 1}
-              />
-            );
-        }
-      })}
+      <View
+        className={cn(
+          title
+            ? 'border-x border-x-LightGray border-b border-b-LightGray rounded-b-md'
+            : 'border border-LightGray',
+          'bg-White'
+        )}
+      >
+        {items.map((item, index) => {
+          switch (item.type) {
+            case 'view':
+              return (
+                <ItemView
+                  key={index}
+                  item={item}
+                  isLast={index === items.length - 1}
+                />
+              );
+            case 'type':
+              return (
+                <ItemType
+                  key={index}
+                  item={item}
+                  isLast={index === items.length - 1}
+                />
+              );
+            case 'select':
+              return (
+                <ItemSelect
+                  key={index}
+                  item={item}
+                  isLast={index === items.length - 1}
+                />
+              );
+            case 'checkbox':
+              return (
+                <ItemCheckbox
+                  key={index}
+                  item={item}
+                  isLast={index === items.length - 1}
+                />
+              );
+          }
+        })}
+      </View>
     </View>
   );
 }
 
 const ItemView = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
   return (
-    <View className="flex flex-row items-center justify-between">
-      <Text>{item.name}</Text>
-      <Text>{item.value}</Text>
+    <View
+      className={cn(
+        'flex flex-row justify-between py-4 ml-4 pr-4 ml border-b border-b-LightGray',
+        isLast && 'border-b-0'
+      )}
+    >
+      <Text className="text-[16px]">{item.name}</Text>
+      <Text className="text-DarkGray text-[16px]">{item.value}</Text>
     </View>
   );
 };

@@ -49,6 +49,10 @@
       "name": "First name",
       "surname": "Last name"
     },
-    "errorFetch": "Error fetching farmers"
+    "errorFetch": "Error fetching farmers",
+    "card": {
+      "villageAndCell": "Village & Cell",
+      "gender": "Gender"
+    }
   }
 }

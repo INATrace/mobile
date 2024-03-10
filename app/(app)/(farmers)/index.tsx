@@ -1,11 +1,5 @@
 import Topbar from '@/components/common/Topbar';
-import {
-  View,
-  Text,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ScrollView,
-} from 'react-native';
+import { View, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import i18n from '@/locales/i18n';
 import SearchInput from '@/components/common/SearchInput';
@@ -13,7 +7,6 @@ import { useContext, useEffect, useState } from 'react';
 import { FlashList } from '@shopify/flash-list';
 import { AuthContext } from '@/context/AuthContext';
 import Card, { CardProps, ItemProps } from '@/components/common/Card';
-import axios from 'axios';
 import { Farmer } from '@/types/farmer';
 
 const sortItems = [
@@ -76,25 +69,31 @@ export default function Farmers() {
         method: 'GET',
       });
 
-      console.log(response.data);
-
       if (response.data.status === 'OK') {
         const farmers = response.data.data.items.map((farmer: Farmer) => {
           return {
             title: `${farmer.name} ${farmer.surname}`,
             items: [
-              { type: 'view', name: 'Name', value: farmer.name },
-              { type: 'view', name: 'Name', value: farmer.name },
+              {
+                type: 'view',
+                name: i18n.t('farmers.card.villageAndCell'),
+                value: `${farmer.location.address.village}, ${farmer.location.address.cell}`,
+              },
+              {
+                type: 'view',
+                name: i18n.t('farmers.card.gender'),
+                value: farmer.gender,
+              },
             ] as ItemProps[],
-            navigationPath: '(app)/(farmers)/(farmer)',
+            navigationPath: `(app)/(farmers)/(info)/${farmer.id}`,
             navigationParams: {
-              farmerId: farmer.id,
+              farmer,
             },
           } as CardProps;
         });
 
+        setDataCount(response.data.data.count);
         setData(farmers);
-        console.log(JSON.stringify(response.data.data, null, 2));
       }
     } catch (error) {
       setError(i18n.t('farmers.errorFetch'));
@@ -106,32 +105,36 @@ export default function Farmers() {
   const loadFarmers = async () => {};
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView className="flex flex-col h-full bg-Background">
-        <Topbar title={i18n.t('farmers.title')} goBack />
-        <SearchInput
-          input={search}
-          setInput={setSearch}
-          showSort={showSort}
-          setShowSort={setShowSort}
-          selectedSort={selectedSort}
-          setSelectedSort={setSelectedSort}
-          showFilter={showFilter}
-          setShowFilter={setShowFilter}
-          selectedFilter={selectedFilter}
-          setSelectedFilter={setSelectedFilter}
-          sortItems={sortItems}
-          filterItems={filterItems}
-        />
-        <ScrollView>
-          <FlashList
-            data={data}
-            renderItem={({ item }) => <Card {...item} />}
-            estimatedItemSize={dataCount}
-            className="h-full"
+    <SafeAreaView className="flex flex-col h-full bg-Background">
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View>
+          <Topbar title={i18n.t('farmers.title')} goBack />
+          <SearchInput
+            input={search}
+            setInput={setSearch}
+            showSort={showSort}
+            setShowSort={setShowSort}
+            selectedSort={selectedSort}
+            setSelectedSort={setSelectedSort}
+            showFilter={showFilter}
+            setShowFilter={setShowFilter}
+            selectedFilter={selectedFilter}
+            setSelectedFilter={setSelectedFilter}
+            sortItems={sortItems}
+            filterItems={filterItems}
           />
-        </ScrollView>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
+
+      <View style={{ flex: 1 }}>
+        <FlashList
+          data={data}
+          renderItem={({ item }) => <Card {...item} />}
+          estimatedItemSize={dataCount}
+          keyExtractor={(_, index) => index.toString()}
+          className="flex flex-col h-full"
+        />
+      </View>
+    </SafeAreaView>
   );
 }

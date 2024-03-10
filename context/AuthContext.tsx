@@ -6,6 +6,7 @@ import axios from 'axios';
 import { decode as atob } from 'base-64';
 
 import { LogInResponse, RequestParams } from '@/types/auth';
+import { Farmer } from '@/types/farmer';
 
 export const AuthContext = createContext<{
   logIn: (username: string, password: string) => Promise<LogInResponse>;
@@ -16,6 +17,7 @@ export const AuthContext = createContext<{
   user: User | null;
   selectedCompany: number | null;
   getConnection: Promise<NetInfoState>;
+  selectedFarmer: Farmer | null;
 }>({
   logIn: async () => ({ success: false, errorStatus: '' }),
   logOut: () => null,
@@ -25,6 +27,7 @@ export const AuthContext = createContext<{
   user: null,
   selectedCompany: null,
   getConnection: Promise.resolve({ isConnected: false } as NetInfoState),
+  selectedFarmer: null,
 });
 
 const isTokenExpired = (token: string): boolean => {
@@ -47,6 +50,10 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   const [user, setUser] = useStorageState<User | null>('user', null);
   const [selectedCompany, setSelectedCompany] = useStorageState<number | null>(
     'selected_company',
+    null
+  );
+  const [selectedFarmer, setSelectedFarmer] = useStorageState<Farmer | null>(
+    'selected_farmer',
     null
   );
 
@@ -152,6 +159,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         user,
         selectedCompany,
         getConnection: getConnection(),
+        selectedFarmer,
       }}
     >
       {props.children}
