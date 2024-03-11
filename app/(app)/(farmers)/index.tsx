@@ -85,9 +85,10 @@ export default function Farmers() {
                 value: farmer.gender,
               },
             ] as ItemProps[],
-            navigationPath: `(app)/(farmers)/(info)/${farmer.id}`,
+            navigationPath: `info/${farmer.id}`,
             navigationParams: {
-              farmer,
+              type: 'farmer',
+              data: farmer,
             },
           } as CardProps;
         });

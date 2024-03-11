@@ -1,5 +1,4 @@
 import { View, Text, Pressable, ScrollView, Linking } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { router } from 'expo-router';
@@ -28,7 +27,7 @@ export default function UserSettings() {
   };
 
   return (
-    <SafeAreaView className="h-full p-5 bg-White">
+    <View className="h-full p-5 border-t bg-White border-t-LightGray">
       <ScrollView className="h-full">
         <Text className="text-[18px] font-medium">
           {i18n.t('userSettings.userInformation')}
@@ -72,7 +71,7 @@ export default function UserSettings() {
             onPress={() => resetPassword()}
             className="w-[55%] px-5 py-3 rounded-md bg-Green flex flex-row items-center justify-center"
           >
-            <Text className="text-White font-medium text-[18px]">
+            <Text className="text-White font-semibold text-[16px]">
               {i18n.t('userSettings.resetPassword')}
             </Text>
           </Pressable>
@@ -80,14 +79,14 @@ export default function UserSettings() {
             onPress={() => handleLogOut()}
             className="flex flex-row items-center justify-center w-[40%] px-5 py-3 rounded-md bg-Orange"
           >
-            <LogOut className="text-White" />
+            <LogOut className="text-White" size={20} />
             <View className="w-2" />
-            <Text className="text-White font-medium text-[18px]">
+            <Text className="text-White font-semibold text-[16px]">
               {i18n.t('userSettings.logOut')}
             </Text>
           </Pressable>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

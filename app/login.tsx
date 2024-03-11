@@ -117,7 +117,7 @@ export default function Login() {
                 {isLoading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text className="text-White font-semibold text-[18px]">
+                  <Text className="text-White font-semibold text-[16px]">
                     {i18n.t('login.login')}
                   </Text>
                 )}

@@ -53,6 +53,36 @@
     "card": {
       "villageAndCell": "Village & Cell",
       "gender": "Gender"
+    },
+    "info": {
+      "viewAllPlots": "View all plots",
+      "basicInformation": {
+        "title": "Basic information",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "gender": "Gender",
+        "userId": "User ID",
+        "companyInternalFarmerId": "Company internal farmer ID"
+      },
+      "address": {
+        "title": "Address",
+        "country": "Country",
+        "village": "Village",
+        "cell": "Cell",
+        "sector": "Sector"
+      },
+      "contact": {
+        "title": "Contact",
+        "phoneNumber": "Phone number",
+        "email": "Email",
+        "smartphone": "Smart phone"
+      },
+      "farmInformation": {
+        "title": "Farm information",
+        "areaUnit": "Farm size",
+        "farmLocation": "Farm location",
+        "farmLocationPlaceholder": "Enter the location of the farm"
+      }
     }
   }
 }

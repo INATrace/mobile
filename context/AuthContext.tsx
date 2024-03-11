@@ -12,6 +12,7 @@ export const AuthContext = createContext<{
   logIn: (username: string, password: string) => Promise<LogInResponse>;
   logOut: () => void;
   checkAuth: () => Promise<boolean>;
+  selectFarmer: (farmer: Farmer) => void;
   makeRequest: ({ url, method, body, headers }: RequestParams) => Promise<any>;
   accessToken: string | null;
   user: User | null;
@@ -23,6 +24,7 @@ export const AuthContext = createContext<{
   logOut: () => null,
   checkAuth: async () => false,
   makeRequest: async () => null,
+  selectFarmer: () => null,
   accessToken: null,
   user: null,
   selectedCompany: null,
@@ -154,6 +156,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         logIn,
         logOut,
         checkAuth,
+        selectFarmer: setSelectedFarmer,
         makeRequest,
         accessToken,
         user,

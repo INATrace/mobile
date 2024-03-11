@@ -2,12 +2,18 @@ import { View, Text, Pressable } from 'react-native';
 import { MoveDiagonal } from 'lucide-react-native';
 import { router } from 'expo-router';
 import cn from '@/utils/cn';
+import { AuthContext } from '@/context/AuthContext';
+import { useContext } from 'react';
+import { Farmer } from '@/types/farmer';
 
 export type CardProps = {
   items: Array<ItemProps>;
   title?: string;
   navigationPath?: string;
-  navigationParams?: any;
+  navigationParams?: {
+    type: 'farmer';
+    data: Farmer;
+  };
 };
 
 export type ItemProps = {
@@ -26,8 +32,18 @@ export default function Card({
   navigationPath,
   navigationParams,
 }: CardProps) {
+  const { selectFarmer } = useContext(AuthContext);
+
   const navigateToDetails = () => {
-    //router.push(navigationPath);
+    switch (navigationParams?.type) {
+      case 'farmer':
+        selectFarmer(navigationParams.data);
+        break;
+      default:
+        break;
+    }
+
+    router.push(navigationPath as any);
   };
 
   return (
@@ -36,7 +52,7 @@ export default function Card({
         <View className="flex flex-row items-center justify-between p-4 bg-Green rounded-t-md">
           <Text className="text-White text-[18px] font-semibold">{title}</Text>
           {navigationPath && (
-            <Pressable onPress={() => {}}>
+            <Pressable onPress={() => navigateToDetails()}>
               <MoveDiagonal className="text-White" />
             </Pressable>
           )}
@@ -46,7 +62,7 @@ export default function Card({
         className={cn(
           title
             ? 'border-x border-x-LightGray border-b border-b-LightGray rounded-b-md'
-            : 'border border-LightGray',
+            : 'border border-LightGray rounded-md',
           'bg-White'
         )}
       >
