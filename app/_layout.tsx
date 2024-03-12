@@ -3,9 +3,11 @@ import { useFonts } from 'expo-font';
 import { Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import { SessionProvider } from '@/context/AuthContext';
 import i18n from '@/locales/i18n';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -43,7 +45,11 @@ export default function RootLayout() {
 
   return (
     <SessionProvider>
-      <Slot />
+      <GestureHandlerRootView style={{ height: '100%' }}>
+        <BottomSheetModalProvider>
+          <Slot />
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
     </SessionProvider>
   );
 }

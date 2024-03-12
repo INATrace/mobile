@@ -1,10 +1,10 @@
 import { View, Text, Pressable, ScrollView } from 'react-native';
-import { useNavigation } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { useContext, useEffect } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import QRCode from 'react-native-qrcode-svg';
 import i18n from '@/locales/i18n';
-import Card from '@/components/common/Card';
+import Card, { ItemProps } from '@/components/common/Card';
 import { ChevronLeft } from 'lucide-react-native';
 
 export default function FarmersInfo() {
@@ -20,18 +20,25 @@ export default function FarmersInfo() {
           className="flex flex-row items-center justify-center mr-3"
         >
           <ChevronLeft className="text-Orange" />
-          <Text className="font-medium text-Orange">Back</Text>
+          <Text className="font-medium text-Orange text-[18px]">Back</Text>
         </Pressable>
       ),
     });
   }, [selectedFarmer]);
+
+  const navigateToPlots = () => {
+    router.push(`view/${selectedFarmer?.id.toString()}` as any);
+  };
 
   return (
     <ScrollView className="h-full border-t bg-White border-t-LightGray">
       <View className="flex flex-col items-center justify-center pt-5 mx-5">
         <QRCode value={selectedFarmer?.id.toString()} />
         <Text className="mt-3 mb-5">{selectedFarmer?.id}</Text>
-        <Pressable className="flex flex-row items-center justify-center w-full px-5 py-3 rounded-md bg-Orange">
+        <Pressable
+          className="flex flex-row items-center justify-center w-full px-5 py-3 rounded-md bg-Orange"
+          onPress={navigateToPlots}
+        >
           <Text className="text-[16px] text-White font-semibold">
             {i18n.t('farmers.info.viewAllPlots')}
           </Text>
@@ -68,6 +75,128 @@ export default function FarmersInfo() {
               'farmers.info.basicInformation.companyInternalFarmerId'
             ),
             value: selectedFarmer?.farmerCompanyInternalId ?? '',
+          },
+        ]}
+      />
+      <Text className="text-[18px] font-medium mt-5 mx-5">
+        {i18n.t('farmers.info.address.title')}
+      </Text>
+      <Card
+        items={[
+          {
+            type: 'view',
+            name: i18n.t('farmers.info.address.country'),
+            value: selectedFarmer?.location.address.country.name ?? '',
+          },
+          {
+            type: 'view',
+            name: i18n.t('farmers.info.address.village'),
+            value: selectedFarmer?.location.address.village ?? '',
+          },
+          {
+            type: 'view',
+            name: i18n.t('farmers.info.address.cell'),
+            value: selectedFarmer?.location.address.cell ?? '',
+          },
+          {
+            type: 'view',
+            name: i18n.t('farmers.info.address.sector'),
+            value: selectedFarmer?.location.address.sector ?? '',
+          },
+        ]}
+      />
+      <Text className="text-[18px] font-medium mt-5 mx-5">
+        {i18n.t('farmers.info.contact.title')}
+      </Text>
+      <Card
+        items={[
+          {
+            type: 'view',
+            name: i18n.t('farmers.info.contact.phoneNumber'),
+            value: selectedFarmer?.phone ?? '',
+          },
+          {
+            type: 'view',
+            name: i18n.t('farmers.info.contact.email'),
+            value: selectedFarmer?.email ?? '',
+          },
+        ]}
+      />
+      <Text className="text-[18px] font-medium mt-5 mx-5">
+        {i18n.t('farmers.info.farmInformation.title')}
+      </Text>
+      <Card
+        items={[
+          {
+            type: 'view',
+            name: i18n.t('farmers.info.farmInformation.areaUnit'),
+            value: selectedFarmer?.farm.areaUnit ?? '',
+          },
+          {
+            type: 'view',
+            name:
+              i18n.t('farmers.info.farmInformation.totalFarmSize') +
+              ` (${selectedFarmer?.farm.areaUnit})`,
+            value: selectedFarmer?.farm.totalCultivatedArea.toString() ?? '',
+          },
+          ...(selectedFarmer?.farm.farmPlantInformationList
+            ?.map((item, index) => [
+              {
+                type: 'view',
+                name:
+                  i18n.t('farmers.info.farmInformation.productType') +
+                  ` ${index + 1}`,
+                value: item.productType.name,
+              } as ItemProps,
+              {
+                type: 'view',
+                name:
+                  i18n.t('farmers.info.farmInformation.area') +
+                  ` (${selectedFarmer?.farm.areaUnit})`,
+                value: item.plantCultivatedArea.toString(),
+              } as ItemProps,
+              {
+                type: 'view',
+                name: i18n.t('farmers.info.farmInformation.plants'),
+                value: item.numberOfPlants.toString(),
+              } as ItemProps,
+            ])
+            .flat() || []),
+          {
+            type: 'view',
+            name: i18n.t('farmers.info.farmInformation.organicFarm'),
+            value: selectedFarmer?.farm.organic ? i18n.t('yes') : i18n.t('no'),
+          },
+          {
+            type: 'view',
+            name: i18n.t(
+              'farmers.info.farmInformation.startedTransitionToOrganic'
+            ),
+            value: new Date(
+              selectedFarmer?.farm.startTransitionToOrganic ?? ''
+            ).toLocaleDateString(),
+          },
+        ]}
+      />
+      <Text className="text-[18px] font-medium mt-5 mx-5">
+        {i18n.t('farmers.info.bankInformation.title')}
+      </Text>
+      <Card
+        items={[
+          {
+            type: 'view',
+            name: i18n.t('farmers.info.bankInformation.bankAccountHolder'),
+            value: selectedFarmer?.bank?.accountHolderName ?? '',
+          },
+          {
+            type: 'view',
+            name: i18n.t('farmers.info.bankInformation.bankAccountNumber'),
+            value: selectedFarmer?.bank?.accountNumber ?? '',
+          },
+          {
+            type: 'view',
+            name: i18n.t('farmers.info.bankInformation.bankName'),
+            value: selectedFarmer?.bank?.bankName ?? '',
           },
         ]}
       />

@@ -1,5 +1,11 @@
 import Topbar from '@/components/common/Topbar';
-import { View, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import {
+  View,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import i18n from '@/locales/i18n';
 import SearchInput from '@/components/common/SearchInput';
@@ -31,34 +37,35 @@ const filterItems = [
 
 export default function Farmers() {
   const [search, setSearch] = useState<string>('');
-  const [showSort, setShowSort] = useState<boolean>(false);
   const [selectedSort, setSelectedSort] = useState<string>('BY_NAME_ASC');
-  const [showFilter, setShowFilter] = useState<boolean>(false);
   const [selectedFilter, setSelectedFilter] = useState<string>('BY_NAME');
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [data, setData] = useState<CardProps[]>([]);
   const [dataCount, setDataCount] = useState<number>(100);
+
+  const [offset, setOffset] = useState<number>(0);
 
   const { getConnection, makeRequest, selectedCompany } =
     useContext(AuthContext);
 
   useEffect(() => {
     handleFarmers();
-  }, []);
+  }, [offset, selectedSort, selectedFilter, search]);
 
   const handleFarmers = async () => {
     const connection = await getConnection;
     if (connection.isConnected) {
-      fetchFarmers(10, 0);
+      fetchFarmers(10, offset);
     } else {
       loadFarmers();
     }
   };
 
   const fetchFarmers = async (limit: number, offset: number) => {
-    setIsLoading(true);
+    if (!isRefreshing) setIsLoading(true);
     try {
       const sort = selectedSort.split('_');
       const sortBy = sort[0] + '_' + sort[1];
@@ -94,16 +101,35 @@ export default function Farmers() {
         });
 
         setDataCount(response.data.data.count);
-        setData(farmers);
+        setData([...data, ...farmers]);
       }
     } catch (error) {
       setError(i18n.t('farmers.errorFetch'));
     } finally {
+      setIsRefreshing(false);
       setIsLoading(false);
     }
   };
 
   const loadFarmers = async () => {};
+
+  const onRefresh = () => {
+    setIsRefreshing(true);
+    setOffset(0);
+    setData([]);
+    fetchFarmers(10, 0);
+  };
+
+  const onEndReached = () => {
+    if (!isLoading) {
+      setOffset((prevOffset) => prevOffset + 10);
+    }
+  };
+
+  const renderFooter = () => {
+    if (!isLoading) return null;
+    return <ActivityIndicator style={{ margin: 20 }} />;
+  };
 
   return (
     <SafeAreaView className="flex flex-col h-full bg-Background">
@@ -113,12 +139,8 @@ export default function Farmers() {
           <SearchInput
             input={search}
             setInput={setSearch}
-            showSort={showSort}
-            setShowSort={setShowSort}
             selectedSort={selectedSort}
             setSelectedSort={setSelectedSort}
-            showFilter={showFilter}
-            setShowFilter={setShowFilter}
             selectedFilter={selectedFilter}
             setSelectedFilter={setSelectedFilter}
             sortItems={sortItems}
@@ -134,6 +156,12 @@ export default function Farmers() {
           estimatedItemSize={dataCount}
           keyExtractor={(_, index) => index.toString()}
           className="flex flex-col h-full"
+          ListFooterComponent={renderFooter}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.5}
+          refreshControl={
+            <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+          }
         />
       </View>
     </SafeAreaView>

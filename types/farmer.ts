@@ -6,6 +6,7 @@ export interface Farmer {
   name: string;
   surname: string;
   phone: string;
+  email?: string;
   hasSmartphone: boolean;
   location: {
     address: {
@@ -41,6 +42,7 @@ export interface Farmer {
     }>;
     organic: boolean;
     areaOrganicCertified: number;
+    startTransitionToOrganic: string;
   };
   associations: Array<any>;
   cooperatives: Array<{

@@ -1,20 +1,16 @@
 import { Pressable, TextInput, View, Text } from 'react-native';
 import { ArrowDownUp, Filter, Search } from 'lucide-react-native';
 import i18n from '@/locales/i18n';
-import { Picker } from '@react-native-picker/picker';
-import { useState } from 'react';
 import Colors from '@/constants/Colors';
-import { MenuView } from '@react-native-menu/menu';
+import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { useCallback, useMemo, useRef } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 type SearchInputProps = {
   input: string;
   setInput: (input: string) => void;
-  showSort: boolean;
-  setShowSort: (showSort: boolean) => void;
   selectedSort: string;
   setSelectedSort: (selectedSort: string) => void;
-  showFilter: boolean;
-  setShowFilter: (showFilter: boolean) => void;
   selectedFilter: string;
   setSelectedFilter: (selectedFilter: string) => void;
   sortItems: { label: string; value: string }[];
@@ -22,6 +18,19 @@ type SearchInputProps = {
 };
 
 export default function SearchInput(props: SearchInputProps) {
+  const bottomSheetSortModalRef = useRef<BottomSheetModal>(null);
+  const bottomSheetFilterModalRef = useRef<BottomSheetModal>(null);
+
+  const snapPoints = useMemo(() => ['25%', '50%'], []);
+
+  const handlePresentSortModalPress = useCallback(() => {
+    bottomSheetSortModalRef.current?.present();
+  }, []);
+
+  const handlePresentFilterModalPress = useCallback(() => {
+    bottomSheetFilterModalRef.current?.present();
+  }, []);
+
   return (
     <View className="flex flex-row items-center justify-between px-5">
       <View className="relative flex flex-row items-center justify-between h-12 mt-1 border rounded-md border-LightGray bg-White w-[70%]">
@@ -35,59 +44,36 @@ export default function SearchInput(props: SearchInputProps) {
         />
       </View>
       <Pressable
-        onPress={() => props.setShowSort(!props.showSort)}
+        onPress={handlePresentSortModalPress}
         className="flex flex-row items-center justify-center w-12 h-12 mt-1 border rounded-md border-LightGray bg-White"
       >
         <ArrowDownUp className="text-LightGray" />
       </Pressable>
-      {props.showSort && (
-        <View className="absolute bg-White top-20">
-          <Picker
-            selectedValue={props.selectedSort}
-            onValueChange={(itemValue: string) =>
-              props.setSelectedSort(itemValue)
-            }
-            style={{ width: 300 }}
-          >
-            {props.sortItems.map((item, index) => {
-              return (
-                <Picker.Item
-                  key={index}
-                  label={item.label}
-                  value={item.value}
-                />
-              );
-            })}
-          </Picker>
-        </View>
-      )}
+      <BottomSheetModal
+        ref={bottomSheetSortModalRef}
+        index={1}
+        snapPoints={snapPoints}
+      >
+        <BottomSheetView className="rounded-t-md">
+          <Text>Awesome 🎉</Text>
+        </BottomSheetView>
+      </BottomSheetModal>
+
       <Pressable
-        onPress={() => props.setShowFilter(!props.showFilter)}
+        onPress={handlePresentFilterModalPress}
         className="flex flex-row items-center justify-center w-12 h-12 mt-1 border rounded-md border-LightGray bg-White"
       >
         <Filter className="text-LightGray" />
       </Pressable>
-      {props.showFilter && (
-        <View className="absolute bg-White top-20 right-5">
-          <Picker
-            selectedValue={props.selectedFilter}
-            onValueChange={(itemValue: string) =>
-              props.setSelectedFilter(itemValue)
-            }
-            style={{ width: 300 }}
-          >
-            {props.filterItems.map((item, index) => {
-              return (
-                <Picker.Item
-                  key={index}
-                  label={item.label}
-                  value={item.value}
-                />
-              );
-            })}
-          </Picker>
-        </View>
-      )}
+      <BottomSheetModal
+        ref={bottomSheetFilterModalRef}
+        index={1}
+        snapPoints={snapPoints}
+      >
+        <BottomSheetView className="rounded-t-md">
+          <Text>Awesome 🎉</Text>
+        </BottomSheetView>
+      </BottomSheetModal>
     </View>
   );
 }
