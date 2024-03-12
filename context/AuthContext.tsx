@@ -7,6 +7,9 @@ import { decode as atob } from 'base-64';
 
 import { LogInResponse, RequestParams } from '@/types/auth';
 import { Farmer } from '@/types/farmer';
+import { CompanyInfo } from '@/types/company';
+
+const apiUri = 'https://test.inatrace.org/api';
 
 export const AuthContext = createContext<{
   logIn: (username: string, password: string) => Promise<LogInResponse>;
@@ -16,9 +19,10 @@ export const AuthContext = createContext<{
   makeRequest: ({ url, method, body, headers }: RequestParams) => Promise<any>;
   accessToken: string | null;
   user: User | null;
-  selectedCompany: number | null;
+  selectedCompany: number | string | null;
+  companies: (CompanyInfo | undefined)[] | string | null;
   getConnection: Promise<NetInfoState>;
-  selectedFarmer: Farmer | null;
+  selectedFarmer: Farmer | string | null;
 }>({
   logIn: async () => ({ success: false, errorStatus: '' }),
   logOut: () => null,
@@ -27,6 +31,7 @@ export const AuthContext = createContext<{
   selectFarmer: () => null,
   accessToken: null,
   user: null,
+  companies: null,
   selectedCompany: null,
   getConnection: Promise.resolve({ isConnected: false } as NetInfoState),
   selectedFarmer: null,
@@ -50,14 +55,15 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     null
   );
   const [user, setUser] = useStorageState<User | null>('user', null);
-  const [selectedCompany, setSelectedCompany] = useStorageState<number | null>(
-    'selected_company',
-    null
-  );
-  const [selectedFarmer, setSelectedFarmer] = useStorageState<Farmer | null>(
-    'selected_farmer',
-    null
-  );
+  const [selectedCompany, setSelectedCompany] = useStorageState<
+    number | string | null
+  >('selected_company', null);
+  const [companies, setCompanies] = useStorageState<
+    (CompanyInfo | undefined)[] | string | null
+  >('companies', null);
+  const [selectedFarmer, setSelectedFarmer] = useStorageState<
+    Farmer | string | null
+  >('selected_farmer', null);
 
   const checkAuth = async (): Promise<boolean> => {
     if (!(await NetInfo.fetch()).isConnected) {
@@ -76,13 +82,10 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     password: string
   ): Promise<LogInResponse> => {
     try {
-      const responseLogin = await axios.post(
-        'https://test.inatrace.org/api/user/login',
-        {
-          username,
-          password,
-        }
-      );
+      const responseLogin = await axios.post(`${apiUri}/user/login`, {
+        username,
+        password,
+      });
 
       const setCookieHeader = responseLogin.headers['set-cookie'];
 
@@ -94,19 +97,41 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
 
         setAccessToken(accessToken);
 
-        const responseUserData = await axios.get(
-          'https://test.inatrace.org/api/user/profile',
-          {
-            headers: {
-              Cookie: `inatrace-accessToken=${accessToken}`,
-            },
-          }
-        );
+        const responseUserData = await axios.get(`${apiUri}/user/profile`, {
+          headers: {
+            /* Cookie: `inatrace-accessToken=${accessToken}`, */
+          },
+        });
 
         if (responseUserData.data.status === 'OK') {
           const user = responseUserData.data.data as User;
           setUser(user);
           setSelectedCompany(user.companyIds[0]);
+
+          const companyDetailsPromises = user.companyIds.map((companyId) =>
+            axios.get(`${apiUri}/company/profile/${companyId}`, {
+              headers: {
+                /* Cookie: `inatrace-accessToken=${accessToken}`, */
+              },
+            })
+          );
+
+          const companyDetailsResponses = await Promise.all(
+            companyDetailsPromises
+          );
+          const companyDetails = companyDetailsResponses.map((response) => {
+            if (response.data.status === 'OK') {
+              const companyInfo = {
+                id: response.data.data.id,
+                name: response.data.data.name,
+                logo: `${apiUri}/common/image/${response.data.data.logo.storageKey}/SMALL`,
+              } as CompanyInfo;
+              return companyInfo;
+            }
+          });
+
+          setCompanies(companyDetails);
+
           return { success: true, errorStatus: '' };
         }
       }
@@ -134,7 +159,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     }
 
     return await axios.request({
-      url,
+      url: apiUri + url,
       method,
       headers: {
         'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
@@ -161,6 +186,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         accessToken,
         user,
         selectedCompany,
+        companies,
         getConnection: getConnection(),
         selectedFarmer,
       }}

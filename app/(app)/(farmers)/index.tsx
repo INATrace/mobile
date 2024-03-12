@@ -72,7 +72,7 @@ export default function Farmers() {
       const sortType = sort[2];
 
       const response = await makeRequest({
-        url: `https://test.inatrace.org/api/company/userCustomers/39/FARMER?limit=${limit}&offset=${offset}&sortBy=${sortBy}&sort=${sortType}&query=${search}&searchBy=${selectedFilter}`,
+        url: `/company/userCustomers/39/FARMER?limit=${limit}&offset=${offset}&sortBy=${sortBy}&sort=${sortType}&query=${search}&searchBy=${selectedFilter}`,
         method: 'GET',
       });
 

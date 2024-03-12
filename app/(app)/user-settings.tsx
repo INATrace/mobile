@@ -1,14 +1,44 @@
-import { View, Text, Pressable, ScrollView, Linking } from 'react-native';
-import { useContext } from 'react';
+import {
+  View,
+  Text,
+  Pressable,
+  ScrollView,
+  Linking,
+  Image,
+} from 'react-native';
+import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import i18n from '@/locales/i18n';
 import { Input } from '@/components/common/Input';
 import LanguageSwitcher from '@/components/settings/LanguageSwitcher';
 import { LogOut } from 'lucide-react-native';
+import { NetInfoState } from '@react-native-community/netinfo';
+import { CompanyInfo } from '@/types/company';
+import { User } from '@/types/user';
 
 export default function UserSettings() {
-  const { logOut, user, selectedCompany } = useContext(AuthContext);
+  const [connection, setConnection] = useState<NetInfoState | null>(null);
+  const [company, setCompany] = useState<CompanyInfo | undefined>(undefined);
+  const { logOut, user, selectedCompany, companies, getConnection } =
+    useContext(AuthContext);
+
+  useEffect(() => {
+    if (
+      selectedCompany &&
+      typeof selectedCompany !== 'string' &&
+      companies &&
+      typeof companies !== 'string'
+    ) {
+      const cmp = companies.find((c) => c?.id === selectedCompany);
+      console.log(cmp);
+      setCompany(companies.find((c) => c?.id === selectedCompany));
+    }
+  }, [selectedCompany, companies]);
+
+  useEffect(() => {
+    getConnection.then((res) => setConnection(res));
+  }, []);
 
   const handleLogOut = () => {
     logOut();
@@ -62,6 +92,20 @@ export default function UserSettings() {
         <Text className="text-[18px] font-medium mt-5">
           {i18n.t('userSettings.companyInformation')}
         </Text>
+        <View>
+          {connection?.isConnected ? (
+            <Image
+              source={{
+                uri: company?.logo,
+              }}
+              className="w-20 h-20 rounded-full bg-LightGray"
+            />
+          ) : (
+            <View>
+              <Text>{company?.name.charAt(0)}</Text>
+            </View>
+          )}
+        </View>
         <Text className="text-[18px] font-medium mt-5 mb-3">
           {i18n.t('userSettings.language')}
         </Text>

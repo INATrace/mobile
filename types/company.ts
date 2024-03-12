@@ -76,3 +76,9 @@ export interface Company {
   companyRoles: string[];
   supportsCollectors: boolean;
 }
+
+export interface CompanyInfo {
+  id: number;
+  name: string;
+  logo: string;
+}
