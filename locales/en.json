@@ -37,14 +37,17 @@
   },
   "farmers": {
     "title": "Farmers",
+    "titleNewPlot": "New plot",
     "newFarmer": "New farmer",
     "search": "Search",
     "sort": {
+      "sortBy": "Sort by",
       "name": "Name",
       "surname": "Surname",
       "id": "ID"
     },
     "filter": {
+      "filterBy": "Filter by",
       "name": "First name",
       "surname": "Last name"
     },

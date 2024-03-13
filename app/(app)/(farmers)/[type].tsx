@@ -15,7 +15,10 @@ import { AuthContext } from '@/context/AuthContext';
 import Card, { CardProps, ItemProps } from '@/components/common/Card';
 import { Farmer } from '@/types/farmer';
 import { ChevronDown, ChevronUp } from 'lucide-react-native';
-import NewFarmerButton from '@/components/home/NewFarmerButton';
+import NewFarmerButton, {
+  ButtonWrapper,
+} from '@/components/farmers/NewFarmerButton';
+import { useLocalSearchParams } from 'expo-router';
 
 const sortItems = [
   { label: i18n.t('farmers.sort.name'), value: 'BY_NAME_ASC', icon: ChevronUp },
@@ -44,6 +47,7 @@ const filterItems = [
 ];
 
 export default function Farmers() {
+  const { type } = useLocalSearchParams();
   const [search, setSearch] = useState<string>('');
   const [selectedSort, setSelectedSort] = useState<string>('BY_NAME_ASC');
   const [selectedFilter, setSelectedFilter] = useState<string>('BY_NAME');
@@ -55,24 +59,37 @@ export default function Farmers() {
   const [dataCount, setDataCount] = useState<number>(100);
 
   const [offset, setOffset] = useState<number>(0);
+  const limit = 10;
 
   const { getConnection, makeRequest, selectedCompany } =
     useContext(AuthContext);
 
   useEffect(() => {
-    handleFarmers();
-  }, [offset, selectedSort, selectedFilter, search, selectedCompany]);
+    handleFarmers(limit, offset, true);
+  }, [selectedSort, selectedFilter, search, selectedCompany]);
 
-  const handleFarmers = async () => {
+  useEffect(() => {
+    handleFarmers(limit, offset, false);
+  }, [offset]);
+
+  const handleFarmers = async (
+    limitHF: number,
+    offsetHF: number,
+    resetData: boolean
+  ) => {
     const connection = await getConnection;
     if (connection.isConnected) {
-      fetchFarmers(10, offset);
+      fetchFarmers(limitHF, offsetHF, resetData);
     } else {
       loadFarmers();
     }
   };
 
-  const fetchFarmers = async (limit: number, offset: number) => {
+  const fetchFarmers = async (
+    limit: number,
+    offset: number,
+    resetData: boolean
+  ) => {
     //if (!isRefreshing) setIsLoading(true);
     try {
       const sort = selectedSort.split('_');
@@ -100,7 +117,8 @@ export default function Farmers() {
                 value: farmer.gender,
               },
             ] as ItemProps[],
-            navigationPath: `info/${farmer.id}`,
+            navigationPath:
+              type === 'farmers' ? `info/${farmer.id}` : `view/${farmer.id}`,
             navigationParams: {
               type: 'farmer',
               data: farmer,
@@ -124,8 +142,7 @@ export default function Farmers() {
   const onRefresh = () => {
     setIsRefreshing(true);
     setOffset(0);
-    setData([]);
-    fetchFarmers(10, 0);
+    fetchFarmers(10, 0, true);
   };
 
   const onEndReached = () => {
@@ -143,7 +160,14 @@ export default function Farmers() {
     <SafeAreaView className="flex flex-col h-full bg-Background">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View>
-          <Topbar title={i18n.t('farmers.title')} goBack />
+          <Topbar
+            title={
+              type === 'farmers'
+                ? i18n.t('farmers.title')
+                : i18n.t('farmers.titleNewPlot')
+            }
+            goBack
+          />
           <SearchInput
             input={search}
             setInput={setSearch}
@@ -173,21 +197,11 @@ export default function Farmers() {
           contentContainerStyle={{ paddingBottom: 50 }}
         />
       </View>
-      <View
-        className="absolute bottom-0 w-full"
-        style={{
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.45,
-          shadowRadius: 3.84,
-          elevation: 5,
-        }}
-      >
-        <NewFarmerButton />
-      </View>
+      {type === 'farmers' && (
+        <ButtonWrapper>
+          <NewFarmerButton />
+        </ButtonWrapper>
+      )}
     </SafeAreaView>
   );
 }

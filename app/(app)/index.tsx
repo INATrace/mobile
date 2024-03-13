@@ -30,12 +30,12 @@ export default function Home() {
         <HomeNavButton
           title={i18n.t('home.farmers')}
           icon={FarmerSvg}
-          link="/(farmers)"
+          link="/(farmers)/farmers"
         />
         <HomeNavButton
           title={i18n.t('home.newPlot')}
           icon={PlotSvg}
-          link="/(farmers)/new-plot"
+          link="/(farmers)/newplot"
         />
       </View>
       <View className="pb-5 border-t bg-White border-t-LightGray">

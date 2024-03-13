@@ -25,8 +25,8 @@ export default function SearchInput(props: SearchInputProps) {
   const bottomSheetSortModalRef = useRef<BottomSheetModal>(null);
   const bottomSheetFilterModalRef = useRef<BottomSheetModal>(null);
 
-  const snapPointsSort = useMemo(() => ['50%'], []);
-  const snapPointsFilter = useMemo(() => ['25%'], []);
+  const snapPointsSort = useMemo(() => ['55%'], []);
+  const snapPointsFilter = useMemo(() => ['30%'], []);
 
   const handlePresentSortModalPress = useCallback(() => {
     bottomSheetSortModalRef.current?.present();
@@ -68,6 +68,9 @@ export default function SearchInput(props: SearchInputProps) {
         enableDismissOnClose={true}
       >
         <BottomSheetView className="rounded-t-md">
+          <Text className="px-5 font-medium text-[16px]">
+            {i18n.t('farmers.sort.sortBy')}
+          </Text>
           <Selector
             items={props.sortItems}
             selected={props.selectedSort}
@@ -96,6 +99,9 @@ export default function SearchInput(props: SearchInputProps) {
         enableDismissOnClose={true}
       >
         <BottomSheetView className="rounded-t-md">
+          <Text className="px-5 font-medium text-[16px]">
+            {i18n.t('farmers.filter.filterBy')}
+          </Text>
           <Selector
             items={props.filterItems}
             selected={props.selectedFilter}

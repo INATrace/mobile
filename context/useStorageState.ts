@@ -1,7 +1,9 @@
 import { deleteItemAsync, setItemAsync, getItemAsync } from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useReducer, useEffect, useCallback } from 'react';
 
 type StorageValue = string | object | number | null;
+type StorageType = 'secureStore' | 'asyncStorage';
 
 type UseStateHook<T> = [T, (value: T) => void];
 
@@ -12,34 +14,53 @@ function useAsyncState<T>(initialValue: T): UseStateHook<T> {
   ) as UseStateHook<T>;
 }
 
-async function setStorageItemAsync(key: string, value: StorageValue) {
+async function setStorageItemAsync(
+  key: string,
+  value: StorageValue,
+  storageType: StorageType
+) {
+  const valueToStore = JSON.stringify(value);
   if (value === null) {
-    await deleteItemAsync(key);
+    if (storageType === 'secureStore') {
+      await deleteItemAsync(key);
+    } else {
+      await AsyncStorage.removeItem(key);
+    }
   } else {
-    const valueToStore = JSON.stringify(value);
-    await setItemAsync(key, valueToStore);
+    if (storageType === 'secureStore') {
+      await setItemAsync(key, valueToStore);
+    } else {
+      await AsyncStorage.setItem(key, valueToStore);
+    }
   }
 }
 
 export function useStorageState<T extends StorageValue>(
   key: string,
-  initialValue: T
+  initialValue: T,
+  storageType: StorageType = 'secureStore'
 ): UseStateHook<T> {
   const [state, setState] = useAsyncState<T>(initialValue);
 
   useEffect(() => {
-    getItemAsync(key).then((value) => {
-      const parsedValue = value ? JSON.parse(value) : 'none';
+    (async () => {
+      let value: string | null = null;
+      if (storageType === 'secureStore') {
+        value = await getItemAsync(key);
+      } else {
+        value = await AsyncStorage.getItem(key);
+      }
+      const parsedValue = value ? JSON.parse(value) : initialValue;
       setState(parsedValue);
-    });
-  }, [key, initialValue]);
+    })();
+  }, [key, storageType, initialValue]);
 
   const setValue = useCallback(
     async (value: T) => {
       setState(value);
-      await setStorageItemAsync(key, value);
+      await setStorageItemAsync(key, value, storageType);
     },
-    [key]
+    [key, storageType]
   );
 
   return [state, setValue];

@@ -1,6 +1,6 @@
 import i18n from '@/locales/i18n';
 import cn from '@/utils/cn';
-import { Link } from 'expo-router';
+import { Link, LinkComponent } from 'expo-router';
 import { Plus } from 'lucide-react-native';
 import { Pressable, View, Text } from 'react-native';
 
@@ -26,3 +26,23 @@ export default function NewFarmerButton() {
     </Link>
   );
 }
+
+export const ButtonWrapper = ({ children }: any) => {
+  return (
+    <View
+      className="absolute bottom-0 w-full"
+      style={{
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.45,
+        shadowRadius: 3.84,
+        elevation: 5,
+      }}
+    >
+      {children}
+    </View>
+  );
+};

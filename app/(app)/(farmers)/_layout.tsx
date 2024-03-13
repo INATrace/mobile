@@ -4,7 +4,7 @@ import { Stack } from 'expo-router';
 export default function FarmersLayout() {
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="[type]" options={{ headerShown: false }} />
       <Stack.Screen name="new-farmer" options={{ presentation: 'modal' }} />
       <Stack.Screen name="info/[id]" options={{ presentation: 'modal' }} />
       <Stack.Screen

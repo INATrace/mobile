@@ -59,13 +59,13 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   const [user, setUser] = useStorageState<User | null>('user', null);
   const [selectedCompany, setSelectedCompany] = useStorageState<
     number | string | null
-  >('selected_company', null);
+  >('selected_company', null, 'asyncStorage');
   const [companies, setCompanies] = useStorageState<
     (CompanyInfo | undefined)[] | string | null
-  >('companies', null);
+  >('companies', null, 'asyncStorage');
   const [selectedFarmer, setSelectedFarmer] = useStorageState<
     Farmer | string | null
-  >('selected_farmer', null);
+  >('selected_farmer', null, 'asyncStorage');
 
   const checkAuth = async (): Promise<boolean> => {
     if (!(await NetInfo.fetch()).isConnected) {
