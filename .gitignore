@@ -43,3 +43,5 @@ expo-env.d.ts
 # Android & iOS directories
 android/
 ios/
+
+%ProgramData%/
