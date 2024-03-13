@@ -1,4 +1,4 @@
-import { Pressable, TextInput, View, Text } from 'react-native';
+import { Pressable, TextInput, View, Text, Keyboard } from 'react-native';
 import { ArrowDownUp, Filter, LucideIcon, Search } from 'lucide-react-native';
 import i18n from '@/locales/i18n';
 import Colors from '@/constants/Colors';
@@ -29,10 +29,12 @@ export default function SearchInput(props: SearchInputProps) {
   const snapPointsFilter = useMemo(() => ['30%'], []);
 
   const handlePresentSortModalPress = useCallback(() => {
+    Keyboard.dismiss();
     bottomSheetSortModalRef.current?.present();
   }, []);
 
   const handlePresentFilterModalPress = useCallback(() => {
+    Keyboard.dismiss();
     bottomSheetFilterModalRef.current?.present();
   }, []);
 

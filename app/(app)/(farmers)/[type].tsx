@@ -1,6 +1,7 @@
 import Topbar from '@/components/common/Topbar';
 import {
   View,
+  Text,
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
@@ -65,12 +66,12 @@ export default function Farmers() {
     useContext(AuthContext);
 
   useEffect(() => {
-    handleFarmers(limit, offset, true);
-  }, [selectedSort, selectedFilter, search, selectedCompany]);
-
-  useEffect(() => {
-    handleFarmers(limit, offset, false);
-  }, [offset]);
+    if (offset !== 0) {
+      handleFarmers(limit, offset, false);
+    } else {
+      handleFarmers(limit, offset, true);
+    }
+  }, [selectedSort, selectedFilter, search, selectedCompany, offset]);
 
   const handleFarmers = async (
     limitHF: number,
@@ -90,7 +91,7 @@ export default function Farmers() {
     offset: number,
     resetData: boolean
   ) => {
-    //if (!isRefreshing) setIsLoading(true);
+    setIsLoading(true);
     try {
       const sort = selectedSort.split('_');
       const sortBy = sort[0] + '_' + sort[1];
@@ -127,7 +128,12 @@ export default function Farmers() {
         });
 
         setDataCount(response.data.data.count);
-        setData([...data, ...farmers]);
+        if (resetData) {
+          setData(farmers);
+          setOffset(0);
+        } else {
+          setData([...data, ...farmers]);
+        }
       }
     } catch (error) {
       setError(i18n.t('farmers.errorFetch'));
@@ -156,6 +162,15 @@ export default function Farmers() {
     return <ActivityIndicator style={{ margin: 20 }} />;
   };
 
+  const emptyComponent = () => {
+    return (
+      <View className="flex flex-row items-center justify-center p-5 mt-[60%]">
+        <Text className="text-[16px] font-medium">
+          {i18n.t('farmers.noData')}
+        </Text>
+      </View>
+    );
+  };
   return (
     <SafeAreaView className="flex flex-col h-full bg-Background">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -188,6 +203,7 @@ export default function Farmers() {
           estimatedItemSize={dataCount}
           keyExtractor={(_, index) => index.toString()}
           className="flex flex-col h-full"
+          ListEmptyComponent={emptyComponent}
           ListFooterComponent={renderFooter}
           onEndReached={onEndReached}
           onEndReachedThreshold={0.5}

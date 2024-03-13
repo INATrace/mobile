@@ -40,6 +40,7 @@
     "titleNewPlot": "New plot",
     "newFarmer": "New farmer",
     "search": "Search",
+    "noData": "No farmers found",
     "sort": {
       "sortBy": "Sort by",
       "name": "Name",
@@ -47,7 +48,7 @@
       "id": "ID"
     },
     "filter": {
-      "filterBy": "Filter by",
+      "filterBy": "Search by",
       "name": "First name",
       "surname": "Last name"
     },

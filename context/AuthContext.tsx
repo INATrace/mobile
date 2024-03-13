@@ -23,6 +23,7 @@ export const AuthContext = createContext<{
   selectedCompany: number | string | null;
   companies: (CompanyInfo | undefined)[] | string | null;
   getConnection: Promise<NetInfoState>;
+  isConnected: boolean;
   selectedFarmer: Farmer | string | null;
 }>({
   logIn: async () => ({ success: false, errorStatus: '' }),
@@ -36,6 +37,7 @@ export const AuthContext = createContext<{
   companies: null,
   selectedCompany: null,
   getConnection: Promise.resolve({ isConnected: false } as NetInfoState),
+  isConnected: false,
   selectedFarmer: null,
 });
 
@@ -66,6 +68,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   const [selectedFarmer, setSelectedFarmer] = useStorageState<
     Farmer | string | null
   >('selected_farmer', null, 'asyncStorage');
+
+  const [isConnected, setIsConnected] = useState<boolean>(false);
 
   const checkAuth = async (): Promise<boolean> => {
     if (!(await NetInfo.fetch()).isConnected) {
@@ -183,6 +187,15 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     return await NetInfo.fetch();
   };
 
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state?.isConnected ?? false);
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -197,6 +210,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         selectedCompany,
         companies,
         getConnection: getConnection(),
+        isConnected,
         selectedFarmer,
       }}
     >

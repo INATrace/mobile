@@ -1,6 +1,7 @@
 import Colors from '@/constants/Colors';
 import { Pressable, TextInput, View } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
+import cn from '@/utils/cn';
 
 type InputProps = {
   placeholder?: string;
@@ -20,7 +21,10 @@ export const Input = (props: InputProps) => {
       placeholder={props.placeholder}
       value={props.value}
       onChangeText={props.onChangeText}
-      className="border border-LightGray w-full h-12 mt-1 px-2 text-[16px] rounded-md"
+      className={cn(
+        'border border-LightGray w-full h-12 mt-1 px-2 text-[16px] rounded-md',
+        props.editable ? '' : 'text-DarkGray'
+      )}
       placeholderTextColor={Colors.darkGray}
       editable={props.editable}
     />

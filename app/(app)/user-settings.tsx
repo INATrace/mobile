@@ -21,10 +21,8 @@ import { router, useNavigation } from 'expo-router';
 import i18n from '@/locales/i18n';
 import { Input } from '@/components/common/Input';
 import LanguageSwitcher from '@/components/settings/LanguageSwitcher';
-import { ChevronLeft, LogOut } from 'lucide-react-native';
-import { NetInfoState } from '@react-native-community/netinfo';
+import { ChevronDown, ChevronLeft, LogOut } from 'lucide-react-native';
 import { CompanyInfo } from '@/types/company';
-import { User } from '@/types/user';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -34,14 +32,13 @@ import Selector from '@/components/common/Selector';
 import { FullWindowOverlay } from 'react-native-screens';
 
 export default function UserSettings() {
-  const [connection, setConnection] = useState<NetInfoState | null>(null);
   const [company, setCompany] = useState<CompanyInfo | undefined>(undefined);
   const {
     logOut,
     user,
     selectedCompany,
     companies,
-    getConnection,
+    isConnected,
     selectCompany,
   } = useContext(AuthContext);
 
@@ -81,10 +78,6 @@ export default function UserSettings() {
       setCompany(companies.find((c) => c?.id === selectedCompany));
     }
   }, [selectedCompany, companies]);
-
-  useEffect(() => {
-    getConnection.then((res) => setConnection(res));
-  }, []);
 
   const handleLogOut = () => {
     logOut();
@@ -151,14 +144,15 @@ export default function UserSettings() {
             <Text className="text-[16px]">
               {i18n.t('userSettings.company')}
             </Text>
-            {connection?.isConnected ? (
+            {isConnected ? (
               <>
                 <Pressable
-                  className="px-2 py-3 mt-2 border rounded-md border-LightGray"
+                  className="flex flex-row items-center justify-between h-12 px-2 mt-2 border rounded-md border-LightGray"
                   style={{ width: Dimensions.get('window').width - 136 }}
                   onPress={handlePresentModalPress}
                 >
-                  <Text className=" text-DarkGray">{company?.name}</Text>
+                  <Text className="text-[16px]">{company?.name}</Text>
+                  <ChevronDown className="text-black" />
                 </Pressable>
                 <BottomSheetModal
                   ref={bottomSheetRef}
@@ -193,9 +187,14 @@ export default function UserSettings() {
                 </BottomSheetModal>
               </>
             ) : (
-              <View>
-                <Text className="font-semibold text-Blue">{company?.name}</Text>
-              </View>
+              <Pressable
+                className="flex flex-row items-center justify-between h-12 px-2 mt-2 border rounded-md border-LightGray"
+                style={{ width: Dimensions.get('window').width - 136 }}
+              >
+                <Text className="text-[16px] text-DarkGray">
+                  {company?.name}
+                </Text>
+              </Pressable>
             )}
           </View>
         </View>
