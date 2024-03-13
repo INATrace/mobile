@@ -42,7 +42,10 @@ export default function AppLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="data-sync" options={{ presentation: 'modal' }} />
+      <Stack.Screen
+        name="data-sync"
+        options={{ presentation: 'modal', title: i18n.t('home.syncData') }}
+      />
       <Stack.Screen name="(farmers)" options={{ headerShown: false }} />
       <Stack.Screen
         name="user-settings"

@@ -14,20 +14,28 @@ import { FlashList } from '@shopify/flash-list';
 import { AuthContext } from '@/context/AuthContext';
 import Card, { CardProps, ItemProps } from '@/components/common/Card';
 import { Farmer } from '@/types/farmer';
+import { ChevronDown, ChevronUp } from 'lucide-react-native';
+import NewFarmerButton from '@/components/home/NewFarmerButton';
 
 const sortItems = [
-  { label: i18n.t('farmers.sort.name_asc'), value: 'BY_NAME_ASC' },
-  { label: i18n.t('farmers.sort.name_desc'), value: 'BY_NAME_DESC' },
+  { label: i18n.t('farmers.sort.name'), value: 'BY_NAME_ASC', icon: ChevronUp },
   {
-    label: i18n.t('farmers.sort.surname_asc'),
+    label: i18n.t('farmers.sort.name'),
+    value: 'BY_NAME_DESC',
+    icon: ChevronDown,
+  },
+  {
+    label: i18n.t('farmers.sort.surname'),
     value: 'BY_SURNAME_ASC',
+    icon: ChevronUp,
   },
   {
-    label: i18n.t('farmers.sort.surname_desc'),
+    label: i18n.t('farmers.sort.surname'),
     value: 'BY_SURNAME_DESC',
+    icon: ChevronDown,
   },
-  { label: i18n.t('farmers.sort.id_asc'), value: 'BY_ID_ASC' },
-  { label: i18n.t('farmers.sort.id_desc'), value: 'BY_ID_DESC' },
+  { label: i18n.t('farmers.sort.id'), value: 'BY_ID_ASC', icon: ChevronUp },
+  { label: i18n.t('farmers.sort.id'), value: 'BY_ID_DESC', icon: ChevronDown },
 ];
 
 const filterItems = [
@@ -53,7 +61,7 @@ export default function Farmers() {
 
   useEffect(() => {
     handleFarmers();
-  }, [offset, selectedSort, selectedFilter, search]);
+  }, [offset, selectedSort, selectedFilter, search, selectedCompany]);
 
   const handleFarmers = async () => {
     const connection = await getConnection;
@@ -65,14 +73,14 @@ export default function Farmers() {
   };
 
   const fetchFarmers = async (limit: number, offset: number) => {
-    if (!isRefreshing) setIsLoading(true);
+    //if (!isRefreshing) setIsLoading(true);
     try {
       const sort = selectedSort.split('_');
       const sortBy = sort[0] + '_' + sort[1];
       const sortType = sort[2];
 
       const response = await makeRequest({
-        url: `/company/userCustomers/39/FARMER?limit=${limit}&offset=${offset}&sortBy=${sortBy}&sort=${sortType}&query=${search}&searchBy=${selectedFilter}`,
+        url: `/company/userCustomers/${selectedCompany}/FARMER?limit=${limit}&offset=${offset}&sortBy=${sortBy}&sort=${sortType}&query=${search}&searchBy=${selectedFilter}`,
         method: 'GET',
       });
 
@@ -162,7 +170,23 @@ export default function Farmers() {
           refreshControl={
             <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
           }
+          contentContainerStyle={{ paddingBottom: 50 }}
         />
+      </View>
+      <View
+        className="absolute bottom-0 w-full"
+        style={{
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.45,
+          shadowRadius: 3.84,
+          elevation: 5,
+        }}
+      >
+        <NewFarmerButton />
       </View>
     </SafeAreaView>
   );

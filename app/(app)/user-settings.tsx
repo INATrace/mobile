@@ -5,23 +5,71 @@ import {
   ScrollView,
   Linking,
   Image,
+  Platform,
+  Dimensions,
 } from 'react-native';
-import { useContext, useEffect, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { AuthContext } from '@/context/AuthContext';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import i18n from '@/locales/i18n';
 import { Input } from '@/components/common/Input';
 import LanguageSwitcher from '@/components/settings/LanguageSwitcher';
-import { LogOut } from 'lucide-react-native';
+import { ChevronLeft, LogOut } from 'lucide-react-native';
 import { NetInfoState } from '@react-native-community/netinfo';
 import { CompanyInfo } from '@/types/company';
 import { User } from '@/types/user';
+import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
+import Selector from '@/components/common/Selector';
+import { FullWindowOverlay } from 'react-native-screens';
 
 export default function UserSettings() {
   const [connection, setConnection] = useState<NetInfoState | null>(null);
   const [company, setCompany] = useState<CompanyInfo | undefined>(undefined);
-  const { logOut, user, selectedCompany, companies, getConnection } =
-    useContext(AuthContext);
+  const {
+    logOut,
+    user,
+    selectedCompany,
+    companies,
+    getConnection,
+    selectCompany,
+  } = useContext(AuthContext);
+
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ['75%'], []);
+  const handlePresentModalPress = () => {
+    bottomSheetRef.current?.present();
+  };
+  const containerComponent = useCallback(
+    (props: any) => <FullWindowOverlay>{props.children}</FullWindowOverlay>,
+    []
+  );
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <Pressable
+          onPress={() => navigation.goBack()}
+          className="flex flex-row items-center justify-center mr-3"
+        >
+          <ChevronLeft className="text-Orange" />
+          <Text className="font-medium text-Orange text-[18px]">Back</Text>
+        </Pressable>
+      ),
+    });
+  }, []);
 
   useEffect(() => {
     if (
@@ -30,8 +78,6 @@ export default function UserSettings() {
       companies &&
       typeof companies !== 'string'
     ) {
-      const cmp = companies.find((c) => c?.id === selectedCompany);
-      console.log(cmp);
       setCompany(companies.find((c) => c?.id === selectedCompany));
     }
   }, [selectedCompany, companies]);
@@ -92,19 +138,66 @@ export default function UserSettings() {
         <Text className="text-[18px] font-medium mt-5">
           {i18n.t('userSettings.companyInformation')}
         </Text>
-        <View>
-          {connection?.isConnected ? (
+        <View className="flex flex-row items-center justify-between w-full mt-3">
+          <View className="flex flex-row items-center justify-center w-20 h-20 border rounded-full border-LightGray">
             <Image
               source={{
                 uri: company?.logo,
               }}
-              className="w-20 h-20 rounded-full bg-LightGray"
+              className="w-20 h-20 rounded-full"
             />
-          ) : (
-            <View>
-              <Text>{company?.name.charAt(0)}</Text>
-            </View>
-          )}
+          </View>
+          <View className="flex flex-col items-start w-full ml-4">
+            <Text className="text-[16px]">
+              {i18n.t('userSettings.company')}
+            </Text>
+            {connection?.isConnected ? (
+              <>
+                <Pressable
+                  className="px-2 py-3 mt-2 border rounded-md border-LightGray"
+                  style={{ width: Dimensions.get('window').width - 136 }}
+                  onPress={handlePresentModalPress}
+                >
+                  <Text className=" text-DarkGray">{company?.name}</Text>
+                </Pressable>
+                <BottomSheetModal
+                  ref={bottomSheetRef}
+                  index={0}
+                  snapPoints={snapPoints}
+                  backdropComponent={(props) => (
+                    <BottomSheetBackdrop
+                      {...props}
+                      onPress={() => bottomSheetRef.current?.close()}
+                      disappearsOnIndex={-1}
+                    />
+                  )}
+                  enableDismissOnClose={true}
+                  containerComponent={
+                    Platform.OS === 'ios' ? containerComponent : undefined
+                  }
+                >
+                  <BottomSheetView className="rounded-t-md">
+                    {typeof companies !== 'string' && (
+                      <Selector
+                        items={
+                          companies?.map((company) => ({
+                            label: company?.name ?? '',
+                            value: company?.id ?? 0,
+                          })) ?? []
+                        }
+                        selected={company?.id ?? 0}
+                        setSelected={selectCompany}
+                      />
+                    )}
+                  </BottomSheetView>
+                </BottomSheetModal>
+              </>
+            ) : (
+              <View>
+                <Text className="font-semibold text-Blue">{company?.name}</Text>
+              </View>
+            )}
+          </View>
         </View>
         <Text className="text-[18px] font-medium mt-5 mb-3">
           {i18n.t('userSettings.language')}

@@ -1,10 +1,14 @@
 import { Pressable, TextInput, View, Text } from 'react-native';
-import { ArrowDownUp, Filter, Search } from 'lucide-react-native';
+import { ArrowDownUp, Filter, LucideIcon, Search } from 'lucide-react-native';
 import i18n from '@/locales/i18n';
 import Colors from '@/constants/Colors';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import { useCallback, useMemo, useRef } from 'react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Selector from './Selector';
 
 type SearchInputProps = {
   input: string;
@@ -13,7 +17,7 @@ type SearchInputProps = {
   setSelectedSort: (selectedSort: string) => void;
   selectedFilter: string;
   setSelectedFilter: (selectedFilter: string) => void;
-  sortItems: { label: string; value: string }[];
+  sortItems: { label: string; value: string; icon?: LucideIcon }[];
   filterItems: { label: string; value: string }[];
 };
 
@@ -21,7 +25,8 @@ export default function SearchInput(props: SearchInputProps) {
   const bottomSheetSortModalRef = useRef<BottomSheetModal>(null);
   const bottomSheetFilterModalRef = useRef<BottomSheetModal>(null);
 
-  const snapPoints = useMemo(() => ['25%', '50%'], []);
+  const snapPointsSort = useMemo(() => ['50%'], []);
+  const snapPointsFilter = useMemo(() => ['25%'], []);
 
   const handlePresentSortModalPress = useCallback(() => {
     bottomSheetSortModalRef.current?.present();
@@ -51,11 +56,23 @@ export default function SearchInput(props: SearchInputProps) {
       </Pressable>
       <BottomSheetModal
         ref={bottomSheetSortModalRef}
-        index={1}
-        snapPoints={snapPoints}
+        index={0}
+        snapPoints={snapPointsSort}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            onPress={() => bottomSheetSortModalRef.current?.close()}
+            disappearsOnIndex={-1}
+          />
+        )}
+        enableDismissOnClose={true}
       >
         <BottomSheetView className="rounded-t-md">
-          <Text>Awesome 🎉</Text>
+          <Selector
+            items={props.sortItems}
+            selected={props.selectedSort}
+            setSelected={props.setSelectedSort}
+          />
         </BottomSheetView>
       </BottomSheetModal>
 
@@ -67,11 +84,23 @@ export default function SearchInput(props: SearchInputProps) {
       </Pressable>
       <BottomSheetModal
         ref={bottomSheetFilterModalRef}
-        index={1}
-        snapPoints={snapPoints}
+        index={0}
+        snapPoints={snapPointsFilter}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            onPress={() => bottomSheetFilterModalRef.current?.close()}
+            disappearsOnIndex={-1}
+          />
+        )}
+        enableDismissOnClose={true}
       >
         <BottomSheetView className="rounded-t-md">
-          <Text>Awesome 🎉</Text>
+          <Selector
+            items={props.filterItems}
+            selected={props.selectedFilter}
+            setSelected={props.setSelectedFilter}
+          />
         </BottomSheetView>
       </BottomSheetModal>
     </View>

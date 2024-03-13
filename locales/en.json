@@ -96,5 +96,8 @@
         "productType": "Product type"
       }
     }
+  },
+  "plots": {
+    "title": "View plots"
   }
 }

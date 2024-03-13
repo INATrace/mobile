@@ -16,6 +16,7 @@ export const AuthContext = createContext<{
   logOut: () => void;
   checkAuth: () => Promise<boolean>;
   selectFarmer: (farmer: Farmer) => void;
+  selectCompany: (company: number | string | null) => void;
   makeRequest: ({ url, method, body, headers }: RequestParams) => Promise<any>;
   accessToken: string | null;
   user: User | null;
@@ -29,6 +30,7 @@ export const AuthContext = createContext<{
   checkAuth: async () => false,
   makeRequest: async () => null,
   selectFarmer: () => null,
+  selectCompany: () => null,
   accessToken: null,
   user: null,
   companies: null,
@@ -119,18 +121,24 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           const companyDetailsResponses = await Promise.all(
             companyDetailsPromises
           );
-          const companyDetails = companyDetailsResponses.map((response) => {
-            if (response.data.status === 'OK') {
-              const companyInfo = {
-                id: response.data.data.id,
-                name: response.data.data.name,
-                logo: `${apiUri}/common/image/${response.data.data.logo.storageKey}/SMALL`,
-              } as CompanyInfo;
-              return companyInfo;
+          const companyDetails = companyDetailsResponses.map(
+            async (response) => {
+              if (response.data.status === 'OK') {
+                const companyInfo = {
+                  id: response.data.data.id,
+                  name: response.data.data.name,
+                  logo: await urlToBase64(
+                    `${apiUri}/common/image/${response.data.data.logo.storageKey}/SMALL`,
+                    accessToken
+                  ),
+                } as CompanyInfo;
+                return companyInfo;
+              }
             }
-          });
+          );
+          const companyDetailsResp = await Promise.all(companyDetails);
 
-          setCompanies(companyDetails);
+          setCompanies(companyDetailsResp);
 
           return { success: true, errorStatus: '' };
         }
@@ -182,6 +190,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         logOut,
         checkAuth,
         selectFarmer: setSelectedFarmer,
+        selectCompany: setSelectedCompany,
         makeRequest,
         accessToken,
         user,
@@ -195,3 +204,27 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     </AuthContext.Provider>
   );
 }
+
+const urlToBase64 = async (
+  url: string,
+  accessToken: string
+): Promise<string | null> => {
+  try {
+    const response = await axios.get(url, {
+      responseType: 'blob',
+      headers: {
+        Cookie: accessToken,
+      },
+    });
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(response.data);
+    });
+  } catch (error) {
+    console.error('Error fetching and converting image:', error);
+    return null;
+  }
+};

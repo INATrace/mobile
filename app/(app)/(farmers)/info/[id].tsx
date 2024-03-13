@@ -6,9 +6,12 @@ import QRCode from 'react-native-qrcode-svg';
 import i18n from '@/locales/i18n';
 import Card, { ItemProps } from '@/components/common/Card';
 import { ChevronLeft } from 'lucide-react-native';
+import { Farmer } from '@/types/farmer';
 
 export default function FarmersInfo() {
-  const { selectedFarmer } = useContext(AuthContext);
+  const { selectedFarmer } = useContext(AuthContext) as {
+    selectedFarmer: Farmer;
+  };
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -27,13 +30,13 @@ export default function FarmersInfo() {
   }, [selectedFarmer]);
 
   const navigateToPlots = () => {
-    router.push(`view/${selectedFarmer?.id.toString()}` as any);
+    router.push(`view/${selectedFarmer?.id?.toString()}` as any);
   };
 
   return (
     <ScrollView className="h-full border-t bg-White border-t-LightGray">
       <View className="flex flex-col items-center justify-center pt-5 mx-5">
-        <QRCode value={selectedFarmer?.id.toString()} />
+        <QRCode value={selectedFarmer?.id?.toString()} />
         <Text className="mt-3 mb-5">{selectedFarmer?.id}</Text>
         <Pressable
           className="flex flex-row items-center justify-center w-full px-5 py-3 rounded-md bg-Orange"
@@ -67,7 +70,7 @@ export default function FarmersInfo() {
           {
             type: 'view',
             name: i18n.t('farmers.info.basicInformation.userId'),
-            value: selectedFarmer?.id.toString() ?? '',
+            value: selectedFarmer?.id?.toString() ?? '',
           },
           {
             type: 'view',
@@ -137,7 +140,7 @@ export default function FarmersInfo() {
             name:
               i18n.t('farmers.info.farmInformation.totalFarmSize') +
               ` (${selectedFarmer?.farm.areaUnit})`,
-            value: selectedFarmer?.farm.totalCultivatedArea.toString() ?? '',
+            value: selectedFarmer?.farm?.totalCultivatedArea?.toString() ?? '',
           },
           ...(selectedFarmer?.farm.farmPlantInformationList
             ?.map((item, index) => [
@@ -152,13 +155,13 @@ export default function FarmersInfo() {
                 type: 'view',
                 name:
                   i18n.t('farmers.info.farmInformation.area') +
-                  ` (${selectedFarmer?.farm.areaUnit})`,
-                value: item.plantCultivatedArea.toString(),
+                  ` (${selectedFarmer?.farm?.areaUnit})`,
+                value: item?.plantCultivatedArea?.toString(),
               } as ItemProps,
               {
                 type: 'view',
                 name: i18n.t('farmers.info.farmInformation.plants'),
-                value: item.numberOfPlants.toString(),
+                value: item?.numberOfPlants?.toString(),
               } as ItemProps,
             ])
             .flat() || []),
