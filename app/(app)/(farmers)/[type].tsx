@@ -171,10 +171,14 @@ export default function Farmers() {
       </View>
     );
   };
+
   return (
-    <SafeAreaView className="flex flex-col h-full bg-Background">
+    <SafeAreaView
+      edges={['top']}
+      className="flex flex-col h-full bg-Background"
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View>
+        <View className="mb-3">
           <Topbar
             title={
               type === 'farmers'

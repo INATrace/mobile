@@ -34,7 +34,7 @@ export default function Selector<T extends string | number>(
             </View>
 
             {props.selected === item.value && (
-              <Check className="text-black" size={20} />
+              <Check className="text-black" size={18} />
             )}
           </Pressable>
         );

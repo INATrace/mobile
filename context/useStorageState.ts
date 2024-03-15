@@ -50,7 +50,7 @@ export function useStorageState<T extends StorageValue>(
       } else {
         value = await AsyncStorage.getItem(key);
       }
-      const parsedValue = value ? JSON.parse(value) : initialValue;
+      const parsedValue = value ? JSON.parse(value) : 'none';
       setState(parsedValue);
     })();
   }, [key, storageType, initialValue]);

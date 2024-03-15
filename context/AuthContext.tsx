@@ -162,6 +162,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     setAccessToken(null);
     setUser(null);
     setSelectedCompany(null);
+    setCompanies(null);
+    setSelectedFarmer(null);
   };
 
   const makeRequest = async ({ url, method, body, headers }: RequestParams) => {

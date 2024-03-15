@@ -1,6 +1,10 @@
 {
   "yes": "Yes",
   "no": "No",
+  "input": {
+    "type": "Type...",
+    "select": "Select"
+  },
   "login": {
     "welcomeBack": "Welcome back!",
     "welcomeBackSubtitle": "Log in to continue",
@@ -98,6 +102,13 @@
       "productTypes": {
         "title": "Product types",
         "productType": "Product type"
+      }
+    },
+    "newFarmerCreation": {
+      "gender": {
+        "male": "Male",
+        "female": "Female",
+        "n/a": "N/A"
       }
     }
   },

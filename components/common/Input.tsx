@@ -2,6 +2,8 @@ import Colors from '@/constants/Colors';
 import { Pressable, TextInput, View } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import cn from '@/utils/cn';
+import { memo } from 'react';
+import i18n from '@/locales/i18n';
 
 type InputProps = {
   placeholder?: string;
@@ -23,7 +25,7 @@ export const Input = (props: InputProps) => {
       onChangeText={props.onChangeText}
       className={cn(
         'border border-LightGray w-full h-12 mt-1 px-2 text-[16px] rounded-md',
-        props.editable ? '' : 'text-DarkGray'
+        props.editable === false ? 'text-DarkGray' : ''
       )}
       placeholderTextColor={Colors.darkGray}
       editable={props.editable}
@@ -53,5 +55,22 @@ export const InputPassword = (props: InputPasswordProps) => {
         </Pressable>
       )}
     </View>
+  );
+};
+
+export const InputCard = (props: InputProps) => {
+  return (
+    <TextInput
+      placeholder={props.placeholder}
+      value={props.value}
+      onChangeText={props.onChangeText}
+      className={cn(
+        'border-b border-b-LightGray flex-grow flex-shrink pb-1 mt-1 px-2 text-[16px] rounded-md',
+        props.editable === false ? 'text-DarkGray' : ''
+      )}
+      placeholderTextColor={Colors.darkGray}
+      editable={props.editable}
+      multiline={true}
+    />
   );
 };

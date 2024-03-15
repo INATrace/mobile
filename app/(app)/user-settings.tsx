@@ -26,7 +26,7 @@ import { CompanyInfo } from '@/types/company';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
-  BottomSheetView,
+  BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 import Selector from '@/components/common/Selector';
 import { FullWindowOverlay } from 'react-native-screens';
@@ -137,7 +137,7 @@ export default function UserSettings() {
               source={{
                 uri: company?.logo,
               }}
-              className="w-20 h-20 rounded-full"
+              className="w-[76px] h-[76px] rounded-full"
             />
           </View>
           <View className="flex flex-col items-start w-full ml-4">
@@ -147,11 +147,11 @@ export default function UserSettings() {
             {isConnected ? (
               <>
                 <Pressable
-                  className="flex flex-row items-center justify-between h-12 px-2 mt-2 border rounded-md border-LightGray"
+                  className="flex flex-row items-center justify-between min-h-[48px] px-2 mt-2 border rounded-md border-LightGray"
                   style={{ width: Dimensions.get('window').width - 136 }}
                   onPress={handlePresentModalPress}
                 >
-                  <Text className="text-[16px]">{company?.name}</Text>
+                  <Text className="text-[16px] w-[85%]">{company?.name}</Text>
                   <ChevronDown className="text-black" />
                 </Pressable>
                 <BottomSheetModal
@@ -170,7 +170,7 @@ export default function UserSettings() {
                     Platform.OS === 'ios' ? containerComponent : undefined
                   }
                 >
-                  <BottomSheetView className="rounded-t-md">
+                  <BottomSheetScrollView className="rounded-t-md">
                     {typeof companies !== 'string' && (
                       <Selector
                         items={
@@ -183,7 +183,7 @@ export default function UserSettings() {
                         setSelected={selectCompany}
                       />
                     )}
-                  </BottomSheetView>
+                  </BottomSheetScrollView>
                 </BottomSheetModal>
               </>
             ) : (

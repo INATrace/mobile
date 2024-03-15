@@ -5,7 +5,10 @@ export default function FarmersLayout() {
   return (
     <Stack>
       <Stack.Screen name="[type]" options={{ headerShown: false }} />
-      <Stack.Screen name="new-farmer" options={{ presentation: 'modal' }} />
+      <Stack.Screen
+        name="new-farmer"
+        options={{ presentation: 'modal', title: i18n.t('farmers.newFarmer') }}
+      />
       <Stack.Screen name="info/[id]" options={{ presentation: 'modal' }} />
       <Stack.Screen
         name="view/[id]"
