@@ -65,7 +65,7 @@ export const InputCard = (props: InputProps) => {
       value={props.value}
       onChangeText={props.onChangeText}
       className={cn(
-        'border-b border-b-LightGray flex-grow flex-shrink pb-1 mt-1 px-2 text-[16px] rounded-md',
+        'border-b border-b-LightGray flex-grow flex-shrink pb-1 mt-1 px-2 text-[16px] rounded-md max-w-[50%]',
         props.editable === false ? 'text-DarkGray' : ''
       )}
       placeholderTextColor={Colors.darkGray}

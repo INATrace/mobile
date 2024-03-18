@@ -10,9 +10,17 @@ export interface Farmer {
   hasSmartphone: boolean;
   location: {
     address: {
-      cell: string;
-      sector: string;
-      village: string;
+      cell?: string;
+      sector?: string;
+      village?: string;
+      address?: string;
+      city?: string;
+      state?: string;
+      zip?: string;
+      hondurasFarm?: string;
+      hondurasVillage?: string;
+      hondurasMunicipality?: string;
+      hondurasDepartment?: string;
       country: {
         id: number;
         code: string;
@@ -63,4 +71,16 @@ export interface Farmer {
     code: string;
     description: string;
   }>;
+}
+
+export interface ProductTypeWithCompanyId {
+  companyId: number;
+  productType: ProductType;
+}
+
+export interface ProductType {
+  id: number;
+  name: string;
+  code: string;
+  description: string;
 }

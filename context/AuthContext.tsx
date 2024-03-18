@@ -6,8 +6,9 @@ import axios from 'axios';
 import { decode as atob } from 'base-64';
 
 import { LogInResponse, RequestParams } from '@/types/auth';
-import { Farmer } from '@/types/farmer';
+import { Farmer, ProductType, ProductTypeWithCompanyId } from '@/types/farmer';
 import { CompanyInfo } from '@/types/company';
+import { Country } from '@/types/country';
 
 const apiUri = 'https://test.inatrace.org/api';
 
@@ -22,6 +23,18 @@ export const AuthContext = createContext<{
   user: User | null;
   selectedCompany: number | string | null;
   companies: (CompanyInfo | undefined)[] | string | null;
+  productTypes: ProductTypeWithCompanyId[] | string | null;
+  countries: Country[] | string | null;
+  offlineFarmers:
+    | (
+        | {
+            companyId: number;
+            farmers: Farmer[];
+          }
+        | undefined
+      )[]
+    | string
+    | null;
   getConnection: Promise<NetInfoState>;
   isConnected: boolean;
   selectedFarmer: Farmer | string | null;
@@ -36,6 +49,9 @@ export const AuthContext = createContext<{
   user: null,
   companies: null,
   selectedCompany: null,
+  productTypes: null,
+  countries: null,
+  offlineFarmers: null,
   getConnection: Promise.resolve({ isConnected: false } as NetInfoState),
   isConnected: false,
   selectedFarmer: null,
@@ -68,6 +84,25 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   const [selectedFarmer, setSelectedFarmer] = useStorageState<
     Farmer | string | null
   >('selected_farmer', null, 'asyncStorage');
+  const [productTypes, setProductTypes] = useStorageState<
+    ProductTypeWithCompanyId[] | string | null
+  >('product_type', null, 'asyncStorage');
+  const [countries, setCountries] = useStorageState<Country[] | string | null>(
+    'countries',
+    null,
+    'asyncStorage'
+  );
+  const [offlineFarmers, setOfflineFarmers] = useStorageState<
+    | (
+        | {
+            companyId: number;
+            farmers: Farmer[];
+          }
+        | undefined
+      )[]
+    | string
+    | null
+  >('offline_farmers', null, 'asyncStorage');
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
@@ -113,6 +148,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           const user = responseUserData.data.data as User;
           setUser(user);
           setSelectedCompany(user.companyIds[0]);
+
+          await fetchAndStoreData(user);
 
           const companyDetailsPromises = user.companyIds.map((companyId) =>
             axios.get(`${apiUri}/company/profile/${companyId}`, {
@@ -185,6 +222,78 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     });
   };
 
+  const fetchAndStoreData = async (user: User): Promise<void> => {
+    //product types
+
+    const productTypesPromises = user.companyIds.map((companyId) =>
+      axios
+        .get(
+          `${apiUri}/company/${companyId}/product-types?limit=1000&offset=0`,
+          {
+            headers: {
+              /* Cookie: `inatrace-accessToken=${accessToken}`, */
+            },
+          }
+        )
+        .then((response) => ({ response, companyId }))
+    );
+
+    const productTypesResponses = await Promise.all(productTypesPromises);
+    const productTypes = productTypesResponses.map(
+      async ({ response, companyId }) => {
+        if (response.data.status === 'OK') {
+          const productTypes = response.data.data.items.map(
+            (productType: ProductType) => {
+              return {
+                companyId,
+                productType: productType,
+              };
+            }
+          );
+          return productTypes;
+        }
+      }
+    );
+
+    const productTypesResp = await Promise.all(productTypes);
+    setProductTypes(productTypesResp);
+
+    //countries
+    const countriesResponse = await axios.get(
+      `${apiUri}/common/countries?requestType=FETCH&limit=500&sort=ASC`,
+      {
+        headers: {
+          /* Cookie: `inatrace-accessToken=${accessToken}`, */
+        },
+      }
+    );
+    const countriesResp = countriesResponse.data.data.items as Country[];
+    setCountries(countriesResp);
+
+    //farmers
+    const farmersPromises = user.companyIds.map((companyId) =>
+      axios
+        .get(`${apiUri}/company/userCustomers/${companyId}/FARMER`, {
+          headers: {
+            /* Cookie: `inatrace-accessToken=${accessToken}`, */
+          },
+        })
+        .then((response) => ({ response, companyId }))
+    );
+    const farmersResponses = await Promise.all(farmersPromises);
+
+    const farmers = farmersResponses.map(async ({ response, companyId }) => {
+      if (response.data.status === 'OK') {
+        return {
+          companyId,
+          farmers: response.data.data.items as Farmer[],
+        };
+      }
+    });
+    const farmersResp = await Promise.all(farmers);
+    setOfflineFarmers(farmersResp);
+  };
+
   const getConnection = async () => {
     return await NetInfo.fetch();
   };
@@ -211,6 +320,9 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         user,
         selectedCompany,
         companies,
+        productTypes,
+        countries,
+        offlineFarmers,
         getConnection: getConnection(),
         isConnected,
         selectedFarmer,

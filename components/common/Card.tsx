@@ -1,9 +1,9 @@
-import { View, Text, Pressable, Platform } from 'react-native';
-import { ChevronDown, MoveDiagonal } from 'lucide-react-native';
+import { View, Text, Pressable, Platform, TextInput } from 'react-native';
+import { ChevronDown, MoveDiagonal, Search } from 'lucide-react-native';
 import { router } from 'expo-router';
 import cn from '@/utils/cn';
 import { AuthContext } from '@/context/AuthContext';
-import { useCallback, useContext, useMemo, useRef } from 'react';
+import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { Farmer } from '@/types/farmer';
 import { InputCard } from './Input';
 import { FullWindowOverlay } from 'react-native-screens';
@@ -13,6 +13,8 @@ import {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 import Selector from './Selector';
+import Colors from '@/constants/Colors';
+import i18n from '@/locales/i18n';
 
 export type CardProps = {
   items: Array<ItemProps>;
@@ -33,6 +35,8 @@ export type ItemProps = {
   selectItems?: Array<{ label: string; value: string }>;
   setValue?: (text: string) => void;
   isSelectScrollable?: boolean;
+  selectWithSearch?: boolean;
+  updateSearch?: (search: string) => void;
 };
 
 export default function Card({
@@ -124,7 +128,7 @@ const ItemView = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
         isLast && 'border-b-0'
       )}
     >
-      <Text className="text-[16px]">{item.name}</Text>
+      <Text className="text-[16px] max-w-[45%]">{item.name}</Text>
       <Text className="text-DarkGray text-[16px]">{item.value}</Text>
     </View>
   );
@@ -138,7 +142,7 @@ const ItemType = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
         isLast && 'border-b-0'
       )}
     >
-      <Text className="text-[16px] mr-3">{item.name}</Text>
+      <Text className="text-[16px] mr-3 max-w-[45%]">{item.name}</Text>
       <InputCard
         value={item.value ?? ''}
         placeholder={item.placeholder}
@@ -160,6 +164,13 @@ const ItemSelect = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
     []
   );
 
+  const [search, setSearch] = useState<string>('');
+
+  const handleChangeSearch = (search: string) => {
+    setSearch(search);
+    item.updateSearch?.(search);
+  };
+
   return (
     <View className="">
       <View
@@ -168,10 +179,10 @@ const ItemSelect = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
           isLast && 'border-b-0'
         )}
       >
-        <Text className="text-[16px] mr-3">{item.name}</Text>
+        <Text className="text-[16px] mr-3 max-w-[45%]">{item.name}</Text>
         <Pressable
           onPress={handlePresentModalPress}
-          className="flex flex-row items-center flex-shrink px-2 border-b border-b-LightGray"
+          className="flex flex-row items-center flex-shrink px-2 py-1 border-b border-b-LightGray"
         >
           <Text
             className={cn('text-[16px]', item.value ? '' : 'text-DarkGray')}
@@ -199,6 +210,18 @@ const ItemSelect = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
         }
       >
         <BottomSheetScrollView className="rounded-t-md">
+          {item.selectWithSearch && (
+            <View className="relative flex flex-row items-center justify-between h-12 mx-5 mt-1 border rounded-md border-LightGray bg-White">
+              <Search className="absolute text-LightGray left-4" />
+              <TextInput
+                placeholder={i18n.t('farmers.search')}
+                value={search}
+                onChangeText={handleChangeSearch}
+                placeholderTextColor={Colors.darkGray}
+                className="text-[16px] h-12 px-2 pl-12 rounded-md w-full"
+              />
+            </View>
+          )}
           <Selector
             items={item.selectItems ?? []}
             selected={item.value ?? ''}

@@ -1,9 +1,11 @@
-import Card from '@/components/common/Card';
+import Card, { ItemProps } from '@/components/common/Card';
+import { AuthContext } from '@/context/AuthContext';
 import i18n from '@/locales/i18n';
+import { Country } from '@/types/country';
 import { Farmer } from '@/types/farmer';
 import { useNavigation } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
@@ -23,6 +25,9 @@ const genderItems = [
 ];
 
 export default function NewFarmer() {
+  const { countries } = useContext(AuthContext) as { countries: Country[] };
+  const [searchedCountries, setSearchedCountries] =
+    useState<Country[]>(countries);
   const navigation = useNavigation();
   const [farmer, setFarmer] = useState<Farmer>({} as Farmer);
 
@@ -52,6 +57,14 @@ export default function NewFarmer() {
 
       return updateNestedObject(currentFarmer, path, value);
     });
+  };
+
+  const updateSearchCountries = (search: string) => {
+    setSearchedCountries(
+      countries.filter((country) =>
+        country.name.toLowerCase().includes(search.toLowerCase())
+      )
+    );
   };
 
   useEffect(() => {
@@ -116,9 +129,155 @@ export default function NewFarmer() {
       <Text className="text-[18px] font-medium mt-5 mx-5">
         {i18n.t('farmers.info.address.title')}
       </Text>
+      <Card
+        items={[
+          {
+            type: 'select',
+            name: i18n.t('farmers.info.address.country'),
+            placeholder: i18n.t('input.select'),
+            value: farmer?.location?.address?.country?.name ?? '',
+            setValue: (value: string) =>
+              updateState(
+                ['location', 'address', 'country'],
+                searchedCountries?.find((country) => country.name === value) ??
+                  {}
+              ),
+            selectItems: searchedCountries?.map((country: Country) => ({
+              label: country.name,
+              value: country.name,
+            })),
+            selectWithSearch: true,
+            updateSearch: updateSearchCountries,
+          },
+          ...((farmer?.location?.address?.country?.code === 'HN'
+            ? [
+                {
+                  type: 'type',
+                  name: i18n.t('farmers.info.address.hondurasFarm'),
+                  placeholder: i18n.t('input.type'),
+                  value: farmer?.location?.address?.hondurasFarm ?? '',
+                  setValue: (value: string) =>
+                    updateState(['location', 'address', 'hondurasFarm'], value),
+                },
+                {
+                  type: 'type',
+                  name: i18n.t('farmers.info.address.hondurasVillage'),
+                  placeholder: i18n.t('input.type'),
+                  value: farmer?.location?.address?.hondurasVillage ?? '',
+                  setValue: (value: string) =>
+                    updateState(
+                      ['location', 'address', 'hondurasVillage'],
+                      value
+                    ),
+                },
+                {
+                  type: 'type',
+                  name: i18n.t('farmers.info.address.hondurasMunicipality'),
+                  placeholder: i18n.t('input.type'),
+                  value: farmer?.location?.address?.hondurasMunicipality ?? '',
+                  setValue: (value: string) =>
+                    updateState(
+                      ['location', 'address', 'hondurasMunicipality'],
+                      value
+                    ),
+                },
+                {
+                  type: 'type',
+                  name: i18n.t('farmers.info.address.hondurasDepartment'),
+                  placeholder: i18n.t('input.type'),
+                  value: farmer?.location?.address?.hondurasDepartment ?? '',
+                  setValue: (value: string) =>
+                    updateState(
+                      ['location', 'address', 'hondurasDepartment'],
+                      value
+                    ),
+                },
+              ]
+            : farmer?.location?.address?.country?.code === 'RW'
+              ? [
+                  {
+                    type: 'type',
+                    name: i18n.t('farmers.info.address.village'),
+                    placeholder: i18n.t('input.type'),
+                    value: farmer?.location?.address?.village ?? '',
+                    setValue: (value: string) =>
+                      updateState(['location', 'address', 'village'], value),
+                  },
+                  {
+                    type: 'type',
+                    name: i18n.t('farmers.info.address.cell'),
+                    placeholder: i18n.t('input.type'),
+                    value: farmer?.location?.address?.cell ?? '',
+                    setValue: (value: string) =>
+                      updateState(['location', 'address', 'cell'], value),
+                  },
+                  {
+                    type: 'type',
+                    name: i18n.t('farmers.info.address.sector'),
+                    placeholder: i18n.t('input.type'),
+                    value: farmer?.location?.address?.sector ?? '',
+                    setValue: (value: string) =>
+                      updateState(['location', 'address', 'sector'], value),
+                  },
+                ]
+              : [
+                  {
+                    type: 'type',
+                    name: i18n.t('farmers.info.address.address'),
+                    placeholder: i18n.t('input.type'),
+                    value: farmer?.location?.address?.address ?? '',
+                    setValue: (value: string) =>
+                      updateState(['location', 'address', 'address'], value),
+                  },
+                  {
+                    type: 'type',
+                    name: i18n.t('farmers.info.address.city'),
+                    placeholder: i18n.t('input.type'),
+                    value: farmer?.location?.address?.city ?? '',
+                    setValue: (value: string) =>
+                      updateState(['location', 'address', 'city'], value),
+                  },
+                  {
+                    type: 'type',
+                    name: i18n.t('farmers.info.address.state'),
+                    placeholder: i18n.t('input.type'),
+                    value: farmer?.location?.address?.state ?? '',
+                    setValue: (value: string) =>
+                      updateState(['location', 'address', 'state'], value),
+                  },
+                  {
+                    type: 'type',
+                    name: i18n.t('farmers.info.address.zip'),
+                    placeholder: i18n.t('input.type'),
+                    value: farmer?.location?.address?.zip ?? '',
+                    setValue: (value: string) =>
+                      updateState(['location', 'address', 'zip'], value),
+                  },
+                ]) as ItemProps[]),
+        ]}
+      />
+
       <Text className="text-[18px] font-medium mt-5 mx-5">
         {i18n.t('farmers.info.contact.title')}
       </Text>
+      <Card
+        items={[
+          {
+            type: 'type',
+            name: i18n.t('farmers.info.contact.phoneNumber'),
+            placeholder: i18n.t('input.type'),
+            value: farmer?.phone ?? '',
+            setValue: (value: string) => updateState(['phone'], value),
+          },
+          {
+            type: 'type',
+            name: i18n.t('farmers.info.contact.email'),
+            placeholder: i18n.t('input.type'),
+            value: farmer?.email ?? '',
+            setValue: (value: string) => updateState(['email'], value),
+          },
+        ]}
+      />
       <Text className="text-[18px] font-medium mt-5 mx-5">
         {i18n.t('farmers.info.productTypes.title')}
       </Text>

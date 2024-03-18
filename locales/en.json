@@ -76,7 +76,15 @@
         "country": "Country",
         "village": "Village",
         "cell": "Cell",
-        "sector": "Sector"
+        "sector": "Sector",
+        "address": "Street address",
+        "city": "City",
+        "state": "State / Province / Region",
+        "zip": "Zip / Postal Code / P.O. Box",
+        "hondurasFarm": "Farm",
+        "hondurasVillage": "Village",
+        "hondurasMunicipality": "Municipality",
+        "hondurasDepartment": "Department"
       },
       "contact": {
         "title": "Contact",
@@ -113,6 +121,8 @@
     }
   },
   "plots": {
-    "title": "View plots"
+    "title": "View plots",
+    "listView": "List view",
+    "mapView": "Map view"
   }
 }

@@ -62,8 +62,7 @@ export default function Farmers() {
   const [offset, setOffset] = useState<number>(0);
   const limit = 10;
 
-  const { getConnection, makeRequest, selectedCompany } =
-    useContext(AuthContext);
+  const { isConnected, makeRequest, selectedCompany } = useContext(AuthContext);
 
   useEffect(() => {
     if (offset !== 0) {
@@ -78,8 +77,7 @@ export default function Farmers() {
     offsetHF: number,
     resetData: boolean
   ) => {
-    const connection = await getConnection;
-    if (connection.isConnected) {
+    if (isConnected) {
       fetchFarmers(limitHF, offsetHF, resetData);
     } else {
       loadFarmers();
@@ -127,7 +125,9 @@ export default function Farmers() {
           } as CardProps;
         });
 
-        setDataCount(response.data.data.count);
+        setDataCount(
+          response.data.data.count === 0 ? 1 : response.data.data.count
+        );
         if (resetData) {
           setData(farmers);
           setOffset(0);
