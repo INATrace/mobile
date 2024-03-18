@@ -30,6 +30,8 @@
     "spanish": "Spanish",
     "german": "German",
     "kinyarwanda": "Kinyarwanda",
+    "offlineMaps": "Offline maps",
+    "offlineMapsSettings": "Offline maps settings",
     "resetPassword": "Reset password",
     "logOut": "Log out"
   },
@@ -123,6 +125,7 @@
   "plots": {
     "title": "View plots",
     "listView": "List view",
-    "mapView": "Map view"
+    "mapView": "Map view",
+    "mapDownload": "Map download"
   }
 }

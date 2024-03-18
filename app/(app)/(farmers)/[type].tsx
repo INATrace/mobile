@@ -96,7 +96,7 @@ export default function Farmers() {
       const sortType = sort[2];
 
       const response = await makeRequest({
-        url: `/company/userCustomers/${selectedCompany}/FARMER?limit=${limit}&offset=${offset}&sortBy=${sortBy}&sort=${sortType}&query=${search}&searchBy=${selectedFilter}`,
+        url: `/api/company/userCustomers/${selectedCompany}/FARMER?limit=${limit}&offset=${offset}&sortBy=${sortBy}&sort=${sortType}&query=${search}&searchBy=${selectedFilter}`,
         method: 'GET',
       });
 

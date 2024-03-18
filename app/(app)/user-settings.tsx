@@ -21,7 +21,7 @@ import { router, useNavigation } from 'expo-router';
 import i18n from '@/locales/i18n';
 import { Input } from '@/components/common/Input';
 import LanguageSwitcher from '@/components/settings/LanguageSwitcher';
-import { ChevronDown, ChevronLeft, LogOut } from 'lucide-react-native';
+import { ChevronDown, ChevronLeft, LogOut, Map } from 'lucide-react-native';
 import { CompanyInfo } from '@/types/company';
 import {
   BottomSheetBackdrop,
@@ -85,7 +85,7 @@ export default function UserSettings() {
   };
 
   const resetPassword = async () => {
-    const url = 'https://test.inatrace.org/en/reset-password';
+    const url = process.env.EXPO_PUBLIC_API_URI + '/en/reset-password';
     const canOpen = await Linking.canOpenURL(url);
 
     if (canOpen) {
@@ -96,133 +96,142 @@ export default function UserSettings() {
   };
 
   return (
-    <View className="h-full p-5 border-t bg-White border-t-LightGray">
-      <ScrollView className="h-full">
-        <Text className="text-[18px] font-medium">
-          {i18n.t('userSettings.userInformation')}
-        </Text>
-        <View className="flex flex-row items-center mx-1.5 mt-5 justify-evenly">
-          <View className="w-1/2">
-            <Text>{i18n.t('userSettings.name')}</Text>
-            <Input
-              value={user?.name || ''}
-              onChangeText={() => {}}
-              editable={false}
-            />
-          </View>
-          <View className="mx-2.5" />
-          <View className="w-1/2">
-            <Text>{i18n.t('userSettings.surname')}</Text>
-            <Input
-              value={user?.surname || ''}
-              onChangeText={() => {}}
-              editable={false}
-            />
-          </View>
-        </View>
-        <View className="mt-3">
-          <Text>{i18n.t('userSettings.username')}</Text>
+    <ScrollView className="h-full p-5 border-t bg-White border-t-LightGray">
+      <Text className="text-[18px] font-medium">
+        {i18n.t('userSettings.userInformation')}
+      </Text>
+      <View className="flex flex-row items-center mx-1.5 mt-5 justify-evenly">
+        <View className="w-1/2">
+          <Text>{i18n.t('userSettings.name')}</Text>
           <Input
-            value={user?.email || ''}
+            value={user?.name || ''}
             onChangeText={() => {}}
             editable={false}
           />
         </View>
-        <Text className="text-[18px] font-medium mt-5">
-          {i18n.t('userSettings.companyInformation')}
-        </Text>
-        <View className="flex flex-row items-center justify-between w-full mt-3">
-          <View className="flex flex-row items-center justify-center w-20 h-20 border rounded-full border-LightGray">
+        <View className="mx-2.5" />
+        <View className="w-1/2">
+          <Text>{i18n.t('userSettings.surname')}</Text>
+          <Input
+            value={user?.surname || ''}
+            onChangeText={() => {}}
+            editable={false}
+          />
+        </View>
+      </View>
+      <View className="mt-3">
+        <Text>{i18n.t('userSettings.username')}</Text>
+        <Input
+          value={user?.email || ''}
+          onChangeText={() => {}}
+          editable={false}
+        />
+      </View>
+      <Text className="text-[18px] font-medium mt-5">
+        {i18n.t('userSettings.companyInformation')}
+      </Text>
+      <View className="flex flex-row items-center justify-between w-full mt-3">
+        <View className="flex flex-row items-center justify-center w-20 h-20 border rounded-full border-LightGray">
+          {company?.logo && (
             <Image
               source={{
                 uri: company?.logo,
               }}
               className="w-[76px] h-[76px] rounded-full"
             />
-          </View>
-          <View className="flex flex-col items-start w-full ml-4">
-            <Text className="text-[16px]">
-              {i18n.t('userSettings.company')}
-            </Text>
-            {isConnected ? (
-              <>
-                <Pressable
-                  className="flex flex-row items-center justify-between min-h-[48px] px-2 mt-2 border rounded-md border-LightGray"
-                  style={{ width: Dimensions.get('window').width - 136 }}
-                  onPress={handlePresentModalPress}
-                >
-                  <Text className="text-[16px] w-[85%]">{company?.name}</Text>
-                  <ChevronDown className="text-black" />
-                </Pressable>
-                <BottomSheetModal
-                  ref={bottomSheetRef}
-                  index={0}
-                  snapPoints={snapPoints}
-                  backdropComponent={(props) => (
-                    <BottomSheetBackdrop
-                      {...props}
-                      onPress={() => bottomSheetRef.current?.close()}
-                      disappearsOnIndex={-1}
+          )}
+        </View>
+        <View className="flex flex-col items-start w-full ml-4">
+          <Text className="text-[16px]">{i18n.t('userSettings.company')}</Text>
+          {isConnected ? (
+            <>
+              <Pressable
+                className="flex flex-row items-center justify-between min-h-[48px] px-2 mt-2 border rounded-md border-LightGray"
+                style={{ width: Dimensions.get('window').width - 136 }}
+                onPress={handlePresentModalPress}
+              >
+                <Text className="text-[16px] w-[85%]">{company?.name}</Text>
+                <ChevronDown className="text-black" />
+              </Pressable>
+              <BottomSheetModal
+                ref={bottomSheetRef}
+                index={0}
+                snapPoints={snapPoints}
+                backdropComponent={(props) => (
+                  <BottomSheetBackdrop
+                    {...props}
+                    onPress={() => bottomSheetRef.current?.close()}
+                    disappearsOnIndex={-1}
+                  />
+                )}
+                enableDismissOnClose={true}
+                containerComponent={
+                  Platform.OS === 'ios' ? containerComponent : undefined
+                }
+              >
+                <BottomSheetScrollView className="rounded-t-md">
+                  {typeof companies !== 'string' && (
+                    <Selector
+                      items={
+                        companies?.map((company) => ({
+                          label: company?.name ?? '',
+                          value: company?.id ?? 0,
+                        })) ?? []
+                      }
+                      selected={company?.id ?? 0}
+                      setSelected={selectCompany}
                     />
                   )}
-                  enableDismissOnClose={true}
-                  containerComponent={
-                    Platform.OS === 'ios' ? containerComponent : undefined
-                  }
-                >
-                  <BottomSheetScrollView className="rounded-t-md">
-                    {typeof companies !== 'string' && (
-                      <Selector
-                        items={
-                          companies?.map((company) => ({
-                            label: company?.name ?? '',
-                            value: company?.id ?? 0,
-                          })) ?? []
-                        }
-                        selected={company?.id ?? 0}
-                        setSelected={selectCompany}
-                      />
-                    )}
-                  </BottomSheetScrollView>
-                </BottomSheetModal>
-              </>
-            ) : (
-              <Pressable
-                className="flex flex-row items-center justify-between h-12 px-2 mt-2 border rounded-md border-LightGray"
-                style={{ width: Dimensions.get('window').width - 136 }}
-              >
-                <Text className="text-[16px] text-DarkGray">
-                  {company?.name}
-                </Text>
-              </Pressable>
-            )}
-          </View>
+                </BottomSheetScrollView>
+              </BottomSheetModal>
+            </>
+          ) : (
+            <Pressable
+              className="flex flex-row items-center justify-between h-12 px-2 mt-2 border rounded-md border-LightGray"
+              style={{ width: Dimensions.get('window').width - 136 }}
+            >
+              <Text className="text-[16px] text-DarkGray">{company?.name}</Text>
+            </Pressable>
+          )}
         </View>
-        <Text className="text-[18px] font-medium mt-5 mb-3">
-          {i18n.t('userSettings.language')}
-        </Text>
-        <LanguageSwitcher />
-        <View className="flex flex-row items-center justify-between mt-5">
-          <Pressable
-            onPress={() => resetPassword()}
-            className="w-[55%] px-5 py-3 rounded-md bg-Green flex flex-row items-center justify-center"
-          >
-            <Text className="text-White font-semibold text-[16px]">
-              {i18n.t('userSettings.resetPassword')}
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => handleLogOut()}
-            className="flex flex-row items-center justify-center w-[40%] px-5 py-3 rounded-md bg-Orange"
-          >
-            <LogOut className="text-White" size={20} />
-            <View className="w-2" />
-            <Text className="text-White font-semibold text-[16px]">
-              {i18n.t('userSettings.logOut')}
-            </Text>
-          </Pressable>
-        </View>
-      </ScrollView>
-    </View>
+      </View>
+      <Text className="text-[18px] font-medium mt-5 mb-3">
+        {i18n.t('userSettings.offlineMaps')}
+      </Text>
+      <View className="flex flex-row items-center justify-between">
+        <Pressable
+          onPress={() => router.push('/map-download')}
+          className="flex flex-row items-center justify-center w-full h-12 px-2 rounded-md bg-Orange"
+        >
+          <Map className="mr-2 text-White" size={20} />
+          <Text className="text-White font-semibold text-[16px]">
+            {i18n.t('userSettings.offlineMapsSettings')}
+          </Text>
+        </Pressable>
+      </View>
+      <Text className="text-[18px] font-medium mt-5 mb-3">
+        {i18n.t('userSettings.language')}
+      </Text>
+      <LanguageSwitcher />
+      <View className="flex flex-row items-center justify-between mt-5 mb-10">
+        <Pressable
+          onPress={() => resetPassword()}
+          className="w-[55%] px-5 py-3 rounded-md bg-Green flex flex-row items-center justify-center"
+        >
+          <Text className="text-White font-semibold text-[16px]">
+            {i18n.t('userSettings.resetPassword')}
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => handleLogOut()}
+          className="flex flex-row items-center justify-center w-[40%] px-5 py-3 rounded-md bg-Orange"
+        >
+          <LogOut className="mr-2 text-White" size={20} />
+          <Text className="text-White font-semibold text-[16px]">
+            {i18n.t('userSettings.logOut')}
+          </Text>
+        </Pressable>
+      </View>
+    </ScrollView>
   );
 }

@@ -4,9 +4,7 @@ import Mapbox from '@rnmapbox/maps';
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 
-Mapbox.setAccessToken(
-  'pk.eyJ1IjoicGlub2tva29sIiwiYSI6ImNsdHdhaHdvcjB5am4yam91eXlvejJoY3kifQ.IfRVFPK6C99qjX13FfT30A'
-);
+Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '');
 
 export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
   const [location, setLocation] = useState<Location.LocationObject | null>(

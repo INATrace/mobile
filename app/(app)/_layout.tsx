@@ -1,9 +1,12 @@
 import { Stack, router, useSegments } from 'expo-router';
 
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 import { AuthContext } from '@/context/AuthContext';
 import i18n from '@/locales/i18n';
+
+import MapboxGL from '@rnmapbox/maps';
+import OfflinePack from '@rnmapbox/maps/lib/typescript/src/modules/offline/OfflinePack';
 
 export const unstable_settings = {
   initialRouteName: 'index',
@@ -15,6 +18,7 @@ export default function AppLayout() {
   const segments = useSegments();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const hasNavigatedToMapDownload = useRef<boolean>(false);
 
   useEffect(() => {
     handleAuthCheck();
@@ -31,7 +35,20 @@ export default function AppLayout() {
         router.replace('/login');
       } else {
         setIsLoading(false);
+        checkForOfflineMaps();
       }
+    }
+  };
+
+  const checkForOfflineMaps = async () => {
+    try {
+      const packs: OfflinePack[] = await MapboxGL.offlineManager.getPacks();
+      if (packs.length === 0 && !hasNavigatedToMapDownload.current) {
+        hasNavigatedToMapDownload.current = true;
+        router.push('/map-download');
+      }
+    } catch (error) {
+      console.error('Error fetching offline packs:', error);
     }
   };
 

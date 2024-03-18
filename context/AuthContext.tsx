@@ -10,7 +10,7 @@ import { Farmer, ProductType, ProductTypeWithCompanyId } from '@/types/farmer';
 import { CompanyInfo } from '@/types/company';
 import { Country } from '@/types/country';
 
-const apiUri = 'https://test.inatrace.org/api';
+const apiUri = process.env.EXPO_PUBLIC_API_URI;
 
 export const AuthContext = createContext<{
   logIn: (username: string, password: string) => Promise<LogInResponse>;
@@ -123,7 +123,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     password: string
   ): Promise<LogInResponse> => {
     try {
-      const responseLogin = await axios.post(`${apiUri}/user/login`, {
+      const responseLogin = await axios.post(`${apiUri}/api/user/login`, {
         username,
         password,
       });
@@ -138,7 +138,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
 
         setAccessToken(accessToken);
 
-        const responseUserData = await axios.get(`${apiUri}/user/profile`, {
+        const responseUserData = await axios.get(`${apiUri}/api/user/profile`, {
           headers: {
             /* Cookie: `inatrace-accessToken=${accessToken}`, */
           },
@@ -152,7 +152,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           await fetchAndStoreData(user);
 
           const companyDetailsPromises = user.companyIds.map((companyId) =>
-            axios.get(`${apiUri}/company/profile/${companyId}`, {
+            axios.get(`${apiUri}/api/company/profile/${companyId}`, {
               headers: {
                 /* Cookie: `inatrace-accessToken=${accessToken}`, */
               },
@@ -169,7 +169,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
                   id: response.data.data.id,
                   name: response.data.data.name,
                   logo: await urlToBase64(
-                    `${apiUri}/common/image/${response.data.data.logo.storageKey}/SMALL`,
+                    `${apiUri}/api/common/image/${response.data.data.logo.storageKey}/SMALL`,
                     accessToken
                   ),
                 } as CompanyInfo;
@@ -201,6 +201,9 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     setSelectedCompany(null);
     setCompanies(null);
     setSelectedFarmer(null);
+    setProductTypes(null);
+    setCountries(null);
+    setOfflineFarmers(null);
   };
 
   const makeRequest = async ({ url, method, body, headers }: RequestParams) => {
@@ -228,7 +231,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     const productTypesPromises = user.companyIds.map((companyId) =>
       axios
         .get(
-          `${apiUri}/company/${companyId}/product-types?limit=1000&offset=0`,
+          `${apiUri}/api/company/${companyId}/product-types?limit=1000&offset=0`,
           {
             headers: {
               /* Cookie: `inatrace-accessToken=${accessToken}`, */
@@ -260,7 +263,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
 
     //countries
     const countriesResponse = await axios.get(
-      `${apiUri}/common/countries?requestType=FETCH&limit=500&sort=ASC`,
+      `${apiUri}/api/common/countries?requestType=FETCH&limit=500&sort=ASC`,
       {
         headers: {
           /* Cookie: `inatrace-accessToken=${accessToken}`, */
@@ -273,7 +276,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     //farmers
     const farmersPromises = user.companyIds.map((companyId) =>
       axios
-        .get(`${apiUri}/company/userCustomers/${companyId}/FARMER`, {
+        .get(`${apiUri}/api/company/userCustomers/${companyId}/FARMER`, {
           headers: {
             /* Cookie: `inatrace-accessToken=${accessToken}`, */
           },

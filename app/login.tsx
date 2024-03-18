@@ -30,7 +30,7 @@ export default function Login() {
   const { logIn } = useContext(AuthContext);
 
   const resetPassword = async () => {
-    const url = 'https://test.inatrace.org/en/reset-password';
+    const url = process.env.EXPO_PUBLIC_API_URI + '/en/reset-password';
     const canOpen = await Linking.canOpenURL(url);
 
     if (canOpen) {
