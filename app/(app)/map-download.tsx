@@ -1,8 +1,20 @@
 import OfflinePack from '@rnmapbox/maps/lib/typescript/src/modules/offline/OfflinePack';
 import { useNavigation } from 'expo-router';
-import { ChevronLeft, Download } from 'lucide-react-native';
+import {
+  ChevronLeft,
+  CircleEllipsis,
+  Download,
+  Trash,
+} from 'lucide-react-native';
 import { createRef, useEffect, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  Alert,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import i18n from '@/locales/i18n';
 import * as Location from 'expo-location';
@@ -111,6 +123,16 @@ export default function MapDownload() {
     }
   };
 
+  const deletePack = (pack: OfflinePack) => async () => {
+    try {
+      await Mapbox.offlineManager.deletePack(pack.name);
+      checkForOfflineMaps();
+    } catch (error) {
+      console.error('Error deleting offline pack:', error);
+      Alert.alert('Error', 'There was an error deleting the pack.');
+    }
+  };
+
   return (
     <View className="h-full">
       {selectingMap ? (
@@ -175,12 +197,20 @@ export default function MapDownload() {
             </Text>
           </Pressable>
           {offlinePacks.length > 0 ? (
-            <ScrollView>
-              <Text>Downloaded Maps:</Text>
+            <ScrollView className="mt-5">
+              <Text className="text-[18px] font-medium">
+                {i18n.t('plots.offlineMapsScreen.downloadedMaps')}
+              </Text>
               {offlinePacks.map((pack, index) => (
-                <Text key={index}>{pack.name}:</Text>
+                <View>
+                  <View>
+                    <Text key={index}>{pack.name}</Text>
+                  </View>
+                  <Pressable onPress={deletePack(pack)} className="flex-row">
+                    <Trash className="text-red-500" size={20} />
+                  </Pressable>
+                </View>
               ))}
-              <Text>Total Size: 0</Text>
             </ScrollView>
           ) : (
             <View className="mt-5">

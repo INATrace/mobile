@@ -6,14 +6,21 @@ import { Pressable, View, Text } from 'react-native';
 export type ViewSwitcherProps = {
   viewType: 'list' | 'map';
   setViewType: (viewType: 'list' | 'map') => void;
+  padding?: boolean;
 };
 
 export default function ViewSwitcher({
   viewType,
   setViewType,
+  padding,
 }: ViewSwitcherProps) {
   return (
-    <View className="flex flex-row items-center justify-between p-5">
+    <View
+      className={cn(
+        'flex flex-row items-center justify-between',
+        padding && 'p-5'
+      )}
+    >
       <Pressable
         onPress={() => setViewType('list')}
         className={cn(

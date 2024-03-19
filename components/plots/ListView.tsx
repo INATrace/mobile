@@ -4,7 +4,7 @@ import ViewSwitcher, { ViewSwitcherProps } from './ViewSwitcher';
 export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
   return (
     <ScrollView>
-      <ViewSwitcher viewType={viewType} setViewType={setViewType} />
+      <ViewSwitcher viewType={viewType} setViewType={setViewType} padding />
     </ScrollView>
   );
 }

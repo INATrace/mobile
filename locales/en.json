@@ -135,6 +135,12 @@
       "cancel": "Cancel",
       "download": "Download",
       "sizeWarning": "Downloads may take up to %{} MB of your free space"
+    },
+    "addPlot": {
+      "newPlot": "New plot",
+      "addCurrentLocation": "Add current location",
+      "cancel": "Cancel",
+      "savePlotShape": "Save plot shape"
     }
   }
 }
