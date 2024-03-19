@@ -126,6 +126,15 @@
     "title": "View plots",
     "listView": "List view",
     "mapView": "Map view",
-    "mapDownload": "Map download"
+    "mapDownload": "Map download",
+    "offlineMapsScreen": {
+      "downloadedMaps": "Downloaded maps",
+      "noMapsDownloaded": "No offline maps downloaded",
+      "selectYourOwnMap": "Select your own map",
+      "downloadThisMap": "Download this map?",
+      "cancel": "Cancel",
+      "download": "Download",
+      "sizeWarning": "Downloads may take up to %{} MB of your free space"
+    }
   }
 }
