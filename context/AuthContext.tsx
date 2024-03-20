@@ -168,10 +168,10 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
                 const companyInfo = {
                   id: response.data.data.id,
                   name: response.data.data.name,
-                  logo: await urlToBase64(
+                  logo: '' /* await urlToBase64(
                     `${apiUri}/api/common/image/${response.data.data.logo.storageKey}/SMALL`,
                     accessToken
-                  ),
+                  ), */,
                 } as CompanyInfo;
                 return companyInfo;
               }
