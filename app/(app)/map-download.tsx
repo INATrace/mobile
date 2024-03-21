@@ -75,7 +75,6 @@ export default function MapDownload() {
     }
 
     let currentLocation = await Location.getCurrentPositionAsync({});
-    console.log('Current location:', currentLocation);
     setLocation(currentLocation);
   };
 

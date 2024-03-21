@@ -143,7 +143,11 @@
       "savePlotShape": "Save plot shape",
       "lowGPSAccuracy": "Low GPS accuracy (%{accuracy}m)",
       "mediumGPSAccuracy": "Medium GPS accuracy (%{accuracy}m)",
-      "highGPSAccuracy": "High GPS accuracy (%{accuracy}m)"
+      "highGPSAccuracy": "High GPS accuracy (%{accuracy}m)",
+      "undo": "Undo",
+      "redo": "Redo",
+      "notEnoughPointsTitle": "Not enough points",
+      "notEnoughPointsMessage": "Please add at least 3 points to create a plot"
     }
   }
 }

@@ -14,6 +14,13 @@ export default function FarmersLayout() {
         name="view/[id]"
         options={{ presentation: 'modal', title: i18n.t('plots.title') }}
       />
+      <Stack.Screen
+        name="view/add-plot"
+        options={{
+          presentation: 'modal',
+          title: i18n.t('plots.addPlot.newPlot'),
+        }}
+      />
     </Stack>
   );
 }

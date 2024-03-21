@@ -3,14 +3,17 @@ import { useStorageState } from './useStorageState';
 import { User } from '@/types/user';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import axios from 'axios';
-import { decode as atob } from 'base-64';
+import RNFetchBlob from 'rn-fetch-blob';
 
 import { LogInResponse, RequestParams } from '@/types/auth';
 import { Farmer, ProductType, ProductTypeWithCompanyId } from '@/types/farmer';
 import { CompanyInfo } from '@/types/company';
 import { Country } from '@/types/country';
+import { uuid } from 'expo-modules-core';
+import { Plot } from '@/types/plot';
 
 const apiUri = process.env.EXPO_PUBLIC_API_URI;
+let creatingImageCacheDir: any = null;
 
 export const AuthContext = createContext<{
   logIn: (username: string, password: string) => Promise<LogInResponse>;
@@ -18,6 +21,7 @@ export const AuthContext = createContext<{
   checkAuth: () => Promise<boolean>;
   selectFarmer: (farmer: Farmer) => void;
   selectCompany: (company: number | string | null) => void;
+  setNewPlot: (plot: Plot) => void;
   makeRequest: ({ url, method, body, headers }: RequestParams) => Promise<any>;
   accessToken: string | null;
   user: User | null;
@@ -38,6 +42,7 @@ export const AuthContext = createContext<{
   getConnection: Promise<NetInfoState>;
   isConnected: boolean;
   selectedFarmer: Farmer | string | null;
+  newPlot: Plot | null;
 }>({
   logIn: async () => ({ success: false, errorStatus: '' }),
   logOut: () => null,
@@ -45,6 +50,7 @@ export const AuthContext = createContext<{
   makeRequest: async () => null,
   selectFarmer: () => null,
   selectCompany: () => null,
+  setNewPlot: () => null,
   accessToken: null,
   user: null,
   companies: null,
@@ -55,6 +61,7 @@ export const AuthContext = createContext<{
   getConnection: Promise.resolve({ isConnected: false } as NetInfoState),
   isConnected: false,
   selectedFarmer: null,
+  newPlot: null,
 });
 
 const isTokenExpired = (token: string): boolean => {
@@ -105,6 +112,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   >('offline_farmers', null, 'asyncStorage');
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [newPlot, setNewPlot] = useState<Plot | null>(null);
 
   const checkAuth = async (): Promise<boolean> => {
     if (!(await NetInfo.fetch()).isConnected) {
@@ -138,11 +146,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
 
         setAccessToken(accessToken);
 
-        const responseUserData = await axios.get(`${apiUri}/api/user/profile`, {
-          headers: {
-            /* Cookie: `inatrace-accessToken=${accessToken}`, */
-          },
-        });
+        const responseUserData = await axios.get(`${apiUri}/api/user/profile`);
 
         if (responseUserData.data.status === 'OK') {
           const user = responseUserData.data.data as User;
@@ -152,11 +156,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           await fetchAndStoreData(user);
 
           const companyDetailsPromises = user.companyIds.map((companyId) =>
-            axios.get(`${apiUri}/api/company/profile/${companyId}`, {
-              headers: {
-                /* Cookie: `inatrace-accessToken=${accessToken}`, */
-              },
-            })
+            axios.get(`${apiUri}/api/company/profile/${companyId}`)
           );
 
           const companyDetailsResponses = await Promise.all(
@@ -165,13 +165,15 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           const companyDetails = companyDetailsResponses.map(
             async (response) => {
               if (response.data.status === 'OK') {
+                const logoFilePath = await downloadImageToFileSystem(
+                  `${apiUri}/api/common/image/${response.data.data.logo.storageKey}/SMALL`,
+                  accessToken
+                );
+
                 const companyInfo = {
                   id: response.data.data.id,
                   name: response.data.data.name,
-                  logo: '' /* await urlToBase64(
-                    `${apiUri}/api/common/image/${response.data.data.logo.storageKey}/SMALL`,
-                    accessToken
-                  ), */,
+                  logo: logoFilePath,
                 } as CompanyInfo;
                 return companyInfo;
               }
@@ -204,6 +206,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     setProductTypes(null);
     setCountries(null);
     setOfflineFarmers(null);
+    clearImageCache();
   };
 
   const makeRequest = async ({ url, method, body, headers }: RequestParams) => {
@@ -231,12 +234,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     const productTypesPromises = user.companyIds.map((companyId) =>
       axios
         .get(
-          `${apiUri}/api/company/${companyId}/product-types?limit=1000&offset=0`,
-          {
-            headers: {
-              /* Cookie: `inatrace-accessToken=${accessToken}`, */
-            },
-          }
+          `${apiUri}/api/company/${companyId}/product-types?limit=1000&offset=0`
         )
         .then((response) => ({ response, companyId }))
     );
@@ -263,12 +261,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
 
     //countries
     const countriesResponse = await axios.get(
-      `${apiUri}/api/common/countries?requestType=FETCH&limit=500&sort=ASC`,
-      {
-        headers: {
-          /* Cookie: `inatrace-accessToken=${accessToken}`, */
-        },
-      }
+      `${apiUri}/api/common/countries?requestType=FETCH&limit=500&sort=ASC`
     );
     const countriesResp = countriesResponse.data.data.items as Country[];
     setCountries(countriesResp);
@@ -276,11 +269,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     //farmers
     const farmersPromises = user.companyIds.map((companyId) =>
       axios
-        .get(`${apiUri}/api/company/userCustomers/${companyId}/FARMER`, {
-          headers: {
-            /* Cookie: `inatrace-accessToken=${accessToken}`, */
-          },
-        })
+        .get(`${apiUri}/api/company/userCustomers/${companyId}/FARMER`)
         .then((response) => ({ response, companyId }))
     );
     const farmersResponses = await Promise.all(farmersPromises);
@@ -329,6 +318,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         getConnection: getConnection(),
         isConnected,
         selectedFarmer,
+        newPlot,
+        setNewPlot,
       }}
     >
       {props.children}
@@ -336,26 +327,56 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   );
 }
 
-const urlToBase64 = async (
-  url: string,
-  accessToken: string
-): Promise<string | null> => {
+const downloadImageToFileSystem = async (url: string, accessToken: string) => {
   try {
-    const response = await axios.get(url, {
-      responseType: 'blob',
-      headers: {
+    const { config, fs } = RNFetchBlob;
+    const imageCacheDir = `${fs.dirs.CacheDir}/inatrace_images`;
+
+    if (!creatingImageCacheDir) {
+      creatingImageCacheDir = fs
+        .exists(imageCacheDir)
+        .then((exists) => {
+          if (!exists) {
+            return fs.mkdir(imageCacheDir);
+          }
+        })
+        .catch((error) => {
+          console.error('Directory check/create error:', error);
+        })
+        .finally(() => {
+          creatingImageCacheDir = null;
+        });
+
+      await creatingImageCacheDir;
+    } else {
+      await creatingImageCacheDir;
+    }
+
+    const options = {
+      path: `${imageCacheDir}/${uuid.v4()}.png`,
+      HTTPHeader: {
         Cookie: accessToken,
       },
-    });
+    };
 
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(response.data);
-    });
+    const res = await config(options).fetch('GET', url);
+    const filePath = res.path();
+    return 'file://' + filePath;
   } catch (error) {
-    console.error('Error fetching and converting image:', error);
+    console.error('Error downloading and saving image:', error);
     return null;
+  }
+};
+
+const clearImageCache = async () => {
+  const { fs } = RNFetchBlob;
+  const imageCacheDir = `${fs.dirs.CacheDir}/inatrace_images`;
+
+  try {
+    if (await fs.exists(imageCacheDir)) {
+      await fs.unlink(imageCacheDir);
+    }
+  } catch (error) {
+    console.error('Error clearing image cache directory:', error);
   }
 };
