@@ -134,13 +134,16 @@
       "downloadThisMap": "Download this map?",
       "cancel": "Cancel",
       "download": "Download",
-      "sizeWarning": "Downloads may take up to %{} MB of your free space"
+      "sizeWarning": "Downloads may take up to %{size} MB of your free space"
     },
     "addPlot": {
       "newPlot": "New plot",
       "addCurrentLocation": "Add current location",
       "cancel": "Cancel",
-      "savePlotShape": "Save plot shape"
+      "savePlotShape": "Save plot shape",
+      "lowGPSAccuracy": "Low GPS accuracy (%{accuracy}m)",
+      "mediumGPSAccuracy": "Medium GPS accuracy (%{accuracy}m)",
+      "highGPSAccuracy": "High GPS accuracy (%{accuracy}m)"
     }
   }
 }
