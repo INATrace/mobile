@@ -1,3 +1,4 @@
+import { ShadowButtonStyle } from '@/constants/Shadow';
 import i18n from '@/locales/i18n';
 import cn from '@/utils/cn';
 import { Link, LinkComponent } from 'expo-router';
@@ -29,19 +30,7 @@ export default function NewFarmerButton() {
 
 export const ButtonWrapper = ({ children }: any) => {
   return (
-    <View
-      className="absolute bottom-0 w-full"
-      style={{
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.45,
-        shadowRadius: 3.84,
-        elevation: 5,
-      }}
-    >
+    <View className="absolute bottom-0 w-full" style={ShadowButtonStyle}>
       {children}
     </View>
   );

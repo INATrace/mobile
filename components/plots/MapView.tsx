@@ -158,15 +158,13 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
       plotName: '',
       crop: '',
       numberOfPlants: 0,
-      unit: '',
-      size: 0,
-      geoId: '',
+      size: '',
+      geoId: 'XXXXXXXXXXXX',
       certification: '',
       organicStartOfTransition: '',
       featureInfo,
     });
 
-    console.log('New plot', featureInfo);
     router.push('/(app)/(farmers)/view/add-plot');
   };
 

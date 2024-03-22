@@ -5,7 +5,7 @@ import cn from '@/utils/cn';
 import { AuthContext } from '@/context/AuthContext';
 import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { Farmer } from '@/types/farmer';
-import { InputCard } from './Input';
+import { InputCard, InputCardDate } from './Input';
 import { FullWindowOverlay } from 'react-native-screens';
 import {
   BottomSheetBackdrop,
@@ -27,7 +27,7 @@ export type CardProps = {
 };
 
 export type ItemProps = {
-  type: 'view' | 'type' | 'select' | 'checkbox';
+  type: 'view' | 'type' | 'select' | 'checkbox' | 'date';
   name: string;
   value: string | null;
   placeholder?: string;
@@ -37,6 +37,9 @@ export type ItemProps = {
   isSelectScrollable?: boolean;
   selectWithSearch?: boolean;
   updateSearch?: (search: string) => void;
+  snapPoints?: string;
+  isNumeric?: boolean;
+  error?: boolean;
 };
 
 export default function Card({
@@ -113,6 +116,14 @@ export default function Card({
                   isLast={index === items.length - 1}
                 />
               );
+            case 'date':
+              return (
+                <ItemDate
+                  key={index}
+                  item={item}
+                  isLast={index === items.length - 1}
+                />
+              );
           }
         })}
       </View>
@@ -148,6 +159,8 @@ const ItemType = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
         placeholder={item.placeholder}
         editable={item.editable}
         onChangeText={item.setValue ?? (() => {})}
+        keyboardType={item.isNumeric ? 'numeric' : 'default'}
+        error={item.error}
       />
     </View>
   );
@@ -171,6 +184,10 @@ const ItemSelect = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
     item.updateSearch?.(search);
   };
 
+  const selected = item.selectItems?.find(
+    (selected) => selected.value === item.value
+  );
+
   return (
     <View className="">
       <View
@@ -182,14 +199,26 @@ const ItemSelect = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
         <Text className="text-[16px] mr-3 max-w-[45%]">{item.name}</Text>
         <Pressable
           onPress={handlePresentModalPress}
-          className="flex flex-row items-center flex-shrink px-2 py-1 border-b border-b-LightGray"
+          className={cn(
+            'flex flex-row items-center flex-shrink px-2 py-1 border-b border-b-LightGray',
+            item.error && 'border-b-red-500'
+          )}
         >
           <Text
-            className={cn('text-[16px]', item.value ? '' : 'text-DarkGray')}
+            className={cn(
+              'text-[16px]',
+              item.value ? '' : 'text-DarkGray',
+              item.error && 'text-red-500'
+            )}
           >
-            {item.value ? item.value : item.placeholder}
+            {selected ? selected.label : item.placeholder}
           </Text>
-          <ChevronDown className="ml-1 text-DarkGray" />
+          <ChevronDown
+            className={cn(
+              'ml-1',
+              item.error ? 'text-red-500' : 'text-DarkGray'
+            )}
+          />
         </Pressable>
       </View>
 
@@ -229,6 +258,26 @@ const ItemSelect = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
           />
         </BottomSheetScrollView>
       </BottomSheetModal>
+    </View>
+  );
+};
+
+const ItemDate = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
+  return (
+    <View
+      className={cn(
+        'flex flex-row items-center justify-between py-2 ml-4 pr-4 border-b border-b-LightGray',
+        isLast && 'border-b-0'
+      )}
+    >
+      <Text className="text-[16px] mr-3 max-w-[45%]">{item.name}</Text>
+      <InputCardDate
+        value={item.value ?? ''}
+        placeholder={item.placeholder}
+        editable={item.editable}
+        onChangeText={item.setValue ?? (() => {})}
+        error={item.error}
+      />
     </View>
   );
 };

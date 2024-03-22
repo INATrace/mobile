@@ -240,24 +240,18 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     );
 
     const productTypesResponses = await Promise.all(productTypesPromises);
+
     const productTypes = productTypesResponses.map(
       async ({ response, companyId }) => {
         if (response.data.status === 'OK') {
-          const productTypes = response.data.data.items.map(
-            (productType: ProductType) => {
-              return {
-                companyId,
-                productType: productType,
-              };
-            }
-          );
-          return productTypes;
+          return { companyId, productTypes: response.data.data.items };
         }
       }
     );
 
     const productTypesResp = await Promise.all(productTypes);
-    setProductTypes(productTypesResp);
+
+    setProductTypes(productTypesResp as any);
 
     //countries
     const countriesResponse = await axios.get(

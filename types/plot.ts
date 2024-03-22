@@ -3,8 +3,7 @@ export interface Plot {
   plotName: string;
   crop: string;
   numberOfPlants: number;
-  unit: string;
-  size: number;
+  size: string;
   geoId: string;
   certification: string;
   organicStartOfTransition: string;

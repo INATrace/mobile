@@ -147,7 +147,16 @@
       "undo": "Undo",
       "redo": "Redo",
       "notEnoughPointsTitle": "Not enough points",
-      "notEnoughPointsMessage": "Please add at least 3 points to create a plot"
+      "notEnoughPointsMessage": "Please add at least 3 points to create a plot",
+      "plotInformation": "Plot information",
+      "plotName": "Plot name",
+      "crop": "Crop",
+      "numberOfPlants": "Number of plants",
+      "size": "Size",
+      "geoId": "Geo-ID",
+      "certification": "Certification",
+      "organicStartOfTransition": "Organic start of transition",
+      "savePlot": "Save plot"
     }
   }
 }

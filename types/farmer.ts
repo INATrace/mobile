@@ -75,7 +75,7 @@ export interface Farmer {
 
 export interface ProductTypeWithCompanyId {
   companyId: number;
-  productType: ProductType;
+  productTypes: ProductType[];
 }
 
 export interface ProductType {
