@@ -11,6 +11,7 @@ import { CompanyInfo } from '@/types/company';
 import { Country } from '@/types/country';
 import { uuid } from 'expo-modules-core';
 import { Plot } from '@/types/plot';
+import { decode } from 'base-64';
 
 const apiUri = process.env.EXPO_PUBLIC_API_URI;
 let creatingImageCacheDir: any = null;
@@ -66,7 +67,7 @@ export const AuthContext = createContext<{
 
 const isTokenExpired = (token: string): boolean => {
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
+    const payload = JSON.parse(decode(token.split('.')[1]));
     const expirationDate = new Date(payload.exp * 1000);
     const currentDate = new Date();
 

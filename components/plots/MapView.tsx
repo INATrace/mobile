@@ -21,6 +21,7 @@ import { router } from 'expo-router';
 import { AuthContext } from '@/context/AuthContext';
 import { uuid } from 'expo-modules-core';
 import { FeatureInfo } from '@/types/plot';
+import area from '@turf/area';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '');
 
@@ -158,7 +159,7 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
       plotName: '',
       crop: '',
       numberOfPlants: 0,
-      size: '',
+      size: (area(featureInfo.geometry) / 1000).toFixed(2) + ' ha',
       geoId: 'XXXXXXXXXXXX',
       certification: '',
       organicStartOfTransition: '',
@@ -225,29 +226,30 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
               ref={cameraRef}
             />
             <Mapbox.PointAnnotation
-              id="userLocation"
               coordinate={[location.coords.longitude, location.coords.latitude]}
+              id="current-location"
             >
-              <View className="relative z-0 flex flex-row items-center justify-center w-5 h-5 bg-white rounded-full">
+              <View className="relative flex flex-row items-center justify-center w-5 h-5 bg-white rounded-full">
                 <View className="w-4 h-4 bg-blue-500 rounded-full" />
               </View>
             </Mapbox.PointAnnotation>
 
             {locationsForFeature.length > 0 &&
               locationsForFeature.map((location, index) => (
-                <Mapbox.PointAnnotation
+                <Mapbox.MarkerView
                   coordinate={[location[0], location[1]]}
-                  key={index.toString()}
+                  key={index}
                   id={`location-${index}`}
                 >
-                  <View className="relative z-10">
+                  <View className="relative z-10 mb-3">
                     <Text className="absolute z-20 left-[8.5px] top-[3px] text-White">
                       {index + 1}
                     </Text>
                     <MarkerSvg />
                   </View>
-                </Mapbox.PointAnnotation>
+                </Mapbox.MarkerView>
               ))}
+
             <Mapbox.ShapeSource
               id={'some-feature'}
               shape={featureCollection}

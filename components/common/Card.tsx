@@ -3,7 +3,14 @@ import { ChevronDown, MoveDiagonal, Search } from 'lucide-react-native';
 import { router } from 'expo-router';
 import cn from '@/utils/cn';
 import { AuthContext } from '@/context/AuthContext';
-import { useCallback, useContext, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Farmer } from '@/types/farmer';
 import { InputCard, InputCardDate } from './Input';
 import { FullWindowOverlay } from 'react-native-screens';

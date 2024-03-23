@@ -21,6 +21,7 @@
     "@react-navigation/native": "^6.0.2",
     "@rnmapbox/maps": "^10.1.19",
     "@shopify/flash-list": "^1.6.3",
+    "@turf/area": "^6.5.0",
     "axios": "^1.6.7",
     "base-64": "^1.0.0",
     "clsx": "^2.1.0",
