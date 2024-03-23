@@ -43,8 +43,12 @@ const realmRead = async (
       objects = objects.sorted(sortField, sortOrder === 'DESC');
     }
 
-    const results = objects.slice(offset, (offset ?? 0) + (limit ?? 0));
-
+    let results;
+    if (limit || offset) {
+      results = objects.slice(offset, (offset ?? 0) + (limit ?? 0));
+    } else {
+      results = objects;
+    }
     const plainResults = results.map((obj) => Object.assign({}, obj));
 
     return plainResults;

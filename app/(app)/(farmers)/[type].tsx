@@ -20,6 +20,7 @@ import NewFarmerButton, {
   ButtonWrapper,
 } from '@/components/farmers/NewFarmerButton';
 import { useLocalSearchParams } from 'expo-router';
+import { emptyComponent } from '@/components/common/FlashListComponents';
 
 const sortItems = [
   { label: i18n.t('farmers.sort.name'), value: 'BY_NAME_ASC', icon: ChevronUp },
@@ -162,16 +163,6 @@ export default function Farmers() {
     return <ActivityIndicator style={{ margin: 20 }} />;
   };
 
-  const emptyComponent = () => {
-    return (
-      <View className="flex flex-row items-center justify-center p-5 mt-[60%]">
-        <Text className="text-[16px] font-medium">
-          {i18n.t('farmers.noData')}
-        </Text>
-      </View>
-    );
-  };
-
   return (
     <SafeAreaView
       edges={['top']}
@@ -207,7 +198,7 @@ export default function Farmers() {
           estimatedItemSize={dataCount}
           keyExtractor={(_, index) => index.toString()}
           className="flex flex-col h-full"
-          ListEmptyComponent={emptyComponent}
+          ListEmptyComponent={emptyComponent(i18n.t('farmers.noData'))}
           ListFooterComponent={renderFooter}
           onEndReached={onEndReached}
           onEndReachedThreshold={0.5}

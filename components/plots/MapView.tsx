@@ -1,4 +1,11 @@
-import { View, StyleSheet, Pressable, Text, Alert } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  Text,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import ViewSwitcher, { ViewSwitcherProps } from './ViewSwitcher';
 import Mapbox from '@rnmapbox/maps';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -17,11 +24,16 @@ import Colors from '@/constants/Colors';
 import MarkerSvg from '../svg/MarkerSvg';
 import { CameraRef } from '@rnmapbox/maps/lib/typescript/src/components/Camera';
 import cn from '@/utils/cn';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { AuthContext } from '@/context/AuthContext';
 import { uuid } from 'expo-modules-core';
-import { FeatureInfo } from '@/types/plot';
+import { FeatureInfo, Plot } from '@/types/plot';
 import area from '@turf/area';
+import realm from '@/realm/useRealm';
+import { PlotSchema } from '@/realm/schemas';
+import { Farmer } from '@/types/farmer';
+import { User } from '@/types/user';
+import Card, { CardProps } from '../common/Card';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '');
 
@@ -43,7 +55,24 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
     });
 
   const cameraRef = useRef<CameraRef>(null);
-  const { setNewPlot } = useContext(AuthContext);
+  const { setNewPlot, selectedFarmer, user } = useContext(AuthContext) as {
+    setNewPlot: (plot: Plot) => void;
+    selectedFarmer: Farmer;
+    user: User;
+  };
+  const [isMapLoading, setIsMapLoading] = useState<boolean>(true);
+  const [cardInfoCollection, setCardInfoCollection] = useState<any[]>([]);
+  const [cardInfo, setCardInfo] = useState<CardProps | null>(null);
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: addingNewPlot
+        ? i18n.t('plots.addPlot.newPlot')
+        : i18n.t('plots.title'),
+    });
+  }, [addingNewPlot]);
 
   useEffect(() => {
     (async () => {
@@ -66,6 +95,52 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
       };
     })();
   }, []);
+
+  useEffect(() => {
+    if (selectedFarmer) {
+      loadExistingPlots();
+    }
+  }, [selectedFarmer]);
+
+  const loadExistingPlots = async () => {
+    const offlinePlots = await realm.realmRead(
+      PlotSchema,
+      undefined,
+      undefined,
+      undefined,
+      `farmerId == '${selectedFarmer?.id}' AND userId == '${user.id}'`
+    );
+
+    if (!offlinePlots) {
+      return;
+    }
+
+    let features: GeoJSON.Feature[] = [];
+    let cardInfos = [];
+
+    for (let plot of offlinePlots) {
+      const plotData = JSON.parse(plot.data as any) as Plot;
+
+      features.push(plotData.featureInfo);
+      cardInfos.push({
+        id: plotData.featureInfo.id,
+        plotName: plotData.plotName,
+        crop: plotData.crop,
+        numberOfPlants: plotData.numberOfPlants,
+        size: plotData.size,
+        geoId: plotData.geoId,
+        certification: plotData.certification,
+        organicStartOfTransition: plotData.organicStartOfTransition,
+      });
+    }
+
+    setCardInfoCollection(cardInfos);
+
+    setFeatureCollection({
+      type: 'FeatureCollection',
+      features,
+    });
+  };
 
   const addLocationToLocations = () => {
     if (location) {
@@ -96,8 +171,11 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
       return;
     }
 
-    let feature: GeoJSON.Feature;
-    if (featureCollection.features.length === 0) {
+    let feature = featureCollection.features.find((f: GeoJSON.Feature) => {
+      return f.id === 'NewFeature';
+    }) as GeoJSON.Feature;
+
+    if (!feature) {
       feature = {
         type: 'Feature',
         properties: {},
@@ -107,17 +185,11 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
           coordinates: [[...locationsForFeature, locationsForFeature[0]]],
         },
       };
+
       setFeatureCollection({
         type: 'FeatureCollection',
         features: [...featureCollection.features, feature],
       });
-      return;
-    }
-    feature = featureCollection.features.find((f: GeoJSON.Feature) => {
-      return f.id === 'NewFeature';
-    }) as GeoJSON.Feature;
-
-    if (!feature) {
       return;
     }
 
@@ -173,14 +245,68 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
     if (location && cameraRef.current) {
       cameraRef.current.setCamera({
         centerCoordinate: [location.coords.longitude, location.coords.latitude],
-        zoomLevel: 14,
+        zoomLevel: 16,
         animationDuration: 500,
       });
     }
   };
 
   const handlePolygonPress = (e: any) => {
-    console.log('Polygon clicked', e.features);
+    const cardInfoId = e.features[0].id;
+    const plot = cardInfoCollection.find((c) => c.id === cardInfoId);
+
+    if (!plot) {
+      return;
+    }
+
+    setCardInfo({
+      canClose: true,
+      onClose: () => setCardInfo(null),
+      items: [
+        {
+          type: 'view',
+          name: i18n.t('plots.addPlot.crop'),
+          value: plot.crop,
+          editable: false,
+        },
+        {
+          type: 'view',
+          name: i18n.t('plots.addPlot.numberOfPlants'),
+          value: plot.numberOfPlants,
+          editable: false,
+        },
+        {
+          type: 'view',
+          name: i18n.t('plots.addPlot.size'),
+          value: plot.size,
+          editable: false,
+        },
+        {
+          type: 'view',
+          name: i18n.t('plots.addPlot.geoId'),
+          value: plot.geoId,
+          editable: false,
+        },
+        {
+          type: 'view',
+          name: i18n.t('plots.addPlot.certification'),
+          value: plot.certification,
+          editable: false,
+        },
+        {
+          type: 'view',
+          name: i18n.t('plots.addPlot.organicStartOfTransition'),
+          value: Intl.DateTimeFormat('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: '2-digit',
+          }).format(new Date(plot.organicStartOfTransition)),
+          editable: false,
+        },
+      ],
+      title: plot.plotName,
+      synced: false,
+    });
   };
 
   const undo = () => {
@@ -204,17 +330,31 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
     setAddingNewPlot(false);
     setLocationsForFeature([]);
     setLocationsForFeatureCache([]);
+
+    const filteredFeatures = featureCollection.features.filter(
+      (f: GeoJSON.Feature) => f.id !== 'NewFeature'
+    ) as GeoJSON.Feature[];
+
     setFeatureCollection({
       type: 'FeatureCollection',
-      features: [],
+      features: [...filteredFeatures],
     });
   };
 
   return (
     <View className="relative flex-1">
       <View style={{ ...StyleSheet.absoluteFillObject }}>
+        {isMapLoading && (
+          <View className="absolute flex flex-col items-center justify-center w-full h-full bg-White">
+            <ActivityIndicator size="large" animating={isMapLoading} />
+            <Text className="mt-2">{i18n.t('plots.mapLoading')}</Text>
+          </View>
+        )}
         {location && (
-          <Mapbox.MapView className="flex-1">
+          <Mapbox.MapView
+            className="flex-1"
+            onDidFinishLoadingMap={() => setIsMapLoading(false)}
+          >
             <Mapbox.Camera
               defaultSettings={{
                 centerCoordinate: [
@@ -428,6 +568,7 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
         <View className="flex flex-col justify-between h-full p-5">
           <ViewSwitcher viewType={viewType} setViewType={setViewType} />
           <View className="flex flex-col">
+            {cardInfo && <Card {...cardInfo} />}
             {/* Location button */}
             <Pressable
               className="flex flex-row items-center self-end justify-center w-16 h-16 mb-5 border-2 border-blue-500 rounded-full bg-White"
@@ -438,7 +579,10 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
             </Pressable>
             {/* New plot button */}
             <Pressable
-              onPress={() => setAddingNewPlot(true)}
+              onPress={() => {
+                setAddingNewPlot(true);
+                setCardInfo(null);
+              }}
               className="flex flex-row items-center justify-center w-full h-12 px-5 mb-10 rounded-md bg-Orange"
               style={style.shadowLarge}
             >

@@ -2,17 +2,21 @@ import Card from '@/components/common/Card';
 import { ShadowButtonStyle } from '@/constants/Shadow';
 import { AuthContext } from '@/context/AuthContext';
 import i18n from '@/locales/i18n';
-import { ProductTypeWithCompanyId } from '@/types/farmer';
-import { useNavigation } from 'expo-router';
+import { Farmer, ProductTypeWithCompanyId } from '@/types/farmer';
+import { router, useNavigation } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useContext, useEffect, useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import realm from '@/realm/useRealm';
+import { PlotSchema } from '@/realm/schemas';
+import { Plot } from '@/types/plot';
+import { User } from '@/types/user';
 
 type PlotInto = {
   plotName: string;
   crop: string;
-  numberOfPlants: number;
+  numberOfPlants: string;
   size: string;
   geoId: string;
   certification: string;
@@ -54,7 +58,14 @@ export default function AddPlot() {
   const [crops, setCrops] = useState<Array<{ label: string; value: string }>>(
     []
   );
-  const { newPlot, productTypes, selectedCompany } = useContext(AuthContext);
+  const { newPlot, productTypes, selectedCompany, selectedFarmer, user } =
+    useContext(AuthContext) as {
+      newPlot: Plot;
+      productTypes: ProductTypeWithCompanyId[];
+      selectedCompany: number;
+      selectedFarmer: Farmer;
+      user: User;
+    };
 
   const navigation = useNavigation();
 
@@ -69,7 +80,23 @@ export default function AddPlot() {
 
         const key = path[0];
 
-        validateFields();
+        setPlotFieldErrors((currentErrors) => {
+          const updatedErrors = { ...currentErrors };
+
+          if (key === 'plotName') {
+            updatedErrors.plotName = false;
+          } else if (key === 'crop') {
+            updatedErrors.crop = false;
+          } else if (key === 'numberOfPlants') {
+            updatedErrors.numberOfPlants = false;
+          } else if (key === 'certification') {
+            updatedErrors.certification = false;
+          } else if (key === 'organicStartOfTransition') {
+            updatedErrors.organicStartOfTransition = false;
+          }
+
+          return updatedErrors;
+        });
 
         if (path.length === 1) {
           updatedObject[key] = value;
@@ -128,11 +155,13 @@ export default function AddPlot() {
 
   const validateFields = () => {
     const errors: PlotInfoErrors = {
-      plotName: !plotInfo.plotName,
-      crop: !plotInfo.crop,
-      numberOfPlants: !plotInfo.numberOfPlants,
-      certification: !plotInfo.certification,
-      organicStartOfTransition: !plotInfo.organicStartOfTransition,
+      plotName: !plotInfo.plotName ? true : false,
+      crop: !plotInfo.crop ? true : false,
+      numberOfPlants: !plotInfo.numberOfPlants ? true : false,
+      certification: !plotInfo.certification ? true : false,
+      organicStartOfTransition: !plotInfo.organicStartOfTransition
+        ? true
+        : false,
     };
 
     setPlotFieldErrors(errors);
@@ -141,11 +170,38 @@ export default function AddPlot() {
   };
 
   const savePlot = async () => {
-    if (validateFields()) {
-      // save plot
-      console.log('save plot');
-    } else {
-      console.log('error');
+    try {
+      if (validateFields()) {
+        const plot: Plot = {
+          id: newPlot?.id ?? '',
+          plotName: plotInfo.plotName,
+          crop: plotInfo.crop,
+          numberOfPlants: parseInt(plotInfo.numberOfPlants, 10),
+          size: newPlot?.size ?? '',
+          geoId: newPlot?.geoId ?? '',
+          certification: plotInfo.certification,
+          organicStartOfTransition: plotInfo.organicStartOfTransition,
+          featureInfo: newPlot?.featureInfo ?? {
+            type: 'Feature',
+            properties: {},
+            id: '',
+            geometry: { type: 'Polygon', coordinates: [] },
+          },
+        };
+
+        const plotRealm = {
+          id: plot.id,
+          farmerId: selectedFarmer?.id?.toString(),
+          userId: user.id.toString(),
+          data: JSON.stringify(plot),
+        };
+
+        await realm.realmWrite(PlotSchema, plotRealm);
+        router.back();
+        router.replace(`view/${selectedFarmer?.id?.toString()}` as any);
+      }
+    } catch (error) {
+      console.error('Error saving plot', error);
     }
   };
 

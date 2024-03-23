@@ -127,6 +127,8 @@
     "listView": "List view",
     "mapView": "Map view",
     "mapDownload": "Map download",
+    "noData": "No plots found",
+    "plots": "plot/s",
     "offlineMapsScreen": {
       "downloadedMaps": "Downloaded maps",
       "noMapsDownloaded": "No offline maps downloaded",
@@ -136,6 +138,7 @@
       "download": "Download",
       "sizeWarning": "Downloads may take up to %{size} MB of your free space"
     },
+    "mapLoading": "Loading map",
     "addPlot": {
       "newPlot": "New plot",
       "addCurrentLocation": "Add current location",
@@ -157,6 +160,12 @@
       "certification": "Certification",
       "organicStartOfTransition": "Organic start of transition",
       "savePlot": "Save plot"
-    }
+    },
+    "totalArea": "total area",
+    "summaryTitle": "Summary",
+    "plotsTitle": "Plots"
+  },
+  "synced": {
+    "itemNotSynced": "Item not synced"
   }
 }

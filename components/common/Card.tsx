@@ -1,16 +1,15 @@
 import { View, Text, Pressable, Platform, TextInput } from 'react-native';
-import { ChevronDown, MoveDiagonal, Search } from 'lucide-react-native';
+import {
+  AlertCircle,
+  ChevronDown,
+  MoveDiagonal,
+  Search,
+  X,
+} from 'lucide-react-native';
 import { router } from 'expo-router';
 import cn from '@/utils/cn';
 import { AuthContext } from '@/context/AuthContext';
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { Farmer } from '@/types/farmer';
 import { InputCard, InputCardDate } from './Input';
 import { FullWindowOverlay } from 'react-native-screens';
@@ -31,6 +30,9 @@ export type CardProps = {
     type: 'farmer';
     data: Farmer;
   };
+  synced?: boolean;
+  canClose?: boolean;
+  onClose?: () => void;
 };
 
 export type ItemProps = {
@@ -54,6 +56,9 @@ export default function Card({
   title,
   navigationPath,
   navigationParams,
+  synced,
+  canClose,
+  onClose,
 }: CardProps) {
   const { selectFarmer } = useContext(AuthContext);
 
@@ -71,12 +76,25 @@ export default function Card({
 
   return (
     <View className="flex flex-col m-5">
+      {synced === false && (
+        <View className="flex flex-row items-center justify-start mb-1">
+          <AlertCircle className="mr-1 text-purple-300" size={14} />
+          <Text className="text-purple-300">
+            {i18n.t('synced.itemNotSynced')}
+          </Text>
+        </View>
+      )}
       {title && (
         <View className="flex flex-row items-center justify-between p-4 bg-Green rounded-t-md">
           <Text className="text-White text-[18px] font-semibold">{title}</Text>
           {navigationPath && (
             <Pressable onPress={() => navigateToDetails()}>
               <MoveDiagonal className="text-White" />
+            </Pressable>
+          )}
+          {canClose && (
+            <Pressable onPress={onClose}>
+              <X className="text-White" />
             </Pressable>
           )}
         </View>
@@ -89,7 +107,7 @@ export default function Card({
           'bg-White'
         )}
       >
-        {items.map((item, index) => {
+        {items?.map((item, index) => {
           switch (item.type) {
             case 'view':
               return (

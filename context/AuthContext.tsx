@@ -6,7 +6,7 @@ import axios from 'axios';
 import RNFetchBlob from 'rn-fetch-blob';
 
 import { LogInResponse, RequestParams } from '@/types/auth';
-import { Farmer, ProductType, ProductTypeWithCompanyId } from '@/types/farmer';
+import { Farmer, ProductTypeWithCompanyId } from '@/types/farmer';
 import { CompanyInfo } from '@/types/company';
 import { Country } from '@/types/country';
 import { uuid } from 'expo-modules-core';

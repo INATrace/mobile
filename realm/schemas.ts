@@ -1,9 +1,10 @@
-export const CompanyImageSchema = {
-  name: 'CompanyImage',
+export const PlotSchema = {
+  name: 'Plot',
   properties: {
-    name: 'string',
-    id: 'int',
-    image: 'string',
+    id: 'string',
+    farmerId: 'string',
+    userId: 'string',
+    data: 'string',
   },
   primaryKey: 'id',
 };
