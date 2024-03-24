@@ -46,4 +46,4 @@ ios/
 
 %ProgramData%/
 
-.env
+*.env

@@ -27,9 +27,10 @@ export const Input = (props: InputProps) => {
       onChangeText={props.onChangeText}
       className={cn(
         'border border-LightGray w-full h-12 mt-1 px-2 text-[16px] rounded-md',
-        props.editable === false ? 'text-DarkGray' : ''
+        props.editable === false ? 'text-DarkGray' : '',
+        props.error ? 'border-red-500' : ''
       )}
-      placeholderTextColor={Colors.darkGray}
+      placeholderTextColor={props.error ? Colors.red : Colors.darkGray}
       editable={props.editable}
     />
   );

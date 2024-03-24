@@ -1,15 +1,12 @@
 import OfflinePack from '@rnmapbox/maps/lib/typescript/src/modules/offline/OfflinePack';
 import { useNavigation } from 'expo-router';
-import {
-  ChevronLeft,
-  CircleEllipsis,
-  Download,
-  Trash,
-} from 'lucide-react-native';
+import { Check, ChevronLeft, Download, Trash, X } from 'lucide-react-native';
 import { createRef, useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
-  Platform,
+  Dimensions,
+  KeyboardAvoidingView,
   Pressable,
   ScrollView,
   Text,
@@ -19,6 +16,10 @@ import Mapbox from '@rnmapbox/maps';
 import i18n from '@/locales/i18n';
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
+import * as turf from '@turf/turf';
+import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
+import { Input } from '@/components/common/Input';
+import Modal from 'react-native-modalbox';
 
 export default function MapDownload() {
   const navigation = useNavigation();
@@ -27,19 +28,22 @@ export default function MapDownload() {
 
   const [offlinePacks, setOfflinePacks] = useState<OfflinePack[]>([]);
   const [bounds, setBounds] = useState<any | null>(null);
-  const [mapLoaded, setMapLoaded] = useState<boolean>(false);
+  const [estimatedSize, setEstimatedSize] = useState<number>(0);
   const [selectingMap, setSelectingMap] = useState<boolean>(false);
+  const [downloadConfirm, setDownloadConfirm] = useState<boolean>(false);
+  const [packName, setPackName] = useState<string>('');
+  const [hasInputError, setHasInputError] = useState<boolean>(false);
 
   const mapRef = createRef<Mapbox.MapView>();
-
-  const [totalSize, setTotalSize] = useState<number>(0);
 
   useEffect(() => {
     navigation.setOptions({
       title: i18n.t('plots.mapDownload'),
       headerLeft: () => (
         <Pressable
-          onPress={() => navigation.goBack()}
+          onPress={() =>
+            selectingMap ? setSelectingMap(false) : navigation.goBack()
+          }
           className="flex flex-row items-center justify-center mr-3"
         >
           <ChevronLeft className="text-Orange" />
@@ -47,7 +51,9 @@ export default function MapDownload() {
         </Pressable>
       ),
     });
+  }, [selectingMap]);
 
+  useEffect(() => {
     checkForOfflineMaps();
     askForLocationPermission();
   }, []);
@@ -55,12 +61,23 @@ export default function MapDownload() {
   const checkForOfflineMaps = async () => {
     try {
       const packs = await Mapbox.offlineManager.getPacks();
-      setOfflinePacks(packs);
-      packs.forEach(async (pack) => {
+      const stop: boolean[] = [];
+      packs.forEach(async (pack: any) => {
         console.log('Pack:', pack);
+        if (pack.pack.state === 'complete') {
+          stop.push(true);
+        }
       });
-      //const totalSize = packs.reduce(async (acc, pack) => acc + await pack.status, 0);
-      setTotalSize(0);
+
+      setOfflinePacks(packs);
+
+      if (stop.length === packs.length) {
+        return;
+      }
+
+      setTimeout(() => {
+        checkForOfflineMaps();
+      }, 1000);
     } catch (error) {
       console.error('Error fetching offline packs:', error);
     }
@@ -70,7 +87,9 @@ export default function MapDownload() {
     const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== 'granted') {
-      Alert.alert('Permission to access location was denied');
+      Alert.alert(
+        i18n.t('plots.offlineMapsScreen.locationPermissionDeniedAlert')
+      );
       return;
     }
 
@@ -85,21 +104,87 @@ export default function MapDownload() {
       console.log('Visible bounds:', visibleBounds);
       console.log('Zoom level:', zoomLevel);
       setBounds(visibleBounds);
+      estimateOfflinePackSize(zoomLevel, visibleBounds);
     }
   };
 
+  function deg2num(latLon: Position, zoom: number): [number, number] {
+    const latRad = (latLon[0] * Math.PI) / 180;
+    const n = Math.pow(2, zoom);
+    const xTile = Math.floor(((latLon[1] + 180) / 360) * n);
+    const yTile = Math.floor(
+      ((1 -
+        Math.abs(Math.log(Math.abs(Math.tan(latRad) + 1 / Math.cos(latRad)))) /
+          Math.PI) /
+        2) *
+        n
+    );
+    return [xTile, yTile];
+  }
+
+  function getTotalTileCount(
+    leftBottom: Position,
+    rightTop: Position,
+    fromZoom: number,
+    toZoom: number
+  ): number {
+    let totalTileCount = 0;
+    for (let zoom = fromZoom; zoom <= toZoom; zoom++) {
+      const leftBottomTiles = deg2num(leftBottom, zoom);
+      const rightTopTiles = deg2num(rightTop, zoom);
+
+      const currentTileCount =
+        (rightTopTiles[0] - leftBottomTiles[0] + 1) *
+        (leftBottomTiles[1] - rightTopTiles[1] + 1);
+
+      totalTileCount += currentTileCount;
+    }
+
+    return totalTileCount;
+  }
+
+  const estimateOfflinePackSize = (
+    zoomLevel: number,
+    bounds: [Position, Position]
+  ) => {
+    const sw: Position = bounds[0];
+    const ne: Position = bounds[1];
+
+    const leftBottom: Position = [sw[0], sw[1]];
+    const rightTop: Position = [ne[0], ne[1]];
+
+    const totalTiles = getTotalTileCount(leftBottom, rightTop, zoomLevel, 20);
+    console.log('Total estimated tiles:', totalTiles);
+
+    const estimatedSizeMB = (totalTiles * 32.5) / 1024;
+
+    console.log('Estimated size:', estimatedSizeMB.toFixed(2));
+
+    setEstimatedSize(parseFloat(estimatedSizeMB.toFixed(2)));
+  };
+
   const onDownloadArea = async () => {
-    if (!bounds) {
-      Alert.alert('No area selected', 'Please select an area to download.');
+    if (!packName) {
+      setHasInputError(true);
       return;
     }
 
-    const metadata = { name: 'Your Map Name', date: new Date().toISOString() };
+    if (!bounds) {
+      Alert.alert(
+        i18n.t('plots.offlineMapsScreen.noAreaSelected'),
+        i18n.t('plots.offlineMapsScreen.noAreaSelectedMessage')
+      );
+      return;
+    }
+
+    const metadata = { name: packName, date: new Date().toISOString() };
+
+    setDownloadConfirm(false);
 
     try {
       await Mapbox.offlineManager.createPack(
         {
-          name: 'Your Map Name',
+          name: packName,
           styleURL: Mapbox.StyleURL.Street,
           bounds: [
             [bounds[0][1], bounds[0][0]],
@@ -109,31 +194,125 @@ export default function MapDownload() {
           maxZoom: 20,
           metadata,
         },
-        (pack) => {}
+        (progress: any) => {
+          console.log('Progress:', progress);
+          //checkForOfflineMaps();
+          /* setOfflinePacks((prevPacks: any) => {
+            const newPacks = prevPacks.map((pack: any) => {
+              if (pack.name === packName) {
+                return {
+                  ...pack,
+                  pack: {
+                    ...pack.pack,
+                    percentage: progress.percentage,
+                    completedResourceSize: progress.completedResourceSize,
+                  },
+                };
+              }
+              return pack;
+            });
+
+            return newPacks;
+          }); */
+        }
       );
 
-      Alert.alert('Download Started', 'Your map is now downloading.');
+      setSelectingMap(false);
     } catch (error) {
       console.error('Error starting offline pack download:', error);
       Alert.alert(
-        'Download Error',
-        'There was an error starting the download.'
+        i18n.t('plots.offlineMapsScreen.errorDownloadingTitle'),
+        i18n.t('plots.offlineMapsScreen.errorDownloading')
       );
     }
   };
 
-  const deletePack = (pack: OfflinePack) => async () => {
+  const deleteOfflinePack = async (packName: string) => {
     try {
-      await Mapbox.offlineManager.deletePack(pack.name);
+      await Mapbox.offlineManager.deletePack(packName);
       checkForOfflineMaps();
     } catch (error) {
       console.error('Error deleting offline pack:', error);
-      Alert.alert('Error', 'There was an error deleting the pack.');
+      Alert.alert(
+        i18n.t('plots.offlineMapsScreen.errorTitle'),
+        i18n.t('plots.offlineMapsScreen.errorDeleting')
+      );
     }
   };
 
+  const deletePack = async (packName: string) => {
+    Alert.alert(
+      i18n.t('plots.offlineMapsScreen.delete'),
+      i18n.t('plots.offlineMapsScreen.deleteAlert'),
+      [
+        {
+          text: i18n.t('plots.offlineMapsScreen.cancel'),
+          style: 'cancel',
+        },
+        {
+          text: i18n.t('plots.offlineMapsScreen.delete'),
+          onPress: () => deleteOfflinePack(packName),
+        },
+      ]
+    );
+  };
+
   return (
-    <View className="h-full">
+    <KeyboardAvoidingView className="h-full" behavior="padding">
+      <Modal
+        isOpen={downloadConfirm}
+        onClosed={() => setDownloadConfirm(false)}
+        position={'center'}
+        backdropPressToClose={true}
+        style={{
+          height: 200,
+          width: '90%',
+          marginRight: 250,
+          borderRadius: 8,
+          padding: 20,
+          justifyContent: 'space-between',
+        }}
+      >
+        <View>
+          <View className="flex flex-row items-center justify-between mb-2">
+            <Text className="text-[18px] font-medium">
+              {i18n.t('plots.mapTitle')}
+            </Text>
+            <Pressable onPress={() => setDownloadConfirm(false)} className="">
+              <X size={20} className="text-black" />
+            </Pressable>
+          </View>
+
+          <Input
+            value={packName}
+            onChangeText={(text: string) => {
+              setHasInputError(false);
+              setPackName(text);
+            }}
+            placeholder={i18n.t('input.type')}
+            error={hasInputError}
+          />
+        </View>
+
+        <View className="flex flex-row items-center justify-between">
+          <Pressable
+            onPress={() => setDownloadConfirm(false)}
+            className="bg-Green w-[48%] px-5 py-3 rounded-md flex flex-col items-center justify-center"
+          >
+            <Text className="text-White font-semibold text-[16px]">
+              {i18n.t('plots.offlineMapsScreen.cancel')}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={onDownloadArea}
+            className="bg-Orange w-[48%] px-5 py-3 rounded-md flex flex-col items-center justify-center"
+          >
+            <Text className="text-White font-semibold text-[16px]">
+              {i18n.t('plots.offlineMapsScreen.confirm')}
+            </Text>
+          </Pressable>
+        </View>
+      </Modal>
       {selectingMap ? (
         <View className="flex-1 h-full">
           <View className="flex-row items-center justify-center w-full p-5 bg-White flew">
@@ -141,13 +320,13 @@ export default function MapDownload() {
               {i18n.t('plots.offlineMapsScreen.downloadThisMap')}
             </Text>
           </View>
-          {location && (
+          {location ? (
             <Mapbox.MapView
-              className="flex-1"
+              className="border-[5px] border-blue-500"
+              style={{ height: Dimensions.get('window').height - 254 }}
               ref={mapRef}
               onMapIdle={onRegionDidChange}
-              rotateEnabled={false}
-              pitchEnabled={false}
+              styleURL={Mapbox.StyleURL.SatelliteStreet}
             >
               <Mapbox.Camera
                 zoomLevel={14}
@@ -156,26 +335,44 @@ export default function MapDownload() {
                   location.coords.latitude,
                 ]}
               />
-              {mapLoaded && location && (
-                <Mapbox.UserLocation
-                  onUpdate={(newLocation) => {}} //setLocation(newLocation)}
-                />
-              )}
+              <Mapbox.PointAnnotation
+                coordinate={[
+                  location.coords.longitude,
+                  location.coords.latitude,
+                ]}
+                id="current-location"
+              >
+                <View className="relative flex flex-row items-center justify-center w-5 h-5 bg-white rounded-full">
+                  <View className="w-4 h-4 bg-blue-500 rounded-full" />
+                </View>
+              </Mapbox.PointAnnotation>
             </Mapbox.MapView>
+          ) : (
+            <View className="flex flex-col items-center justify-center flex-1 w-full h-full bg-White">
+              <ActivityIndicator size="large" animating={true} />
+              <Text className="mt-2">{i18n.t('plots.mapLoading')}</Text>
+            </View>
           )}
-
-          <View className="flex flex-row items-center justify-between p-5 bg-White">
+          <Text className="px-5 my-3 bg-White">
+            {i18n.t('plots.offlineMapsScreen.sizeWarning', {
+              size: estimatedSize,
+            })}
+          </Text>
+          <View className="flex flex-row items-center justify-between px-5 pb-5 bg-White">
             <Pressable
               onPress={() => setSelectingMap(false)}
-              className="w-[55%] px-5 py-3 rounded-md bg-Green flex flex-row items-center justify-center"
+              className="w-[48%] px-5 py-3 rounded-md bg-Green flex flex-row items-center justify-center"
             >
               <Text className="text-White font-semibold text-[16px]">
                 {i18n.t('plots.offlineMapsScreen.cancel')}
               </Text>
             </Pressable>
             <Pressable
-              onPress={onDownloadArea}
-              className="flex flex-row items-center justify-center w-[40%] px-5 py-3 rounded-md bg-Orange"
+              onPress={() => {
+                setPackName('');
+                setDownloadConfirm(true);
+              }}
+              className="flex flex-row items-center justify-center w-[48%] px-5 py-3 rounded-md bg-Orange"
             >
               <Download className="mr-2 text-White" size={20} />
               <Text className="text-White font-semibold text-[16px]">
@@ -197,19 +394,67 @@ export default function MapDownload() {
           </Pressable>
           {offlinePacks.length > 0 ? (
             <ScrollView className="mt-5">
-              <Text className="text-[18px] font-medium">
+              <Text className="text-[18px] font-medium mb-2">
                 {i18n.t('plots.offlineMapsScreen.downloadedMaps')}
               </Text>
-              {offlinePacks.map((pack, index) => (
-                <View>
-                  <View>
-                    <Text key={index}>{pack.name}</Text>
+              {offlinePacks.map((pack: any, index: number) => {
+                if (!pack?.pack?.state || !pack?.pack?.percentage) {
+                  return (
+                    <Pressable
+                      onPress={() => deletePack(pack.name)}
+                      className="flex-row"
+                      key={index}
+                    >
+                      <Trash className="text-black" size={20} />
+                    </Pressable>
+                  );
+                }
+                const date = pack?.pack?.expires?.split(' ');
+                return (
+                  <View
+                    key={index}
+                    className="flex flex-row items-center justify-between"
+                  >
+                    <View className="flex flex-row items-center justify-center">
+                      {pack?.pack?.state === 'complete' &&
+                      pack?.pack?.percentage === 100 ? (
+                        <View className="flex flex-row items-center justify-center w-[24] h-[24] p-[2px] bg-blue-500 rounded-full">
+                          <Check className="text-White" size={16} />
+                        </View>
+                      ) : (
+                        <View className="w-[24] h-[24] p-[2px] bg-Orange rounded-full flex items-center justify-center">
+                          <Text className="text-White text-[8px]">
+                            {pack?.pack?.percentage}%
+                          </Text>
+                        </View>
+                      )}
+                      <View className="ml-2">
+                        <Text>{pack?.name}</Text>
+                        <View className="flex flex-row items-center">
+                          <Text>
+                            {(
+                              pack?.pack?.completedResourceSize / 1048576
+                            ).toFixed(1)}{' '}
+                            MB
+                          </Text>
+                          <View className="w-[4] h-[4] rounded-full bg-black mx-2" />
+                          <Text>
+                            {i18n.t('plots.offlineMapsScreen.expires', {
+                              date: date[2] + ' ' + date[1] + ' ' + date[5],
+                            })}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                    <Pressable
+                      onPress={() => deletePack(pack.name)}
+                      className="flex-row"
+                    >
+                      <Trash className="text-black" size={20} />
+                    </Pressable>
                   </View>
-                  <Pressable onPress={deletePack(pack)} className="flex-row">
-                    <Trash className="text-red-500" size={20} />
-                  </Pressable>
-                </View>
-              ))}
+                );
+              })}
             </ScrollView>
           ) : (
             <View className="mt-5">
@@ -221,6 +466,6 @@ export default function MapDownload() {
           )}
         </View>
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 }

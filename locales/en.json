@@ -127,6 +127,7 @@
     "listView": "List view",
     "mapView": "Map view",
     "mapDownload": "Map download",
+    "mapTitle": "Map title",
     "noData": "No plots found",
     "plots": "plot/s",
     "offlineMapsScreen": {
@@ -136,7 +137,18 @@
       "downloadThisMap": "Download this map?",
       "cancel": "Cancel",
       "download": "Download",
-      "sizeWarning": "Downloads may take up to %{size} MB of your free space"
+      "confirm": "Confirm",
+      "sizeWarning": "Downloads may take up to %{size} MB of your free space",
+      "expires": "Expires %{date}",
+      "delete": "Delete",
+      "deleteAlert": "Are you sure you want to delete this map?",
+      "locationPermissionDeniedAlert": "Permission to access location was denied",
+      "noAreaSelected": "No area selected",
+      "noAreaSelectedMessage": "Please select an area to download",
+      "errorTitle": "Error",
+      "errorDeleting": "There was an error deleting the pack",
+      "errorDownloadingTitle": "Download Error",
+      "errorDownloading": "There was an error starting the download"
     },
     "mapLoading": "Loading map",
     "addPlot": {
