@@ -1,4 +1,3 @@
-import OfflinePack from '@rnmapbox/maps/lib/typescript/src/modules/offline/OfflinePack';
 import { useNavigation } from 'expo-router';
 import { Check, ChevronLeft, Download, Trash, X } from 'lucide-react-native';
 import { createRef, useEffect, useState } from 'react';
@@ -20,6 +19,14 @@ import * as turf from '@turf/turf';
 import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
 import { Input } from '@/components/common/Input';
 import Modal from 'react-native-modalbox';
+
+type OfflinePack = {
+  name: string;
+  state: string;
+  percentage: number;
+  completedResourceSize: number;
+  expires: string;
+};
 
 export default function MapDownload() {
   const navigation = useNavigation();
@@ -61,17 +68,24 @@ export default function MapDownload() {
   const checkForOfflineMaps = async () => {
     try {
       const packs = await Mapbox.offlineManager.getPacks();
-      const stop: boolean[] = [];
-      packs.forEach(async (pack: any) => {
-        console.log('Pack:', pack);
+      let completeCount = 0;
+      const displayPacks = packs.map((pack: any) => {
         if (pack.pack.state === 'complete') {
-          stop.push(true);
+          completeCount++;
         }
+
+        return {
+          name: pack.name,
+          state: pack.pack?.state ?? 'unknown',
+          percentage: pack.pack?.percentage ?? 0,
+          completedResourceSize: pack.pack?.completedResourceSize ?? 0,
+          expires: pack.pack?.expires ?? 'unknown',
+        };
       });
 
-      setOfflinePacks(packs);
+      setOfflinePacks(displayPacks);
 
-      if (stop.length === packs.length) {
+      if (completeCount === packs.length) {
         return;
       }
 
@@ -187,33 +201,15 @@ export default function MapDownload() {
           name: packName,
           styleURL: Mapbox.StyleURL.Street,
           bounds: [
-            [bounds[0][1], bounds[0][0]],
-            [bounds[1][1], bounds[1][0]],
+            [bounds[0][0], bounds[0][1]],
+            [bounds[1][0], bounds[1][1]],
           ],
           minZoom: 14,
           maxZoom: 20,
           metadata,
         },
         (progress: any) => {
-          console.log('Progress:', progress);
-          //checkForOfflineMaps();
-          /* setOfflinePacks((prevPacks: any) => {
-            const newPacks = prevPacks.map((pack: any) => {
-              if (pack.name === packName) {
-                return {
-                  ...pack,
-                  pack: {
-                    ...pack.pack,
-                    percentage: progress.percentage,
-                    completedResourceSize: progress.completedResourceSize,
-                  },
-                };
-              }
-              return pack;
-            });
-
-            return newPacks;
-          }); */
+          checkForOfflineMaps();
         }
       );
 
@@ -398,33 +394,22 @@ export default function MapDownload() {
                 {i18n.t('plots.offlineMapsScreen.downloadedMaps')}
               </Text>
               {offlinePacks.map((pack: any, index: number) => {
-                if (!pack?.pack?.state || !pack?.pack?.percentage) {
-                  return (
-                    <Pressable
-                      onPress={() => deletePack(pack.name)}
-                      className="flex-row"
-                      key={index}
-                    >
-                      <Trash className="text-black" size={20} />
-                    </Pressable>
-                  );
-                }
-                const date = pack?.pack?.expires?.split(' ');
+                const date = pack?.expires?.split(' ');
                 return (
                   <View
                     key={index}
-                    className="flex flex-row items-center justify-between"
+                    className="flex flex-row items-center justify-between mt-4"
                   >
                     <View className="flex flex-row items-center justify-center">
-                      {pack?.pack?.state === 'complete' &&
-                      pack?.pack?.percentage === 100 ? (
+                      {pack?.state === 'complete' &&
+                      pack?.percentage === 100 ? (
                         <View className="flex flex-row items-center justify-center w-[24] h-[24] p-[2px] bg-blue-500 rounded-full">
                           <Check className="text-White" size={16} />
                         </View>
                       ) : (
                         <View className="w-[24] h-[24] p-[2px] bg-Orange rounded-full flex items-center justify-center">
                           <Text className="text-White text-[8px]">
-                            {pack?.pack?.percentage}%
+                            {Math.round(pack?.percentage)}%
                           </Text>
                         </View>
                       )}
@@ -432,15 +417,16 @@ export default function MapDownload() {
                         <Text>{pack?.name}</Text>
                         <View className="flex flex-row items-center">
                           <Text>
-                            {(
-                              pack?.pack?.completedResourceSize / 1048576
-                            ).toFixed(1)}{' '}
+                            {(pack?.completedResourceSize / 1048576).toFixed(1)}{' '}
                             MB
                           </Text>
                           <View className="w-[4] h-[4] rounded-full bg-black mx-2" />
                           <Text>
                             {i18n.t('plots.offlineMapsScreen.expires', {
-                              date: date[2] + ' ' + date[1] + ' ' + date[5],
+                              date:
+                                date[0] === 'unknown'
+                                  ? '-'
+                                  : date[2] + ' ' + date[1] + ' ' + date[5],
                             })}
                           </Text>
                         </View>

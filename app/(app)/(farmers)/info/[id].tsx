@@ -139,7 +139,7 @@ export default function FarmersInfo() {
             type: 'view',
             name:
               i18n.t('farmers.info.farmInformation.totalFarmSize') +
-              ` (${selectedFarmer?.farm.areaUnit})`,
+              ` (${selectedFarmer?.farm.areaUnit ?? '/'})`,
             value: selectedFarmer?.farm?.totalCultivatedArea?.toString() ?? '',
           },
           ...(selectedFarmer?.farm.farmPlantInformationList
@@ -155,7 +155,7 @@ export default function FarmersInfo() {
                 type: 'view',
                 name:
                   i18n.t('farmers.info.farmInformation.area') +
-                  ` (${selectedFarmer?.farm?.areaUnit})`,
+                  ` (${selectedFarmer?.farm?.areaUnit ?? '/'})`,
                 value: item?.plantCultivatedArea?.toString(),
               } as ItemProps,
               {
@@ -175,9 +175,15 @@ export default function FarmersInfo() {
             name: i18n.t(
               'farmers.info.farmInformation.startedTransitionToOrganic'
             ),
-            value: new Date(
-              selectedFarmer?.farm.startTransitionToOrganic ?? ''
-            ).toLocaleDateString(),
+            value: selectedFarmer?.farm?.startTransitionToOrganic
+              ? Intl.DateTimeFormat('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: '2-digit',
+                }).format(
+                  new Date(selectedFarmer?.farm?.startTransitionToOrganic ?? '')
+                )
+              : '',
           },
         ]}
       />

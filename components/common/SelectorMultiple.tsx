@@ -2,15 +2,13 @@ import cn from '@/utils/cn';
 import { Check, LucideIcon } from 'lucide-react-native';
 import { Pressable, View, Text } from 'react-native';
 
-type SelectorProps<T extends string | number> = {
-  selected: T;
-  setSelected: (selected: T) => void;
-  items: { label: string; value: T; icon?: LucideIcon }[];
+type SelectorProps = {
+  selected: string[] | number[];
+  setSelected: (selected: string | number) => void;
+  items: { label: string; value: string | number; icon?: LucideIcon }[];
 };
 
-export default function Selector<T extends string | number>(
-  props: SelectorProps<T>
-) {
+export default function SelectorMultiple(props: SelectorProps) {
   return (
     <View className="m-5 border rounded-md border-LightGray">
       {props.items.map((item, index) => {
@@ -33,8 +31,10 @@ export default function Selector<T extends string | number>(
               )}
             </View>
 
-            {props.selected === item.value && (
-              <Check className="text-black" size={18} />
+            {(props?.selected as any)?.includes(item.value) && (
+              <View>
+                <Check className="text-black" size={18} />
+              </View>
             )}
           </Pressable>
         );

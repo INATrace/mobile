@@ -119,7 +119,13 @@
         "male": "Male",
         "female": "Female",
         "n/a": "N/A"
-      }
+      },
+      "saveFarmer": "Save farmer",
+      "success": "Success",
+      "successMessage": "Farmer successfully created",
+      "ok": "OK",
+      "error": "Error",
+      "errorMessage": "There was an error creating the farmer"
     }
   },
   "plots": {

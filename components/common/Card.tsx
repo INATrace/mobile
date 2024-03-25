@@ -1,6 +1,7 @@
 import { View, Text, Pressable, Platform, TextInput } from 'react-native';
 import {
   AlertCircle,
+  Check,
   ChevronDown,
   MoveDiagonal,
   Search,
@@ -315,8 +316,26 @@ const ItemCheckbox = ({
   isLast: boolean;
 }) => {
   return (
-    <View>
-      <Text>{item.name}</Text>
+    <View
+      className={cn(
+        'flex flex-row items-center justify-between py-3 ml-4 pr-4 border-b border-b-LightGray',
+        isLast && 'border-b-0'
+      )}
+    >
+      <Text className="text-[16px] mr-3 max-w-[45%]">{item.name}</Text>
+      {item.value === i18n.t('yes') ? (
+        <Pressable
+          className="flex flex-row items-center justify-center w-6 h-6 border rounded-md border-LightGray"
+          onPress={() => item.setValue!(i18n.t('no'))}
+        >
+          <Check className="text-black" size={18} />
+        </Pressable>
+      ) : (
+        <Pressable
+          className="flex flex-row items-center justify-center w-6 h-6 border rounded-md border-LightGray"
+          onPress={() => item.setValue!(i18n.t('yes'))}
+        ></Pressable>
+      )}
     </View>
   );
 };
