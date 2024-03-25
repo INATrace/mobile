@@ -31,6 +31,23 @@ const genderItems = [
   },
 ];
 
+type NewFarmerErrors = {
+  lastName: boolean;
+  gender: boolean;
+  country: boolean;
+  hondurasFarm?: boolean;
+  hondurasVillage?: boolean;
+  hondurasMunicipality?: boolean;
+  hondurasDepartment?: boolean;
+  village?: boolean;
+  cell?: boolean;
+  sector?: boolean;
+  address?: boolean;
+  city?: boolean;
+  state?: boolean;
+  zip?: boolean;
+};
+
 export default function NewFarmer() {
   const { countries, productTypes, selectedCompany, isConnected, makeRequest } =
     useContext(AuthContext) as {
@@ -47,6 +64,7 @@ export default function NewFarmer() {
   const [productTypesSelect, setProductTypesSelect] = useState<ProductType[]>(
     []
   );
+  const [errors, setErrors] = useState<NewFarmerErrors>({} as NewFarmerErrors);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
 
@@ -79,6 +97,8 @@ export default function NewFarmer() {
 
         const key = path[0];
 
+        updateErrors(key.toString());
+
         if (path.length === 1) {
           updatedObject[key] = value;
         } else {
@@ -93,6 +113,81 @@ export default function NewFarmer() {
       };
 
       return updateNestedObject(currentFarmer, path, value);
+    });
+  };
+
+  const updateErrors = (key: string) => {
+    setErrors((currentErrors) => {
+      const updatedErrors = { ...currentErrors };
+
+      if (key === 'surname') {
+        updatedErrors.lastName = false;
+      } else if (key === 'gender') {
+        updatedErrors.gender = false;
+      } else if (key === 'country') {
+        updatedErrors.country = false;
+      } else if (
+        key === 'hondurasFarm' &&
+        farmer.location?.address?.country?.code === 'HN'
+      ) {
+        updatedErrors.hondurasFarm = false;
+      } else if (
+        key === 'hondurasVillage' &&
+        farmer.location?.address?.country?.code === 'HN'
+      ) {
+        updatedErrors.hondurasVillage = false;
+      } else if (
+        key === 'hondurasMunicipality' &&
+        farmer.location?.address?.country?.code === 'HN'
+      ) {
+        updatedErrors.hondurasMunicipality = false;
+      } else if (
+        key === 'hondurasDepartment' &&
+        farmer.location?.address?.country?.code === 'HN'
+      ) {
+        updatedErrors.hondurasDepartment = false;
+      } else if (
+        key === 'village' &&
+        farmer.location?.address?.country?.code === 'RW'
+      ) {
+        updatedErrors.village = false;
+      } else if (
+        key === 'cell' &&
+        farmer.location?.address?.country?.code === 'RW'
+      ) {
+        updatedErrors.cell = false;
+      } else if (
+        key === 'sector' &&
+        farmer.location?.address?.country?.code === 'RW'
+      ) {
+        updatedErrors.sector = false;
+      } else if (
+        key === 'address' &&
+        farmer.location?.address?.country?.code !== 'HN' &&
+        farmer.location?.address?.country?.code !== 'RW'
+      ) {
+        updatedErrors.address = false;
+      } else if (
+        key === 'city' &&
+        farmer.location?.address?.country?.code !== 'HN' &&
+        farmer.location?.address?.country?.code !== 'RW'
+      ) {
+        updatedErrors.city = false;
+      } else if (
+        key === 'state' &&
+        farmer.location?.address?.country?.code !== 'HN' &&
+        farmer.location?.address?.country?.code !== 'RW'
+      ) {
+        updatedErrors.state = false;
+      } else if (
+        key === 'zip' &&
+        farmer.location?.address?.country?.code !== 'HN' &&
+        farmer.location?.address?.country?.code !== 'RW'
+      ) {
+        updatedErrors.zip = false;
+      }
+
+      return updatedErrors;
     });
   };
 
@@ -118,13 +213,113 @@ export default function NewFarmer() {
     });
   }, []);
 
+  const validateFields = () => {
+    const errors: NewFarmerErrors = {
+      lastName: !farmer.surname,
+      gender: !farmer.gender,
+      country: !farmer.location?.address?.country,
+      hondurasFarm:
+        farmer?.location?.address?.country?.code === 'HN' &&
+        !farmer.location?.address?.hondurasFarm,
+      hondurasVillage:
+        farmer?.location?.address?.country?.code === 'HN' &&
+        !farmer.location?.address?.hondurasVillage,
+      hondurasMunicipality:
+        farmer?.location?.address?.country?.code === 'HN' &&
+        !farmer.location?.address?.hondurasMunicipality,
+      hondurasDepartment:
+        farmer?.location?.address?.country?.code === 'HN' &&
+        !farmer.location?.address?.hondurasDepartment,
+      village:
+        farmer?.location?.address?.country?.code === 'RW' &&
+        !farmer.location?.address?.village,
+      cell:
+        farmer?.location?.address?.country?.code === 'RW' &&
+        !farmer.location?.address?.cell,
+      sector:
+        farmer?.location?.address?.country?.code === 'RW' &&
+        !farmer.location?.address?.sector,
+      address:
+        farmer?.location?.address?.country?.code !== 'HN' &&
+        farmer?.location?.address?.country?.code !== 'RW' &&
+        !farmer.location?.address?.address,
+      city:
+        farmer?.location?.address?.country?.code !== 'HN' &&
+        farmer?.location?.address?.country?.code !== 'RW' &&
+        !farmer.location?.address?.city,
+      state:
+        farmer?.location?.address?.country?.code !== 'HN' &&
+        farmer?.location?.address?.country?.code !== 'RW' &&
+        !farmer.location?.address?.state,
+      zip:
+        farmer?.location?.address?.country?.code !== 'HN' &&
+        farmer?.location?.address?.country?.code !== 'RW' &&
+        !farmer.location?.address?.zip,
+    };
+
+    setErrors(errors);
+
+    return Object.values(errors).every((error) => !error);
+  };
+
   const saveFarmer = async () => {
+    if (!validateFields()) return;
+
+    const farmerBody = {
+      type: 'FARMER',
+      name: farmer.name ?? '',
+      surname: farmer.surname ?? '',
+      phone: farmer.phone ?? '',
+      email: farmer.email ?? '',
+      hasSmartphone: farmer.hasSmartphone ?? false,
+      location: {
+        address: {
+          cell: farmer.location?.address?.cell ?? '',
+          sector: farmer.location?.address?.sector ?? '',
+          village: farmer.location?.address?.village ?? '',
+          address: farmer.location?.address?.address ?? '',
+          city: farmer.location?.address?.city ?? '',
+          state: farmer.location?.address?.state ?? '',
+          zip: farmer.location?.address?.zip ?? '',
+          hondurasFarm: farmer.location?.address?.hondurasFarm ?? '',
+          hondurasVillage: farmer.location?.address?.hondurasVillage ?? '',
+          hondurasMunicipality:
+            farmer.location?.address?.hondurasMunicipality ?? '',
+          hondurasDepartment:
+            farmer.location?.address?.hondurasDepartment ?? '',
+          country: farmer.location?.address?.country,
+        },
+      },
+      gender: farmer.gender ?? '',
+      bank: {
+        accountHolderName: farmer.bank?.accountHolderName ?? '',
+        accountNumber: farmer.bank?.accountNumber ?? '',
+        bankName: farmer.bank?.bankName ?? '',
+        additionalInformation: farmer.bank?.additionalInformation ?? '',
+      },
+      farm: {
+        areaUnit: farmer.farm?.areaUnit ?? '',
+        totalCultivatedArea: farmer.farm?.totalCultivatedArea ?? 0,
+        farmPlantInformationList: farmer.farm?.farmPlantInformationList ?? [],
+        organic: farmer.farm?.organic ?? false,
+        areaOrganicCertified: farmer.farm?.areaOrganicCertified ?? 0,
+        startTransitionToOrganic: farmer.farm?.startTransitionToOrganic ?? '',
+      },
+      associations: [],
+      cooperatives: [],
+      certifications: [],
+      productTypes:
+        farmer.farm?.farmPlantInformationList?.map(
+          (item) => item.productType
+        ) ?? [],
+    };
+
     try {
       if (isConnected) {
         const response = await makeRequest({
           url: `/api/company/userCustomers/add/${selectedCompany}`,
           method: 'POST',
-          body: farmer,
+          body: farmerBody,
         });
 
         if (response?.data?.status === 'OK') {
@@ -146,7 +341,6 @@ export default function NewFarmer() {
         }
       }
     } catch (error) {
-      console.error(error);
       Alert.alert(
         i18n.t('farmers.newFarmerCreation.error'),
         i18n.t('farmers.newFarmerCreation.errorMessage')
@@ -173,18 +367,20 @@ export default function NewFarmer() {
           },
           {
             type: 'type',
-            name: i18n.t('farmers.info.basicInformation.lastName'),
+            name: i18n.t('farmers.info.basicInformation.lastName') + '*',
             placeholder: i18n.t('input.type'),
             value: farmer?.surname ?? '',
             setValue: (value: string) => updateState(['surname'], value),
+            error: errors.lastName,
           },
           {
             type: 'select',
-            name: i18n.t('farmers.info.basicInformation.gender'),
+            name: i18n.t('farmers.info.basicInformation.gender') + '*',
             placeholder: i18n.t('input.select'),
             value: farmer?.gender ?? '',
             setValue: (value: string) => updateState(['gender'], value),
             selectItems: genderItems,
+            error: errors.gender,
           },
           {
             type: 'type',
@@ -206,7 +402,7 @@ export default function NewFarmer() {
         items={[
           {
             type: 'select',
-            name: i18n.t('farmers.info.address.country'),
+            name: i18n.t('farmers.info.address.country') + '*',
             placeholder: i18n.t('input.select'),
             value: farmer?.location?.address?.country?.name ?? '',
             setValue: (value: string) =>
@@ -221,20 +417,22 @@ export default function NewFarmer() {
             })),
             selectWithSearch: true,
             updateSearch: updateSearchCountries,
+            error: errors.country,
           },
           ...((farmer?.location?.address?.country?.code === 'HN'
             ? [
                 {
                   type: 'type',
-                  name: i18n.t('farmers.info.address.hondurasFarm'),
+                  name: i18n.t('farmers.info.address.hondurasFarm') + '*',
                   placeholder: i18n.t('input.type'),
                   value: farmer?.location?.address?.hondurasFarm ?? '',
                   setValue: (value: string) =>
                     updateState(['location', 'address', 'hondurasFarm'], value),
+                  error: errors.hondurasFarm,
                 },
                 {
                   type: 'type',
-                  name: i18n.t('farmers.info.address.hondurasVillage'),
+                  name: i18n.t('farmers.info.address.hondurasVillage') + '*',
                   placeholder: i18n.t('input.type'),
                   value: farmer?.location?.address?.hondurasVillage ?? '',
                   setValue: (value: string) =>
@@ -242,10 +440,12 @@ export default function NewFarmer() {
                       ['location', 'address', 'hondurasVillage'],
                       value
                     ),
+                  error: errors.hondurasVillage,
                 },
                 {
                   type: 'type',
-                  name: i18n.t('farmers.info.address.hondurasMunicipality'),
+                  name:
+                    i18n.t('farmers.info.address.hondurasMunicipality') + '*',
                   placeholder: i18n.t('input.type'),
                   value: farmer?.location?.address?.hondurasMunicipality ?? '',
                   setValue: (value: string) =>
@@ -253,10 +453,11 @@ export default function NewFarmer() {
                       ['location', 'address', 'hondurasMunicipality'],
                       value
                     ),
+                  error: errors.hondurasMunicipality,
                 },
                 {
                   type: 'type',
-                  name: i18n.t('farmers.info.address.hondurasDepartment'),
+                  name: i18n.t('farmers.info.address.hondurasDepartment') + '*',
                   placeholder: i18n.t('input.type'),
                   value: farmer?.location?.address?.hondurasDepartment ?? '',
                   setValue: (value: string) =>
@@ -264,67 +465,75 @@ export default function NewFarmer() {
                       ['location', 'address', 'hondurasDepartment'],
                       value
                     ),
+                  error: errors.hondurasDepartment,
                 },
               ]
             : farmer?.location?.address?.country?.code === 'RW'
               ? [
                   {
                     type: 'type',
-                    name: i18n.t('farmers.info.address.village'),
+                    name: i18n.t('farmers.info.address.village') + '*',
                     placeholder: i18n.t('input.type'),
                     value: farmer?.location?.address?.village ?? '',
                     setValue: (value: string) =>
                       updateState(['location', 'address', 'village'], value),
+                    error: errors.village,
                   },
                   {
                     type: 'type',
-                    name: i18n.t('farmers.info.address.cell'),
+                    name: i18n.t('farmers.info.address.cell') + '*',
                     placeholder: i18n.t('input.type'),
                     value: farmer?.location?.address?.cell ?? '',
                     setValue: (value: string) =>
                       updateState(['location', 'address', 'cell'], value),
+                    error: errors.cell,
                   },
                   {
                     type: 'type',
-                    name: i18n.t('farmers.info.address.sector'),
+                    name: i18n.t('farmers.info.address.sector') + '*',
                     placeholder: i18n.t('input.type'),
                     value: farmer?.location?.address?.sector ?? '',
                     setValue: (value: string) =>
                       updateState(['location', 'address', 'sector'], value),
+                    error: errors.sector,
                   },
                 ]
               : [
                   {
                     type: 'type',
-                    name: i18n.t('farmers.info.address.address'),
+                    name: i18n.t('farmers.info.address.address') + '*',
                     placeholder: i18n.t('input.type'),
                     value: farmer?.location?.address?.address ?? '',
                     setValue: (value: string) =>
                       updateState(['location', 'address', 'address'], value),
+                    error: errors.address,
                   },
                   {
                     type: 'type',
-                    name: i18n.t('farmers.info.address.city'),
+                    name: i18n.t('farmers.info.address.city') + '*',
                     placeholder: i18n.t('input.type'),
                     value: farmer?.location?.address?.city ?? '',
                     setValue: (value: string) =>
                       updateState(['location', 'address', 'city'], value),
+                    error: errors.city,
                   },
                   {
                     type: 'type',
-                    name: i18n.t('farmers.info.address.state'),
+                    name: i18n.t('farmers.info.address.state') + '*',
                     placeholder: i18n.t('input.type'),
                     value: farmer?.location?.address?.state ?? '',
                     setValue: (value: string) =>
                       updateState(['location', 'address', 'state'], value),
+                    error: errors.state,
                   },
                   {
                     type: 'type',
-                    name: i18n.t('farmers.info.address.zip'),
+                    name: i18n.t('farmers.info.address.zip') + '*',
                     placeholder: i18n.t('input.type'),
                     value: farmer?.location?.address?.zip ?? '',
                     setValue: (value: string) =>
                       updateState(['location', 'address', 'zip'], value),
+                    error: errors.zip,
                   },
                 ]) as ItemProps[]),
         ]}

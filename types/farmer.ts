@@ -1,3 +1,5 @@
+import { Plot } from './plot';
+
 export interface Farmer {
   id: number;
   companyId: number;
@@ -71,6 +73,7 @@ export interface Farmer {
     code: string;
     description: string;
   }>;
+  plots: Plot[];
 }
 
 export interface ProductTypeWithCompanyId {

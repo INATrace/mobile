@@ -36,7 +36,7 @@ const certificationItems = [
     label: 'EU_ORGANIC',
     value: 'EU_ORGANIC',
   },
-  {
+  /* {
     label: 'RAINFOREST_ALLIANCE',
     value: 'RAINFOREST_ALLIANCE',
   },
@@ -47,7 +47,7 @@ const certificationItems = [
   {
     label: 'FAIRTRADE',
     value: 'FAIRTRADE',
-  },
+  }, */
 ];
 
 export default function AddPlot() {
@@ -170,36 +170,36 @@ export default function AddPlot() {
   };
 
   const savePlot = async () => {
+    if (!validateFields()) return;
+
     try {
-      if (validateFields()) {
-        const plot: Plot = {
-          id: newPlot?.id ?? '',
-          plotName: plotInfo.plotName,
-          crop: plotInfo.crop,
-          numberOfPlants: parseInt(plotInfo.numberOfPlants, 10),
-          size: newPlot?.size ?? '',
-          geoId: newPlot?.geoId ?? '',
-          certification: plotInfo.certification,
-          organicStartOfTransition: plotInfo.organicStartOfTransition,
-          featureInfo: newPlot?.featureInfo ?? {
-            type: 'Feature',
-            properties: {},
-            id: '',
-            geometry: { type: 'Polygon', coordinates: [] },
-          },
-        };
+      const plot: Plot = {
+        id: newPlot?.id ?? '',
+        plotName: plotInfo.plotName,
+        crop: plotInfo.crop,
+        numberOfPlants: parseInt(plotInfo.numberOfPlants, 10),
+        size: newPlot?.size ?? '',
+        geoId: newPlot?.geoId ?? '',
+        certification: plotInfo.certification,
+        organicStartOfTransition: plotInfo.organicStartOfTransition,
+        featureInfo: newPlot?.featureInfo ?? {
+          type: 'Feature',
+          properties: {},
+          id: '',
+          geometry: { type: 'Polygon', coordinates: [] },
+        },
+      };
 
-        const plotRealm = {
-          id: plot.id,
-          farmerId: selectedFarmer?.id?.toString(),
-          userId: user.id.toString(),
-          data: JSON.stringify(plot),
-        };
+      const plotRealm = {
+        id: plot.id,
+        farmerId: selectedFarmer?.id?.toString(),
+        userId: user.id.toString(),
+        data: JSON.stringify(plot),
+      };
 
-        await realm.realmWrite(PlotSchema, plotRealm);
-        router.back();
-        router.replace(`view/${selectedFarmer?.id?.toString()}` as any);
-      }
+      await realm.realmWrite(PlotSchema, plotRealm);
+      router.back();
+      router.replace(`view/${selectedFarmer?.id?.toString()}` as any);
     } catch (error) {
       console.error('Error saving plot', error);
     }

@@ -8,3 +8,29 @@ export const PlotSchema = {
   },
   primaryKey: 'id',
 };
+
+export const FarmerSchema = {
+  name: 'Farmer',
+  properties: {
+    id: 'string',
+    userId: 'string',
+    companyId: 'string',
+    data: 'string',
+    name: 'string',
+    surname: 'string',
+  },
+  primaryKey: 'id',
+};
+
+export const NewFarmerSchema = {
+  name: 'Farmer',
+  properties: {
+    id: 'string',
+    userId: 'string',
+    companyId: 'string',
+    data: 'string',
+    name: 'string',
+    surname: 'string',
+  },
+  primaryKey: 'id',
+};

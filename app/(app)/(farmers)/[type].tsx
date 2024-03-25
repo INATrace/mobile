@@ -21,6 +21,8 @@ import NewFarmerButton, {
 } from '@/components/farmers/NewFarmerButton';
 import { useLocalSearchParams } from 'expo-router';
 import { emptyComponent } from '@/components/common/FlashListComponents';
+import realm from '@/realm/useRealm';
+import { FarmerSchema, NewFarmerSchema } from '@/realm/schemas';
 
 const sortItems = [
   { label: i18n.t('farmers.sort.name'), value: 'BY_NAME_ASC', icon: ChevronUp },
@@ -78,10 +80,10 @@ export default function Farmers() {
     offsetHF: number,
     resetData: boolean
   ) => {
-    if (isConnected) {
+    if (!isConnected) {
       fetchFarmers(limitHF, offsetHF, resetData);
     } else {
-      loadFarmers();
+      loadFarmers(limitHF, offsetHF, resetData);
     }
   };
 
@@ -144,7 +146,102 @@ export default function Farmers() {
     }
   };
 
-  const loadFarmers = async () => {};
+  const loadFarmers = async (
+    limit: number,
+    offset: number,
+    resetData: boolean
+  ) => {
+    try {
+      const sort = selectedSort.split('_');
+      const search = '';
+      const newFarmersRealm = await realm.realmRead(
+        NewFarmerSchema,
+        limit,
+        offset,
+        sort[2] as 'ASC' | 'DESC',
+        search
+      );
+      const newFarmersRealmData = newFarmersRealm.map(
+        (farmer: any) => JSON.parse(farmer.data) as Farmer
+      );
+      const farmersRealm = await realm.realmRead(
+        FarmerSchema,
+        limit,
+        offset,
+        sort[2] as 'ASC' | 'DESC',
+        search
+      );
+      const farmersRealmData = farmersRealm.map(
+        (farmer: any) => JSON.parse(farmer.data) as Farmer
+      );
+      let offlineData: CardProps[] = [];
+
+      if (newFarmersRealmData.length > 0) {
+        offlineData = newFarmersRealmData.map((farmer: Farmer) => {
+          return {
+            title: `${farmer.name} ${farmer.surname}`,
+            items: [
+              {
+                type: 'view',
+                name: i18n.t('farmers.card.villageAndCell'),
+                value: `${farmer.location.address.village}, ${farmer.location.address.cell}`,
+              },
+              {
+                type: 'view',
+                name: i18n.t('farmers.card.gender'),
+                value: farmer.gender,
+              },
+            ] as ItemProps[],
+            navigationPath:
+              type === 'farmers' ? `info/${farmer.id}` : `view/${farmer.id}`,
+            navigationParams: {
+              type: 'farmer',
+              data: farmer,
+            },
+          } as CardProps;
+        });
+      }
+
+      if (farmersRealmData.length > 0) {
+        offlineData = [
+          ...data,
+          ...farmersRealmData.map((farmer: Farmer) => {
+            return {
+              title: `${farmer.name} ${farmer.surname}`,
+              items: [
+                {
+                  type: 'view',
+                  name: i18n.t('farmers.card.villageAndCell'),
+                  value: `${farmer.location.address.village}, ${farmer.location.address.cell}`,
+                },
+                {
+                  type: 'view',
+                  name: i18n.t('farmers.card.gender'),
+                  value: farmer.gender,
+                },
+              ] as ItemProps[],
+              navigationPath:
+                type === 'farmers' ? `info/${farmer.id}` : `view/${farmer.id}`,
+              navigationParams: {
+                type: 'farmer',
+                data: farmer,
+              },
+            } as CardProps;
+          }),
+        ];
+      }
+
+      setDataCount(offlineData.length);
+      if (resetData) {
+        setData(offlineData);
+        setOffset(0);
+      } else {
+        setData([...data, ...offlineData]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const onRefresh = () => {
     setIsRefreshing(true);

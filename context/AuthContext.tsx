@@ -12,6 +12,8 @@ import { Country } from '@/types/country';
 import { uuid } from 'expo-modules-core';
 import { Plot } from '@/types/plot';
 import { decode } from 'base-64';
+import realm from '@/realm/useRealm';
+import { FarmerSchema } from '@/realm/schemas';
 
 const apiUri = process.env.EXPO_PUBLIC_API_URI;
 let creatingImageCacheDir: any = null;
@@ -30,16 +32,6 @@ export const AuthContext = createContext<{
   companies: (CompanyInfo | undefined)[] | string | null;
   productTypes: ProductTypeWithCompanyId[] | string | null;
   countries: Country[] | string | null;
-  offlineFarmers:
-    | (
-        | {
-            companyId: number;
-            farmers: Farmer[];
-          }
-        | undefined
-      )[]
-    | string
-    | null;
   getConnection: Promise<NetInfoState>;
   isConnected: boolean;
   selectedFarmer: Farmer | string | null;
@@ -58,7 +50,6 @@ export const AuthContext = createContext<{
   selectedCompany: null,
   productTypes: null,
   countries: null,
-  offlineFarmers: null,
   getConnection: Promise.resolve({ isConnected: false } as NetInfoState),
   isConnected: false,
   selectedFarmer: null,
@@ -73,6 +64,7 @@ const isTokenExpired = (token: string): boolean => {
 
     return expirationDate < currentDate;
   } catch (error) {
+    console.error('Error decoding token:', error);
     return false;
   }
 };
@@ -100,17 +92,6 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     null,
     'asyncStorage'
   );
-  const [offlineFarmers, setOfflineFarmers] = useStorageState<
-    | (
-        | {
-            companyId: number;
-            farmers: Farmer[];
-          }
-        | undefined
-      )[]
-    | string
-    | null
-  >('offline_farmers', null, 'asyncStorage');
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [newPlot, setNewPlot] = useState<Plot | null>(null);
@@ -198,7 +179,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     return { success: false, errorStatus: 'GENERIC_ERROR' };
   };
 
-  const logOut = () => {
+  const logOut = async () => {
     setAccessToken(null);
     setUser(null);
     setSelectedCompany(null);
@@ -206,7 +187,9 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     setSelectedFarmer(null);
     setProductTypes(null);
     setCountries(null);
-    setOfflineFarmers(null);
+
+    await realm.realmDeleteAll(FarmerSchema);
+
     clearImageCache();
   };
 
@@ -264,7 +247,9 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     //farmers
     const farmersPromises = user.companyIds.map((companyId) =>
       axios
-        .get(`${apiUri}/api/company/userCustomers/${companyId}/FARMER`)
+        .get(
+          `${apiUri}/api/company/userCustomers/${companyId}/FARMER?limit=5000`
+        )
         .then((response) => ({ response, companyId }))
     );
     const farmersResponses = await Promise.all(farmersPromises);
@@ -277,8 +262,26 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         };
       }
     });
+
     const farmersResp = await Promise.all(farmers);
-    setOfflineFarmers(farmersResp);
+    const farmersRealm: any = [];
+
+    farmersResp.forEach((company) => {
+      company?.farmers?.forEach((farmer) => {
+        const farmerRealm = {
+          id: farmer.id ? farmer.id.toString() : '',
+          userId: user.id ? user.id.toString() : '',
+          companyId: company?.companyId ? company?.companyId.toString() : '',
+          data: JSON.stringify(farmer),
+          name: farmer.name ?? '',
+          surname: farmer.surname ?? '',
+        };
+
+        farmersRealm.push(farmerRealm);
+      });
+    });
+
+    await realm.realmWriteMultiple(FarmerSchema, farmersRealm);
   };
 
   const getConnection = async () => {
@@ -309,7 +312,6 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         companies,
         productTypes,
         countries,
-        offlineFarmers,
         getConnection: getConnection(),
         isConnected,
         selectedFarmer,
