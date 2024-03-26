@@ -245,6 +245,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     setCountries(countriesResp);
 
     //farmers
+    await realm.realmDeleteAll(FarmerSchema, 'synced == true');
     const farmersPromises = user.companyIds.map((companyId) =>
       axios
         .get(
@@ -275,6 +276,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           data: JSON.stringify(farmer),
           name: farmer.name ?? '',
           surname: farmer.surname ?? '',
+          synced: true,
         };
 
         farmersRealm.push(farmerRealm);

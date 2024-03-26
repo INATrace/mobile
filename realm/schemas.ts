@@ -18,19 +18,7 @@ export const FarmerSchema = {
     data: 'string',
     name: 'string',
     surname: 'string',
-  },
-  primaryKey: 'id',
-};
-
-export const NewFarmerSchema = {
-  name: 'Farmer',
-  properties: {
-    id: 'string',
-    userId: 'string',
-    companyId: 'string',
-    data: 'string',
-    name: 'string',
-    surname: 'string',
+    synced: 'bool',
   },
   primaryKey: 'id',
 };

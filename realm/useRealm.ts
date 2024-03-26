@@ -46,7 +46,8 @@ const realmRead = async (
   schema: any,
   limit?: number,
   offset?: number,
-  sort?: 'ASC' | 'DESC',
+  sortField?: string,
+  sortOrder: 'ASC' | 'DESC' = 'ASC',
   filter?: string
 ) => {
   const realm = await Realm.open({
@@ -61,9 +62,7 @@ const realmRead = async (
       objects = objects.filtered(filter);
     }
 
-    if (sort && typeof sort === 'string') {
-      const sortField = sort.startsWith('-') ? sort.substring(1) : sort;
-      const sortOrder = sort.startsWith('-') ? 'DESC' : 'ASC';
+    if (sortField && typeof sortField === 'string') {
       objects = objects.sorted(sortField, sortOrder === 'DESC');
     }
 
@@ -85,7 +84,7 @@ const realmRead = async (
   }
 };
 
-const realmDeleteAll = async (schema: any) => {
+const realmDeleteAll = async (schema: any, filter?: string) => {
   const realm = await Realm.open({
     path: 'myrealm',
     schema: [schema],
@@ -93,7 +92,10 @@ const realmDeleteAll = async (schema: any) => {
 
   try {
     realm.write(() => {
-      const objects = realm.objects(schema.name);
+      let objects = realm.objects(schema.name);
+      if (filter && filter.trim() !== '') {
+        objects = objects.filtered(filter);
+      }
       realm.delete(objects);
     });
   } catch (error) {

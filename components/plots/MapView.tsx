@@ -108,6 +108,7 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
       undefined,
       undefined,
       undefined,
+      undefined,
       `farmerId == '${selectedFarmer?.id}' AND userId == '${user.id}'`
     );
 

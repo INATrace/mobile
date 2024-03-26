@@ -6,6 +6,7 @@ import {
   Keyboard,
   ActivityIndicator,
   RefreshControl,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import i18n from '@/locales/i18n';
@@ -22,7 +23,7 @@ import NewFarmerButton, {
 import { useLocalSearchParams } from 'expo-router';
 import { emptyComponent } from '@/components/common/FlashListComponents';
 import realm from '@/realm/useRealm';
-import { FarmerSchema, NewFarmerSchema } from '@/realm/schemas';
+import { FarmerSchema } from '@/realm/schemas';
 
 const sortItems = [
   { label: i18n.t('farmers.sort.name'), value: 'BY_NAME_ASC', icon: ChevronUp },
@@ -65,7 +66,8 @@ export default function Farmers() {
   const [offset, setOffset] = useState<number>(0);
   const limit = 10;
 
-  const { isConnected, makeRequest, selectedCompany } = useContext(AuthContext);
+  const { isConnected, makeRequest, selectedCompany, user } =
+    useContext(AuthContext);
 
   useEffect(() => {
     if (offset !== 0) {
@@ -153,85 +155,45 @@ export default function Farmers() {
   ) => {
     try {
       const sort = selectedSort.split('_');
-      const search = '';
-      const newFarmersRealm = await realm.realmRead(
-        NewFarmerSchema,
-        limit,
-        offset,
-        sort[2] as 'ASC' | 'DESC',
-        search
-      );
-      const newFarmersRealmData = newFarmersRealm.map(
-        (farmer: any) => JSON.parse(farmer.data) as Farmer
-      );
+      const searchString = `companyId == '${selectedCompany}' AND userId == '${user?.id}' AND (${selectedFilter === 'BY_NAME' ? 'name' : 'surname'} CONTAINS[c] '${search}')`;
+
       const farmersRealm = await realm.realmRead(
         FarmerSchema,
         limit,
         offset,
+        sort[1].toLowerCase(),
         sort[2] as 'ASC' | 'DESC',
-        search
+        searchString
       );
       const farmersRealmData = farmersRealm.map(
         (farmer: any) => JSON.parse(farmer.data) as Farmer
       );
-      let offlineData: CardProps[] = [];
 
-      if (newFarmersRealmData.length > 0) {
-        offlineData = newFarmersRealmData.map((farmer: Farmer) => {
-          return {
-            title: `${farmer.name} ${farmer.surname}`,
-            items: [
-              {
-                type: 'view',
-                name: i18n.t('farmers.card.villageAndCell'),
-                value: `${farmer.location.address.village}, ${farmer.location.address.cell}`,
-              },
-              {
-                type: 'view',
-                name: i18n.t('farmers.card.gender'),
-                value: farmer.gender,
-              },
-            ] as ItemProps[],
-            navigationPath:
-              type === 'farmers' ? `info/${farmer.id}` : `view/${farmer.id}`,
-            navigationParams: {
-              type: 'farmer',
-              data: farmer,
+      const offlineData = farmersRealmData.map((farmer: Farmer) => {
+        return {
+          title: `${farmer.name} ${farmer.surname}`,
+          items: [
+            {
+              type: 'view',
+              name: i18n.t('farmers.card.villageAndCell'),
+              value: `${farmer.location.address.village}, ${farmer.location.address.cell}`,
             },
-          } as CardProps;
-        });
-      }
+            {
+              type: 'view',
+              name: i18n.t('farmers.card.gender'),
+              value: farmer.gender,
+            },
+          ] as ItemProps[],
+          navigationPath:
+            type === 'farmers' ? `info/${farmer.id}` : `view/${farmer.id}`,
+          navigationParams: {
+            type: 'farmer',
+            data: farmer,
+          },
+        } as CardProps;
+      });
 
-      if (farmersRealmData.length > 0) {
-        offlineData = [
-          ...data,
-          ...farmersRealmData.map((farmer: Farmer) => {
-            return {
-              title: `${farmer.name} ${farmer.surname}`,
-              items: [
-                {
-                  type: 'view',
-                  name: i18n.t('farmers.card.villageAndCell'),
-                  value: `${farmer.location.address.village}, ${farmer.location.address.cell}`,
-                },
-                {
-                  type: 'view',
-                  name: i18n.t('farmers.card.gender'),
-                  value: farmer.gender,
-                },
-              ] as ItemProps[],
-              navigationPath:
-                type === 'farmers' ? `info/${farmer.id}` : `view/${farmer.id}`,
-              navigationParams: {
-                type: 'farmer',
-                data: farmer,
-              },
-            } as CardProps;
-          }),
-        ];
-      }
-
-      setDataCount(offlineData.length);
+      setDataCount(offlineData.length === 0 ? 1 : offlineData.length);
       if (resetData) {
         setData(offlineData);
         setOffset(0);
@@ -302,7 +264,9 @@ export default function Farmers() {
           refreshControl={
             <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
           }
-          contentContainerStyle={{ paddingBottom: 50 }}
+          contentContainerStyle={{
+            paddingBottom: Platform.OS === 'ios' ? 50 : 100,
+          }}
         />
       </View>
       {type === 'farmers' && (
