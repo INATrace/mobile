@@ -1,10 +1,17 @@
+import { Farmer } from '@/types/farmer';
 import { useNavigation } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import realm from '@/realm/useRealm';
+import { FarmerSchema, PlotSchema } from '@/realm/schemas';
 
 export default function DataSync() {
   const navigation = useNavigation();
+
+  const [farmersToSync, setFarmersToSync] = useState<Farmer[]>([]);
+  const [plotsToSync, setPlotsToSync] = useState<Farmer[]>([]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -18,11 +25,31 @@ export default function DataSync() {
         </Pressable>
       ),
     });
+
+    getItemsToSync();
   }, []);
 
-  return (
-    <View>
-      <Text>Data Sync</Text>
-    </View>
-  );
+  const getItemsToSync = async () => {
+    const farmers = await realm.realmRead(
+      FarmerSchema,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'synced = false'
+    );
+    const plots = await realm.realmRead(
+      PlotSchema,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'synced = false'
+    );
+
+    console.log(farmers);
+    console.log(plots);
+  };
+
+  return <ScrollView className="h-full bg-White"></ScrollView>;
 }

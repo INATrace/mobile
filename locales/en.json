@@ -1,6 +1,7 @@
 {
   "yes": "Yes",
   "no": "No",
+  "loading": "Loading...",
   "input": {
     "type": "Type...",
     "select": "Select"

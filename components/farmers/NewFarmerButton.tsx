@@ -1,7 +1,7 @@
 import { ShadowButtonStyle } from '@/constants/Shadow';
 import i18n from '@/locales/i18n';
 import cn from '@/utils/cn';
-import { Link, LinkComponent } from 'expo-router';
+import { Link } from 'expo-router';
 import { Plus } from 'lucide-react-native';
 import { Pressable, View, Text } from 'react-native';
 

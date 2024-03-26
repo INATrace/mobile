@@ -6,12 +6,13 @@ import { Farmer, ProductTypeWithCompanyId } from '@/types/farmer';
 import { router, useNavigation } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useContext, useEffect, useState } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, Alert } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import realm from '@/realm/useRealm';
 import { PlotSchema } from '@/realm/schemas';
 import { Plot } from '@/types/plot';
 import { User } from '@/types/user';
+import { RequestParams } from '@/types/auth';
 
 type PlotInto = {
   plotName: string;
@@ -58,14 +59,28 @@ export default function AddPlot() {
   const [crops, setCrops] = useState<Array<{ label: string; value: string }>>(
     []
   );
-  const { newPlot, productTypes, selectedCompany, selectedFarmer, user } =
-    useContext(AuthContext) as {
-      newPlot: Plot;
-      productTypes: ProductTypeWithCompanyId[];
-      selectedCompany: number;
-      selectedFarmer: Farmer;
-      user: User;
-    };
+  const {
+    newPlot,
+    productTypes,
+    selectedCompany,
+    selectedFarmer,
+    user,
+    isConnected,
+    makeRequest,
+  } = useContext(AuthContext) as {
+    newPlot: Plot;
+    productTypes: ProductTypeWithCompanyId[];
+    selectedCompany: number;
+    selectedFarmer: Farmer;
+    user: User;
+    isConnected: boolean;
+    makeRequest: ({
+      url,
+      method,
+      body,
+      headers,
+    }: RequestParams) => Promise<any>;
+  };
 
   const navigation = useNavigation();
 
@@ -132,7 +147,7 @@ export default function AddPlot() {
         setCrops(
           products.productTypes.map((product) => ({
             label: product.name,
-            value: product.code,
+            value: product.id.toString(),
           }))
         );
       }
@@ -173,31 +188,59 @@ export default function AddPlot() {
     if (!validateFields()) return;
 
     try {
-      const plot: Plot = {
-        id: newPlot?.id ?? '',
-        plotName: plotInfo.plotName,
-        crop: plotInfo.crop,
-        numberOfPlants: parseInt(plotInfo.numberOfPlants, 10),
-        size: newPlot?.size ?? '',
-        geoId: newPlot?.geoId ?? '',
-        certification: plotInfo.certification,
-        organicStartOfTransition: plotInfo.organicStartOfTransition,
-        featureInfo: newPlot?.featureInfo ?? {
-          type: 'Feature',
-          properties: {},
-          id: '',
-          geometry: { type: 'Polygon', coordinates: [] },
-        },
-      };
+      if (isConnected && !isUUIDV4(selectedFarmer.id.toString())) {
+        const response = await makeRequest({
+          url: `/api/company/userCustomers/${selectedFarmer.id}/plots/add`,
+          method: 'POST',
+          body: {
+            plotName: plotInfo.plotName,
+            crop: { id: parseInt(plotInfo.crop, 10) },
+            numberOfPlants: parseInt(plotInfo.numberOfPlants, 10),
+            unit: newPlot.size.split(' ')[1],
+            size: parseFloat(newPlot.size.split(' ')[0]),
+            geoId: '',
+            organicStartOfTransition: plotInfo.organicStartOfTransition,
+            coordinates: newPlot.featureInfo.geometry.coordinates[0].map(
+              (coordinate: number[]) => {
+                return { latitude: coordinate[1], longitude: coordinate[0] };
+              }
+            ),
+          },
+        });
 
-      const plotRealm = {
-        id: plot.id,
-        farmerId: selectedFarmer?.id?.toString(),
-        userId: user.id.toString(),
-        data: JSON.stringify(plot),
-      };
+        if (response.data.status !== 'OK') {
+          Alert.alert('Error', 'Error saving plot');
+          return;
+        }
+      } else {
+        const plot: Plot = {
+          id: newPlot?.id ?? '',
+          plotName: plotInfo.plotName,
+          crop: plotInfo.crop,
+          numberOfPlants: parseInt(plotInfo.numberOfPlants, 10),
+          size: newPlot?.size ?? '',
+          geoId: newPlot?.geoId ?? '',
+          certification: plotInfo.certification,
+          organicStartOfTransition: plotInfo.organicStartOfTransition,
+          featureInfo: newPlot?.featureInfo ?? {
+            type: 'Feature',
+            properties: {},
+            id: '',
+            geometry: { type: 'Polygon', coordinates: [] },
+          },
+        };
 
-      await realm.realmWrite(PlotSchema, plotRealm);
+        const plotRealm = {
+          id: plot.id,
+          farmerId: selectedFarmer?.id?.toString(),
+          userId: user.id.toString(),
+          data: JSON.stringify(plot),
+          synced: false,
+        };
+
+        await realm.realmWrite(PlotSchema, plotRealm);
+      }
+
       router.back();
       router.replace(`view/${selectedFarmer?.id?.toString()}` as any);
     } catch (error) {
@@ -291,3 +334,9 @@ export default function AddPlot() {
     </KeyboardAwareScrollView>
   );
 }
+
+const isUUIDV4 = (uuid: string) => {
+  const uuidV4Regex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+  return uuidV4Regex.test(uuid);
+};

@@ -5,6 +5,7 @@ export const PlotSchema = {
     farmerId: 'string',
     userId: 'string',
     data: 'string',
+    synced: 'bool',
   },
   primaryKey: 'id',
 };

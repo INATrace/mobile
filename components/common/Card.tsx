@@ -166,7 +166,9 @@ const ItemView = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
       )}
     >
       <Text className="text-[16px] max-w-[45%]">{item.name}</Text>
-      <Text className="text-DarkGray text-[16px]">{item.value}</Text>
+      <Text className="text-DarkGray text-[16px] max-w-[50%]">
+        {item.value}
+      </Text>
     </View>
   );
 };

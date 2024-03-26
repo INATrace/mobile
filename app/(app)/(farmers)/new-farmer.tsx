@@ -5,6 +5,7 @@ import { AuthContext } from '@/context/AuthContext';
 import i18n from '@/locales/i18n';
 import { Country } from '@/types/country';
 import { Farmer, ProductType, ProductTypeWithCompanyId } from '@/types/farmer';
+import { User } from '@/types/user';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -15,6 +16,10 @@ import { ChevronLeft, PlusCircle, X, XCircle } from 'lucide-react-native';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { View, Text, Pressable, Alert } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { uuid } from 'expo-modules-core';
+import realm from '@/realm/useRealm';
+import { FarmerSchema } from '@/realm/schemas';
+import { RequestParams } from '@/types/auth';
 
 const genderItems = [
   {
@@ -49,14 +54,26 @@ type NewFarmerErrors = {
 };
 
 export default function NewFarmer() {
-  const { countries, productTypes, selectedCompany, isConnected, makeRequest } =
-    useContext(AuthContext) as {
-      countries: Country[];
-      productTypes: ProductTypeWithCompanyId[];
-      selectedCompany: number;
-      isConnected: boolean;
-      makeRequest: any;
-    };
+  const {
+    countries,
+    productTypes,
+    selectedCompany,
+    isConnected,
+    makeRequest,
+    user,
+  } = useContext(AuthContext) as {
+    countries: Country[];
+    productTypes: ProductTypeWithCompanyId[];
+    selectedCompany: number;
+    isConnected: boolean;
+    makeRequest: ({
+      url,
+      method,
+      body,
+      headers,
+    }: RequestParams) => Promise<any>;
+    user: User;
+  };
   const [searchedCountries, setSearchedCountries] =
     useState<Country[]>(countries);
   const navigation = useNavigation();
@@ -312,10 +329,10 @@ export default function NewFarmer() {
         farmer.farm?.farmPlantInformationList?.map(
           (item) => item.productType
         ) ?? [],
-    };
+    } as any;
 
     try {
-      if (isConnected) {
+      if (!isConnected) {
         const response = await makeRequest({
           url: `/api/company/userCustomers/add/${selectedCompany}`,
           method: 'POST',
@@ -339,6 +356,31 @@ export default function NewFarmer() {
             i18n.t('farmers.newFarmerCreation.errorMessage')
           );
         }
+      } else {
+        const farmerId = uuid.v4();
+        farmerBody.id = farmerId;
+        const farmerRealm = {
+          id: farmerId,
+          userId: user.id ? user.id.toString() : '',
+          companyId: selectedCompany.toString(),
+          data: JSON.stringify(farmerBody),
+          name: farmerBody.name ? farmerBody.name : '',
+          surname: farmerBody.surname ? farmerBody.surname : '',
+          synced: false,
+        };
+
+        await realm.realmWrite(FarmerSchema, farmerRealm);
+
+        Alert.alert(
+          i18n.t('farmers.newFarmerCreation.success'),
+          i18n.t('farmers.newFarmerCreation.successMessage'),
+          [
+            {
+              text: i18n.t('farmers.newFarmerCreation.ok'),
+              onPress: () => navigation.goBack(),
+            },
+          ]
+        );
       }
     } catch (error) {
       Alert.alert(

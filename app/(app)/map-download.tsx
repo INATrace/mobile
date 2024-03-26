@@ -254,7 +254,7 @@ export default function MapDownload() {
   };
 
   return (
-    <KeyboardAvoidingView className="h-full" behavior="padding">
+    <KeyboardAvoidingView className="h-full bg-White" behavior="padding">
       <Modal
         isOpen={downloadConfirm}
         onClosed={() => setDownloadConfirm(false)}

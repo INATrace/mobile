@@ -274,8 +274,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           userId: user.id ? user.id.toString() : '',
           companyId: company?.companyId ? company?.companyId.toString() : '',
           data: JSON.stringify(farmer),
-          name: farmer.name ?? '',
-          surname: farmer.surname ?? '',
+          name: farmer.name ? farmer.name : '',
+          surname: farmer.surname ? farmer.surname : '',
           synced: true,
         };
 

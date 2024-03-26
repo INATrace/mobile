@@ -20,7 +20,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react-native';
 import NewFarmerButton, {
   ButtonWrapper,
 } from '@/components/farmers/NewFarmerButton';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useSegments } from 'expo-router';
 import { emptyComponent } from '@/components/common/FlashListComponents';
 import realm from '@/realm/useRealm';
 import { FarmerSchema } from '@/realm/schemas';
@@ -57,17 +57,23 @@ export default function Farmers() {
   const [selectedSort, setSelectedSort] = useState<string>('BY_NAME_ASC');
   const [selectedFilter, setSelectedFilter] = useState<string>('BY_NAME');
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [data, setData] = useState<CardProps[]>([]);
   const [dataCount, setDataCount] = useState<number>(100);
+  const [preventOnEndReached, setPreventOnEndReached] =
+    useState<boolean>(false);
 
   const [offset, setOffset] = useState<number>(0);
   const limit = 10;
 
   const { isConnected, makeRequest, selectedCompany, user } =
     useContext(AuthContext);
+
+  const segments = useSegments();
+
+  useEffect(() => {}, [segments]);
 
   useEffect(() => {
     if (offset !== 0) {
@@ -113,7 +119,7 @@ export default function Farmers() {
               {
                 type: 'view',
                 name: i18n.t('farmers.card.villageAndCell'),
-                value: `${farmer.location.address.village}, ${farmer.location.address.cell}`,
+                value: `${farmer.location.address.village ? farmer.location.address.village : '/'}, ${farmer.location.address.cell ? farmer.location.address.cell : '/'}`,
               },
               {
                 type: 'view',
@@ -143,6 +149,7 @@ export default function Farmers() {
     } catch (error) {
       setError(i18n.t('farmers.errorFetch'));
     } finally {
+      setPreventOnEndReached(true);
       setIsRefreshing(false);
       setIsLoading(false);
     }
@@ -153,6 +160,7 @@ export default function Farmers() {
     offset: number,
     resetData: boolean
   ) => {
+    setIsLoading(true);
     try {
       const sort = selectedSort.split('_');
       const searchString = `companyId == '${selectedCompany}' AND userId == '${user?.id}' AND (${selectedFilter === 'BY_NAME' ? 'name' : 'surname'} CONTAINS[c] '${search}')`;
@@ -165,33 +173,39 @@ export default function Farmers() {
         sort[2] as 'ASC' | 'DESC',
         searchString
       );
-      const farmersRealmData = farmersRealm.map(
-        (farmer: any) => JSON.parse(farmer.data) as Farmer
-      );
+      const farmersRealmData = farmersRealm.map((farmer: any) => ({
+        data: JSON.parse(farmer.data) as Farmer,
+        synced: farmer.synced,
+      }));
 
-      const offlineData = farmersRealmData.map((farmer: Farmer) => {
-        return {
-          title: `${farmer.name} ${farmer.surname}`,
-          items: [
-            {
-              type: 'view',
-              name: i18n.t('farmers.card.villageAndCell'),
-              value: `${farmer.location.address.village}, ${farmer.location.address.cell}`,
+      const offlineData = farmersRealmData.map(
+        (farmer: { data: Farmer; synced: boolean }) => {
+          return {
+            title: `${farmer.data.name} ${farmer.data.surname}`,
+            synced: farmer.synced,
+            items: [
+              {
+                type: 'view',
+                name: i18n.t('farmers.card.villageAndCell'),
+                value: `${farmer.data.location.address.village}, ${farmer.data.location.address.cell}`,
+              },
+              {
+                type: 'view',
+                name: i18n.t('farmers.card.gender'),
+                value: farmer.data.gender,
+              },
+            ] as ItemProps[],
+            navigationPath:
+              type === 'farmers'
+                ? `info/${farmer.data.id}`
+                : `view/${farmer.data.id}`,
+            navigationParams: {
+              type: 'farmer',
+              data: farmer.data,
             },
-            {
-              type: 'view',
-              name: i18n.t('farmers.card.gender'),
-              value: farmer.gender,
-            },
-          ] as ItemProps[],
-          navigationPath:
-            type === 'farmers' ? `info/${farmer.id}` : `view/${farmer.id}`,
-          navigationParams: {
-            type: 'farmer',
-            data: farmer,
-          },
-        } as CardProps;
-      });
+          } as CardProps;
+        }
+      );
 
       setDataCount(offlineData.length === 0 ? 1 : offlineData.length);
       if (resetData) {
@@ -202,17 +216,21 @@ export default function Farmers() {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setPreventOnEndReached(true);
+      setIsRefreshing(false);
+      setIsLoading(false);
     }
   };
 
   const onRefresh = () => {
     setIsRefreshing(true);
     setOffset(0);
-    fetchFarmers(10, 0, true);
+    handleFarmers(10, 0, true);
   };
 
   const onEndReached = () => {
-    if (!isLoading) {
+    if (!isLoading && !preventOnEndReached) {
       setOffset((prevOffset) => prevOffset + 10);
     }
   };
@@ -257,9 +275,11 @@ export default function Farmers() {
           estimatedItemSize={dataCount}
           keyExtractor={(_, index) => index.toString()}
           className="flex flex-col h-full"
-          ListEmptyComponent={emptyComponent(i18n.t('farmers.noData'))}
+          ListEmptyComponent={emptyComponent(
+            isLoading ? i18n.t('loading') : i18n.t('farmers.noData')
+          )}
           ListFooterComponent={renderFooter}
-          onEndReached={onEndReached}
+          onEndReached={data.length > 0 ? onEndReached : () => {}}
           onEndReachedThreshold={0.5}
           refreshControl={
             <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
@@ -267,6 +287,7 @@ export default function Farmers() {
           contentContainerStyle={{
             paddingBottom: Platform.OS === 'ios' ? 50 : 100,
           }}
+          onMomentumScrollBegin={() => setPreventOnEndReached(false)}
         />
       </View>
       {type === 'farmers' && (
