@@ -132,6 +132,34 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
         geoId: plotData.geoId,
         certification: plotData.certification,
         organicStartOfTransition: plotData.organicStartOfTransition,
+        synced: false,
+      });
+    }
+
+    for (let plot of selectedFarmer.plots as any) {
+      const featureInfo = {
+        type: 'Feature',
+        properties: {},
+        id: plot.id,
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            plot?.coordinates.map((c: any) => [c.longitude, c.latitude]),
+          ],
+        },
+      };
+
+      features.push(featureInfo as any);
+      cardInfos.push({
+        id: plot.id,
+        plotName: plot.plotName,
+        crop: plot.crop,
+        numberOfPlants: plot.numberOfPlants,
+        size: plot.size,
+        geoId: plot.geoId,
+        certification: plot.certification,
+        organicStartOfTransition: plot.organicStartOfTransition,
+        synced: true,
       });
     }
 
@@ -297,16 +325,18 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
         {
           type: 'view',
           name: i18n.t('plots.addPlot.organicStartOfTransition'),
-          value: Intl.DateTimeFormat('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: '2-digit',
-          }).format(new Date(plot.organicStartOfTransition)),
+          value: plot.organicStartOfTransition
+            ? Intl.DateTimeFormat('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: '2-digit',
+              }).format(new Date(plot.organicStartOfTransition))
+            : '',
           editable: false,
         },
       ],
       title: plot.plotName,
-      synced: false,
+      synced: plot.synced,
     });
   };
 
