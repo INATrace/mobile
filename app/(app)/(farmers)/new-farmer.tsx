@@ -332,7 +332,7 @@ export default function NewFarmer() {
     } as any;
 
     try {
-      if (!isConnected) {
+      if (isConnected) {
         const response = await makeRequest({
           url: `/api/company/userCustomers/add/${selectedCompany}`,
           method: 'POST',

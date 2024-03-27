@@ -88,7 +88,7 @@ export default function Farmers() {
     offsetHF: number,
     resetData: boolean
   ) => {
-    if (!isConnected) {
+    if (isConnected) {
       fetchFarmers(limitHF, offsetHF, resetData);
     } else {
       loadFarmers(limitHF, offsetHF, resetData);

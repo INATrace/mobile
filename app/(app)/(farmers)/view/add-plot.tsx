@@ -27,9 +27,6 @@ type PlotInto = {
 type PlotInfoErrors = {
   plotName: boolean;
   crop: boolean;
-  numberOfPlants: boolean;
-  certification: boolean;
-  organicStartOfTransition: boolean;
 };
 
 const certificationItems = [
@@ -102,12 +99,6 @@ export default function AddPlot() {
             updatedErrors.plotName = false;
           } else if (key === 'crop') {
             updatedErrors.crop = false;
-          } else if (key === 'numberOfPlants') {
-            updatedErrors.numberOfPlants = false;
-          } else if (key === 'certification') {
-            updatedErrors.certification = false;
-          } else if (key === 'organicStartOfTransition') {
-            updatedErrors.organicStartOfTransition = false;
           }
 
           return updatedErrors;
@@ -172,11 +163,6 @@ export default function AddPlot() {
     const errors: PlotInfoErrors = {
       plotName: !plotInfo.plotName ? true : false,
       crop: !plotInfo.crop ? true : false,
-      numberOfPlants: !plotInfo.numberOfPlants ? true : false,
-      certification: !plotInfo.certification ? true : false,
-      organicStartOfTransition: !plotInfo.organicStartOfTransition
-        ? true
-        : false,
     };
 
     setPlotFieldErrors(errors);
@@ -200,6 +186,7 @@ export default function AddPlot() {
             size: parseFloat(newPlot.size.split(' ')[0]),
             geoId: '',
             organicStartOfTransition: plotInfo.organicStartOfTransition,
+            certification: plotInfo.certification,
             coordinates: newPlot.featureInfo.geometry.coordinates[0].map(
               (coordinate: number[]) => {
                 return { latitude: coordinate[1], longitude: coordinate[0] };
@@ -264,7 +251,7 @@ export default function AddPlot() {
           items={[
             {
               type: 'type',
-              name: i18n.t('plots.addPlot.plotName'),
+              name: i18n.t('plots.addPlot.plotName') + '*',
               placeholder: i18n.t('input.type'),
               value: plotInfo?.plotName ?? '',
               setValue: (value: string) => updateState(['plotName'], value),
@@ -272,7 +259,7 @@ export default function AddPlot() {
             },
             {
               type: 'select',
-              name: i18n.t('plots.addPlot.crop'),
+              name: i18n.t('plots.addPlot.crop') + '*',
               placeholder: i18n.t('input.select'),
               value: plotInfo?.crop ?? '',
               setValue: (value: string) => updateState(['crop'], value),
@@ -287,7 +274,6 @@ export default function AddPlot() {
               isNumeric: true,
               setValue: (value: string) =>
                 updateState(['numberOfPlants'], value),
-              error: plotFieldErrors?.numberOfPlants,
             },
             {
               type: 'view',
@@ -308,7 +294,6 @@ export default function AddPlot() {
                 updateState(['certification'], value),
               selectItems: certificationItems,
               snapPoints: '50%',
-              error: plotFieldErrors?.certification,
             },
             {
               type: 'date',
@@ -317,7 +302,6 @@ export default function AddPlot() {
               value: plotInfo?.organicStartOfTransition ?? '',
               setValue: (value: string) =>
                 updateState(['organicStartOfTransition'], value),
-              error: plotFieldErrors?.organicStartOfTransition,
             },
           ]}
         />
