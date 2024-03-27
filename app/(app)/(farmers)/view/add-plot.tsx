@@ -61,6 +61,7 @@ export default function AddPlot() {
     productTypes,
     selectedCompany,
     selectedFarmer,
+    selectFarmer,
     user,
     isConnected,
     makeRequest,
@@ -69,6 +70,7 @@ export default function AddPlot() {
     productTypes: ProductTypeWithCompanyId[];
     selectedCompany: number;
     selectedFarmer: Farmer;
+    selectFarmer: (farmer: Farmer) => void;
     user: User;
     isConnected: boolean;
     makeRequest: ({
@@ -193,6 +195,11 @@ export default function AddPlot() {
               }
             ),
           },
+        });
+
+        selectFarmer({
+          ...selectedFarmer,
+          plots: [...selectedFarmer.plots, response.data.data],
         });
 
         if (response.data.status !== 'OK') {

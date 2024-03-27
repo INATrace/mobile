@@ -38,6 +38,16 @@ export default function SearchInput(props: SearchInputProps) {
     bottomSheetFilterModalRef.current?.present();
   }, []);
 
+  const setSelectedSort = (selectedSort: string) => {
+    props.setSelectedSort(selectedSort);
+    bottomSheetSortModalRef.current?.close();
+  };
+
+  const setSelectedFilter = (selectedFilter: string) => {
+    props.setSelectedFilter(selectedFilter);
+    bottomSheetFilterModalRef.current?.close();
+  };
+
   return (
     <View className="flex flex-row items-center justify-between px-5">
       <View className="relative flex flex-row items-center justify-between h-12 mt-1 border rounded-md border-LightGray bg-White w-[70%]">
@@ -76,7 +86,7 @@ export default function SearchInput(props: SearchInputProps) {
           <Selector
             items={props.sortItems}
             selected={props.selectedSort}
-            setSelected={props.setSelectedSort}
+            setSelected={setSelectedSort}
           />
         </BottomSheetView>
       </BottomSheetModal>
@@ -107,7 +117,7 @@ export default function SearchInput(props: SearchInputProps) {
           <Selector
             items={props.filterItems}
             selected={props.selectedFilter}
-            setSelected={props.setSelectedFilter}
+            setSelected={setSelectedFilter}
           />
         </BottomSheetView>
       </BottomSheetModal>

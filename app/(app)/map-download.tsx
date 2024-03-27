@@ -118,7 +118,7 @@ export default function MapDownload() {
       console.log('Visible bounds:', visibleBounds);
       console.log('Zoom level:', zoomLevel);
       setBounds(visibleBounds);
-      estimateOfflinePackSize(zoomLevel, visibleBounds);
+      estimateOfflinePackSize(zoomLevel);
     }
   };
 
@@ -157,24 +157,8 @@ export default function MapDownload() {
     return totalTileCount;
   }
 
-  const estimateOfflinePackSize = (
-    zoomLevel: number,
-    bounds: [Position, Position]
-  ) => {
-    const sw: Position = bounds[0];
-    const ne: Position = bounds[1];
-
-    const leftBottom: Position = [sw[0], sw[1]];
-    const rightTop: Position = [ne[0], ne[1]];
-
-    const totalTiles = getTotalTileCount(leftBottom, rightTop, zoomLevel, 20);
-    console.log('Total estimated tiles:', totalTiles);
-
-    const estimatedSizeMB = (totalTiles * 32.5) / 1024;
-
-    console.log('Estimated size:', estimatedSizeMB.toFixed(2));
-
-    setEstimatedSize(parseFloat(estimatedSizeMB.toFixed(2)));
+  const estimateOfflinePackSize = (zoomLevel: number) => {
+    setEstimatedSize(parseFloat(((20 - zoomLevel) * 6).toFixed(2)));
   };
 
   const onDownloadArea = async () => {
@@ -199,7 +183,7 @@ export default function MapDownload() {
       await Mapbox.offlineManager.createPack(
         {
           name: packName,
-          styleURL: Mapbox.StyleURL.Street,
+          styleURL: Mapbox.StyleURL.SatelliteStreet,
           bounds: [
             [bounds[0][0], bounds[0][1]],
             [bounds[1][0], bounds[1][1]],
@@ -326,6 +310,7 @@ export default function MapDownload() {
             >
               <Mapbox.Camera
                 zoomLevel={14}
+                minZoomLevel={10}
                 centerCoordinate={[
                   location.coords.longitude,
                   location.coords.latitude,

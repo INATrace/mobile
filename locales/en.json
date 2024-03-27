@@ -185,6 +185,8 @@
     "plotsTitle": "Plots"
   },
   "synced": {
-    "itemNotSynced": "Item not synced"
+    "itemNotSynced": "Item not synced",
+    "noFarmers": "No farmers to sync",
+    "noPlots": "No plots to sync"
   }
 }

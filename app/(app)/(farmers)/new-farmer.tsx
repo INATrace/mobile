@@ -32,7 +32,7 @@ const genderItems = [
   },
   {
     label: i18n.t('farmers.newFarmerCreation.gender.n/a'),
-    value: 'N/A',
+    value: 'N_A',
   },
 ];
 

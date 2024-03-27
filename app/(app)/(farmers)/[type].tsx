@@ -73,15 +73,13 @@ export default function Farmers() {
 
   const segments = useSegments();
 
-  useEffect(() => {}, [segments]);
-
   useEffect(() => {
     if (offset !== 0) {
       handleFarmers(limit, offset, false);
     } else {
       handleFarmers(limit, offset, true);
     }
-  }, [selectedSort, selectedFilter, search, selectedCompany, offset]);
+  }, [selectedSort, selectedFilter, search, selectedCompany, offset, segments]);
 
   const handleFarmers = async (
     limitHF: number,
@@ -89,9 +87,9 @@ export default function Farmers() {
     resetData: boolean
   ) => {
     if (isConnected) {
-      fetchFarmers(limitHF, offsetHF, resetData);
+      await fetchFarmers(limitHF, offsetHF, resetData);
     } else {
-      loadFarmers(limitHF, offsetHF, resetData);
+      await loadFarmers(limitHF, offsetHF, resetData);
     }
   };
 
@@ -101,6 +99,7 @@ export default function Farmers() {
     resetData: boolean
   ) => {
     setIsLoading(true);
+
     try {
       const sort = selectedSort.split('_');
       const sortBy = sort[0] + '_' + sort[1];
@@ -136,14 +135,60 @@ export default function Farmers() {
           } as CardProps;
         });
 
+        const searchString = `companyId == '${selectedCompany}' AND userId == '${user?.id}' AND (${selectedFilter === 'BY_NAME' ? 'name' : 'surname'} CONTAINS[c] '${search}') AND synced == false`;
+
+        const farmersRealm = await realm.realmRead(
+          FarmerSchema,
+          limit,
+          offset,
+          sort[1].toLowerCase(),
+          sort[2] as 'ASC' | 'DESC',
+          searchString
+        );
+        const farmersRealmData = farmersRealm.map((farmer: any) => ({
+          data: JSON.parse(farmer.data) as Farmer,
+          synced: farmer.synced,
+        }));
+
+        const offlineData = farmersRealmData.map(
+          (farmer: { data: Farmer; synced: boolean }) => {
+            return {
+              title: `${farmer.data.name} ${farmer.data.surname}`,
+              synced: farmer.synced,
+              items: [
+                {
+                  type: 'view',
+                  name: i18n.t('farmers.card.villageAndCell'),
+                  value: `${farmer.data.location.address.village}, ${farmer.data.location.address.cell}`,
+                },
+                {
+                  type: 'view',
+                  name: i18n.t('farmers.card.gender'),
+                  value: farmer.data.gender,
+                },
+              ] as ItemProps[],
+              navigationPath:
+                type === 'farmers'
+                  ? `info/${farmer.data.id}`
+                  : `view/${farmer.data.id}`,
+              navigationParams: {
+                type: 'farmer',
+                data: farmer.data,
+              },
+            } as CardProps;
+          }
+        );
+
         setDataCount(
-          response.data.data.count === 0 ? 1 : response.data.data.count
+          response.data.data.count === 0 || offlineData.length === 0
+            ? 1
+            : response.data.data.count + offlineData.length
         );
         if (resetData) {
-          setData(farmers);
+          setData([...offlineData, ...farmers]);
           setOffset(0);
         } else {
-          setData([...data, ...farmers]);
+          setData([...data, ...offlineData, ...farmers]);
         }
       }
     } catch (error) {

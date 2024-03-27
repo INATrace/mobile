@@ -216,6 +216,11 @@ const ItemSelect = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
     (selected) => selected.value === item.value
   );
 
+  const setSelected = (selected: string) => {
+    item.setValue ? item.setValue(selected) : () => {};
+    bottomSheetRef.current?.close();
+  };
+
   return (
     <View className="">
       <View
@@ -282,7 +287,7 @@ const ItemSelect = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
           <Selector
             items={item.selectItems ?? []}
             selected={item.value ?? ''}
-            setSelected={item.setValue ?? (() => {})}
+            setSelected={setSelected}
           />
         </BottomSheetScrollView>
       </BottomSheetModal>

@@ -31,7 +31,7 @@ import { FeatureInfo, Plot } from '@/types/plot';
 import area from '@turf/area';
 import realm from '@/realm/useRealm';
 import { PlotSchema } from '@/realm/schemas';
-import { Farmer } from '@/types/farmer';
+import { Farmer, ProductTypeWithCompanyId } from '@/types/farmer';
 import { User } from '@/types/user';
 import Card, { CardProps } from '../common/Card';
 
@@ -55,11 +55,14 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
     });
 
   const cameraRef = useRef<CameraRef>(null);
-  const { setNewPlot, selectedFarmer, user } = useContext(AuthContext) as {
-    setNewPlot: (plot: Plot) => void;
-    selectedFarmer: Farmer;
-    user: User;
-  };
+  const { setNewPlot, selectedFarmer, user, selectedCompany, productTypes } =
+    useContext(AuthContext) as {
+      selectedCompany: number;
+      setNewPlot: (plot: Plot) => void;
+      selectedFarmer: Farmer;
+      user: User;
+      productTypes: ProductTypeWithCompanyId[];
+    };
   const [isMapLoading, setIsMapLoading] = useState<boolean>(true);
   const [cardInfoCollection, setCardInfoCollection] = useState<any[]>([]);
   const [cardInfo, setCardInfo] = useState<CardProps | null>(null);
@@ -103,72 +106,85 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
   }, [selectedFarmer]);
 
   const loadExistingPlots = async () => {
-    const offlinePlots = await realm.realmRead(
-      PlotSchema,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      `farmerId == '${selectedFarmer?.id}' AND userId == '${user.id}'`
-    );
+    try {
+      const offlinePlots = await realm.realmRead(
+        PlotSchema,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        `farmerId == '${selectedFarmer?.id}' AND userId == '${user.id}'`
+      );
 
-    if (!offlinePlots) {
-      return;
-    }
+      let features: GeoJSON.Feature[] = [];
+      let cardInfos = [];
 
-    let features: GeoJSON.Feature[] = [];
-    let cardInfos = [];
+      if (offlinePlots && offlinePlots.length !== 0) {
+        for (let plot of offlinePlots) {
+          const plotData = JSON.parse(plot.data as any) as Plot;
 
-    for (let plot of offlinePlots) {
-      const plotData = JSON.parse(plot.data as any) as Plot;
+          const products = productTypes?.find(
+            (product: ProductTypeWithCompanyId) => {
+              return product.companyId === selectedCompany;
+            }
+          );
+          const crop = products?.productTypes.find(
+            (product) => product.id.toString() === plotData.crop
+          );
 
-      features.push(plotData.featureInfo);
-      cardInfos.push({
-        id: plotData.featureInfo.id,
-        plotName: plotData.plotName,
-        crop: plotData.crop,
-        numberOfPlants: plotData.numberOfPlants,
-        size: plotData.size,
-        geoId: plotData.geoId,
-        certification: plotData.certification,
-        organicStartOfTransition: plotData.organicStartOfTransition,
-        synced: false,
+          features.push(plotData.featureInfo);
+          cardInfos.push({
+            id: plotData.featureInfo.id,
+            plotName: plotData.plotName,
+            crop: crop,
+            numberOfPlants: plotData.numberOfPlants,
+            size: plotData.size,
+            geoId: plotData.geoId,
+            certification: plotData.certification,
+            organicStartOfTransition: plotData.organicStartOfTransition,
+            synced: false,
+          });
+        }
+      }
+
+      if (selectedFarmer.plots && selectedFarmer.plots.length > 0) {
+        for (let plot of selectedFarmer.plots as any) {
+          const featureInfo = {
+            type: 'Feature',
+            properties: {},
+            id: plot.id,
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                plot?.coordinates.map((c: any) => [c.longitude, c.latitude]),
+              ],
+            },
+          };
+
+          features.push(featureInfo as any);
+          cardInfos.push({
+            id: plot.id,
+            plotName: plot.plotName,
+            crop: plot.crop,
+            numberOfPlants: plot.numberOfPlants,
+            size: plot.size + ' ' + plot.unit,
+            geoId: plot.geoId,
+            certification: plot.certification,
+            organicStartOfTransition: plot.organicStartOfTransition,
+            synced: true,
+          });
+        }
+      }
+
+      setCardInfoCollection(cardInfos);
+
+      setFeatureCollection({
+        type: 'FeatureCollection',
+        features,
       });
+    } catch (error) {
+      console.error(error);
     }
-
-    for (let plot of selectedFarmer.plots as any) {
-      const featureInfo = {
-        type: 'Feature',
-        properties: {},
-        id: plot.id,
-        geometry: {
-          type: 'Polygon',
-          coordinates: [
-            plot?.coordinates.map((c: any) => [c.longitude, c.latitude]),
-          ],
-        },
-      };
-
-      features.push(featureInfo as any);
-      cardInfos.push({
-        id: plot.id,
-        plotName: plot.plotName,
-        crop: plot.crop,
-        numberOfPlants: plot.numberOfPlants,
-        size: plot.size,
-        geoId: plot.geoId,
-        certification: plot.certification,
-        organicStartOfTransition: plot.organicStartOfTransition,
-        synced: true,
-      });
-    }
-
-    setCardInfoCollection(cardInfos);
-
-    setFeatureCollection({
-      type: 'FeatureCollection',
-      features,
-    });
   };
 
   const addLocationToLocations = () => {
@@ -282,7 +298,14 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
 
   const handlePolygonPress = (e: any) => {
     const cardInfoId = e.features[0].id;
-    const plot = cardInfoCollection.find((c) => c.id === cardInfoId);
+    const plot = cardInfoCollection.find((c) => c.id.toString() === cardInfoId);
+
+    const products = productTypes?.find((product: ProductTypeWithCompanyId) => {
+      return product.companyId === selectedCompany;
+    });
+    const crop = products?.productTypes.find(
+      (product) => product.id === plot.crop.id
+    );
 
     if (!plot) {
       return;
@@ -295,7 +318,7 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
         {
           type: 'view',
           name: i18n.t('plots.addPlot.crop'),
-          value: plot.crop,
+          value: crop?.name,
           editable: false,
         },
         {
@@ -385,6 +408,7 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
           <Mapbox.MapView
             className="flex-1"
             onDidFinishLoadingMap={() => setIsMapLoading(false)}
+            styleURL={Mapbox.StyleURL.SatelliteStreet}
           >
             <Mapbox.Camera
               defaultSettings={{
