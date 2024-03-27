@@ -1,54 +1,193 @@
 {
+  "yes": "Yego",
+  "no": "Oya",
+  "loading": "Birimo birakorwa...",
+  "input": {
+    "type": "Andika...",
+    "select": "Hitamo"
+  },
   "login": {
-    "welcomeBack": "Welcome back!",
-    "welcomeBackSubtitle": "Log in to continue",
-    "username": "Username",
-    "usernamePlaceholder": "Enter your username",
-    "password": "Password",
-    "passwordPlaceholder": "Enter your password",
-    "forgotPassword": "Forgot password?",
-    "login": "Log in",
-    "genericError": "Something went wrong, please try again later",
-    "authError": "Wrong username or password"
+    "welcomeBack": "Murakaza neza!",
+    "welcomeBackSubtitle": "Injira kugira ngo ukomeze",
+    "username": "Izina ry'umukoresha",
+    "usernamePlaceholder": "Andika izina ry'umukoresha",
+    "password": "Ijambo ry'ibanga",
+    "passwordPlaceholder": "Andika ijambo ry'ibanga",
+    "forgotPassword": "Wibagiwe ijambo ry'ibanga?",
+    "login": "Injira",
+    "genericError": "Habayeho ikibazo, ongera ugerageze nyuma",
+    "authError": "Izina ry'umukoresha cyangwa ijambo ry'ibanga ntibikwiye"
   },
   "userSettings": {
-    "title": "User settings",
-    "userInformation": "User information",
-    "name": "Name",
-    "surname": "Surname",
-    "username": "Username",
-    "companyInformation": "Company information",
-    "company": "Company",
-    "language": "Language",
-    "english": "English",
-    "spanish": "Spanish",
-    "german": "German",
-    "kinyarwanda": "Kinyarwanda",
-    "resetPassword": "Reset password",
-    "logOut": "Log out"
+    "title": "Igenamiterere ry'umukoresha",
+    "userInformation": "Amakuru y'umukoresha",
+    "name": "Izina",
+    "surname": "Izina ry'umuryango",
+    "username": "Izina ry'umukoresha",
+    "companyInformation": "Amakuru y'ikompanyi",
+    "company": "Ikompanyi",
+    "language": "Ururimi",
+    "english": "Icyongereza",
+    "spanish": "Icyespanyole",
+    "german": "Icyidage",
+    "kinyarwanda": "Ikinyarwanda",
+    "offlineMaps": "Ikarita zitari kuri murandasi",
+    "offlineMapsSettings": "Igenamiterere ry'ikarita zitari kuri murandasi",
+    "resetPassword": "Siba ijambo ry'ibanga",
+    "logOut": "Sohoka"
   },
   "home": {
-    "title": "Home",
-    "farmers": "Farmers",
-    "newPlot": "New plot",
-    "syncData": "Sync data"
+    "title": "Ahabanza",
+    "farmers": "Abahinzi",
+    "newPlot": "Ikibanza gishya",
+    "syncData": "Hindura amakuru"
   },
   "farmers": {
-    "title": "Farmers",
-    "newFarmer": "New farmer",
-    "search": "Search",
+    "title": "Abahinzi",
+    "titleNewPlot": "Ikibanza gishya",
+    "newFarmer": "Umuhinzi mushya",
+    "search": "Shakisha",
+    "noData": "Nta bahinzi babonetse",
     "sort": {
-      "name_asc": "Name ↑",
-      "name_desc": "Name ↓",
-      "surname_asc": "Surname ↑",
-      "surname_desc": "Surname ↓",
-      "id_asc": "ID ↑",
-      "id_desc": "ID ↓"
+      "sortBy": "Rangura hashingiwe kuri",
+      "name": "Izina",
+      "surname": "Izina ry'umuryango",
+      "id": "ID"
     },
     "filter": {
-      "name": "First name",
-      "surname": "Last name"
+      "filterBy": "Shakisha hashingiwe kuri",
+      "name": "Izina rya mbere",
+      "surname": "Izina ry'umuryango"
     },
-    "errorFetch": "Error fetching farmers"
+    "errorFetch": "Ikosa mu gushaka abahinzi",
+    "card": {
+      "villageAndCell": "Umudugudu & Akagari",
+      "gender": "Igitsina"
+    },
+    "info": {
+      "viewAllPlots": "Reba ibibanza byose",
+      "basicInformation": {
+        "title": "Amakuru y'ibanze",
+        "firstName": "Izina rya mbere",
+        "lastName": "Izina ry'umuryango",
+        "gender": "Igitsina",
+        "userId": "ID y'umukoresha",
+        "companyInternalFarmerId": "ID y'umuhinzi mu ikompanyi"
+      },
+      "address": {
+        "title": "Aho atuye",
+        "country": "Igihugu",
+        "village": "Umudugudu",
+        "cell": "Akagari",
+        "sector": "Umurenge",
+        "address": "Adiresi",
+        "city": "Umujyi",
+        "state": "Leta / Intara / Akarere",
+        "zip": "Zip / Kode ya Posita / P.O. Box",
+        "hondurasFarm": "Urugo rw'ubuhinzi",
+        "hondurasVillage": "Umudugudu",
+        "hondurasMunicipality": "Akarere",
+        "hondurasDepartment": "Intara"
+      },
+      "contact": {
+        "title": "Ibyerekeye Ihererekanyamakuru",
+        "phoneNumber": "Nomero ya Telefoni",
+        "email": "Imeli"
+      },
+      "farmInformation": {
+        "title": "Amakuru y'Urugo rw'Uhinzi",
+        "areaUnit": "Icyicaro cy'Ubunini",
+        "totalFarmSize": "Ubunini bwose bw'Urugo rw'Uhinzi",
+        "productType": "Ubwoko bw'Ibicuruzwa",
+        "area": "Akarere",
+        "plants": "Ibimera",
+        "organicFarm": "Urugo rw'Uhinzi rw'Ibinyabuzima",
+        "startedTransitionToOrganic": "Yatangiye Guhindura ku Binyabuzima"
+      },
+      "bankInformation": {
+        "title": "Amakuru y'Ibanki",
+        "bankName": "Izina ry'Ibanki",
+        "bankAccountNumber": "Nomero y'Ukuntu",
+        "bankAccountHolder": "Nyir'ukuntu"
+      },
+      "productTypes": {
+        "title": "Ubwoko bw'Ibicuruzwa",
+        "productType": "Ubwoko bw'Ibicuruzwa"
+      }
+    },
+    "newFarmerCreation": {
+      "gender": {
+        "male": "Gabo",
+        "female": "Gore",
+        "n/a": "Ntibisobanutse"
+      },
+      "saveFarmer": "Bika Umuhinzi",
+      "success": "Byagenze Neza",
+      "successMessage": "Umuhinzi yararemwe neza",
+      "ok": "OK",
+      "error": "Ikosa",
+      "errorMessage": "Habaye ikibazo mu kurema umuhinzi"
+    }
+  },
+  "plots": {
+    "title": "Reba ibibanza",
+    "listView": "Urutonde rw'Irebe",
+    "mapView": "Irebe ry'Ikarita",
+    "mapDownload": "Kumanura Ikarita",
+    "mapTitle": "Umutwe w'Ikarita",
+    "noData": "Nta bibanza bibonetse",
+    "plots": "ikibanza/ibibanza",
+    "offlineMapsScreen": {
+      "downloadedMaps": "Ikarita zikumanuwe",
+      "noMapsDownloaded": "Nta karita zikumanuwe ziriho",
+      "selectYourOwnMap": "Hitamo ikarita yawe",
+      "downloadThisMap": "Kumanura iyi karita?",
+      "cancel": "Hagarika",
+      "download": "Kumanura",
+      "confirm": "Emeza",
+      "sizeWarning": "Kumanura bishobora gufata kugeza kuri %{size} MB by'umwanya wawe w'ubuntu",
+      "expires": "Birangira %{date}",
+      "delete": "Siba",
+      "deleteAlert": "Uratekereza neza ko ushaka gusiba iyi karita?",
+      "locationPermissionDeniedAlert": "Uruhushya rwo kwinjira aho uri rwahakanywe",
+      "noAreaSelected": "Nta gace katowe",
+      "noAreaSelectedMessage": "Nyabuneka hitamo agace kugira ngo ukamanure",
+      "errorTitle": "Ikosa",
+      "errorDeleting": "Habaye ikibazo mu gusiba ipaki",
+      "errorDownloadingTitle": "Ikosa ryo Kumanura",
+      "errorDownloading": "Habaye ikibazo mu gutangira kumanura"
+    },
+    "mapLoading": "Ikarita irimo kuboneka",
+    "addPlot": {
+      "newPlot": "Ikibanza gishya",
+      "addCurrentLocation": "Ongeraho aho uri ubu",
+      "cancel": "Hagarika",
+      "savePlotShape": "Bika imiterere y'ikibanza",
+      "lowGPSAccuracy": "Ukuri k'umwanya wa GPS kuri hasi (%{accuracy}m)",
+      "mediumGPSAccuracy": "Ukuri k'umwanya wa GPS ku rwego ruringaniye (%{accuracy}m)",
+      "undo": "Subira inyuma",
+      "redo": "Kora bundi bushya",
+      "notEnoughPointsTitle": "Amabara ntahagije",
+      "notEnoughPointsMessage": "Nyabuneka ongeraho nibura amanota atatu kugira ngo ureme ikibanza",
+      "plotInformation": "Amakuru y'ikibanza",
+      "plotName": "Izina ry'ikibanza",
+      "crop": "Igihingwa",
+      "numberOfPlants": "Umubare w'ibimera",
+      "size": "Ingano",
+      "geoId": "Geo-ID",
+      "certification": "Icyemezo",
+      "organicStartOfTransition": "Intangiriro yo guhindura ku bihingwa by'umwimerere",
+      "savePlot": "Bika ikibanza"
+    },
+    "totalArea": "ubuso bwose",
+    "summaryTitle": "Isummari",
+    "plotsTitle": "Ibibanza"
+  },
+  "synced": {
+    "itemNotSynced": "Igikoresho kitahuje",
+    "noFarmers": "Nta bahinzi bo guhuza",
+    "noPlots": "Nta bibanza byo guhuza",
+    "name": "Izina",
+    "title": "Umutwe"
   }
 }

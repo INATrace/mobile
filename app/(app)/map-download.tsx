@@ -115,8 +115,6 @@ export default function MapDownload() {
     if (mapRef.current) {
       const visibleBounds = await mapRef.current.getVisibleBounds();
       const zoomLevel = await mapRef.current.getZoom();
-      console.log('Visible bounds:', visibleBounds);
-      console.log('Zoom level:', zoomLevel);
       setBounds(visibleBounds);
       estimateOfflinePackSize(zoomLevel);
     }

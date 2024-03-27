@@ -187,6 +187,8 @@
   "synced": {
     "itemNotSynced": "Item not synced",
     "noFarmers": "No farmers to sync",
-    "noPlots": "No plots to sync"
+    "noPlots": "No plots to sync",
+    "name": "Name",
+    "title": "Title"
   }
 }

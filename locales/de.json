@@ -1,4 +1,11 @@
 {
+  "yes": "Ja",
+  "no": "Nein",
+  "loading": "Lädt...",
+  "input": {
+    "type": "Eingeben...",
+    "select": "Auswählen"
+  },
   "login": {
     "welcomeBack": "Willkommen zurück!",
     "welcomeBackSubtitle": "Loggen Sie sich ein, um fortzufahren",
@@ -17,38 +24,171 @@
     "name": "Name",
     "surname": "Nachname",
     "username": "Benutzername",
-    "companyInformation": "Unternehmensinformationen",
-    "company": "Unternehmen",
+    "companyInformation": "Firmeninformationen",
+    "company": "Firma",
     "language": "Sprache",
     "english": "Englisch",
     "spanish": "Spanisch",
     "german": "Deutsch",
     "kinyarwanda": "Kinyarwanda",
+    "offlineMaps": "Offline-Karten",
+    "offlineMapsSettings": "Einstellungen für Offline-Karten",
     "resetPassword": "Passwort zurücksetzen",
     "logOut": "Ausloggen"
   },
   "home": {
     "title": "Startseite",
-    "farmers": "Landwirte",
-    "newPlot": "Neues Feld",
+    "farmers": "Bauern",
+    "newPlot": "Neue Parzelle",
     "syncData": "Daten synchronisieren"
   },
   "farmers": {
-    "title": "Landwirte",
-    "newFarmer": "Neuer Landwirt",
+    "title": "Bauern",
+    "titleNewPlot": "Neue Parzelle",
+    "newFarmer": "Neuer Bauer",
     "search": "Suche",
+    "noData": "Keine Bauern gefunden",
     "sort": {
-      "name_asc": "Name ↑",
-      "name_desc": "Name ↓",
-      "surname_asc": "Nachname ↑",
-      "surname_desc": "Nachname ↓",
-      "id_asc": "ID ↑",
-      "id_desc": "ID ↓"
+      "sortBy": "Sortieren nach",
+      "name": "Name",
+      "surname": "Nachname",
+      "id": "ID"
     },
     "filter": {
+      "filterBy": "Suchen nach",
       "name": "Vorname",
       "surname": "Nachname"
     },
-    "errorFetch": "Fehler beim Abrufen der Landwirte"
+    "errorFetch": "Fehler beim Abrufen der Bauern",
+    "card": {
+      "villageAndCell": "Dorf & Zelle",
+      "gender": "Geschlecht"
+    },
+    "info": {
+      "viewAllPlots": "Alle Parzellen ansehen",
+      "basicInformation": {
+        "title": "Grundinformation",
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "gender": "Geschlecht",
+        "userId": "Benutzer-ID",
+        "companyInternalFarmerId": "Interne Bauern-ID der Firma"
+      },
+      "address": {
+        "title": "Adresse",
+        "country": "Land",
+        "village": "Dorf",
+        "cell": "Zelle",
+        "sector": "Sektor",
+        "address": "Straßenadresse",
+        "city": "Stadt",
+        "state": "Bundesland / Provinz / Region",
+        "zip": "PLZ / Postleitzahl / Postfach",
+        "hondurasFarm": "Bauernhof",
+        "hondurasVillage": "Dorf",
+        "hondurasMunicipality": "Gemeinde",
+        "hondurasDepartment": "Abteilung"
+      },
+      "contact": {
+        "title": "Kontakt",
+        "phoneNumber": "Telefonnummer",
+        "email": "E-Mail"
+      },
+      "farmInformation": {
+        "title": "Farminformationen",
+        "areaUnit": "Flächeneinheit",
+        "totalFarmSize": "Gesamtgröße der Farm",
+        "productType": "Produkttyp",
+        "area": "Fläche",
+        "plants": "Pflanzen",
+        "organicFarm": "Biobauernhof",
+        "startedTransitionToOrganic": "Beginn der Umstellung auf Bio"
+      },
+      "bankInformation": {
+        "title": "Bankinformationen",
+        "bankName": "Bankname",
+        "bankAccountNumber": "Kontonummer",
+        "bankAccountHolder": "Kontoinhaber"
+      },
+      "productTypes": {
+        "title": "Produkttypen",
+        "productType": "Produkttyp"
+      }
+    },
+    "newFarmerCreation": {
+      "gender": {
+        "male": "Männlich",
+        "female": "Weiblich",
+        "n/a": "N/A"
+      },
+      "saveFarmer": "Bauern speichern",
+      "success": "Erfolg",
+      "successMessage": "Bauer erfolgreich erstellt",
+      "ok": "OK",
+      "error": "Fehler",
+      "errorMessage": "Beim Erstellen des Bauern ist ein Fehler aufgetreten"
+    }
+  },
+  "plots": {
+    "title": "Parzellen ansehen",
+    "listView": "Listenansicht",
+    "mapView": "Kartenansicht",
+    "mapDownload": "Karte herunterladen",
+    "mapTitle": "Kartentitel",
+    "noData": "Keine Parzellen gefunden",
+    "plots": "Parzelle/n",
+    "offlineMapsScreen": {
+      "downloadedMaps": "Heruntergeladene Karten",
+      "noMapsDownloaded": "Keine Offline-Karten heruntergeladen",
+      "selectYourOwnMap": "Wählen Sie Ihre eigene Karte",
+      "downloadThisMap": "Diese Karte herunterladen?",
+      "cancel": "Abbrechen",
+      "download": "Herunterladen",
+      "confirm": "Bestätigen",
+      "sizeWarning": "Downloads können bis zu %{size} MB Ihres freien Speichers beanspruchen",
+      "expires": "Läuft ab am %{date}",
+      "delete": "Löschen",
+      "deleteAlert": "Sind Sie sicher, dass Sie diese Karte löschen möchten?",
+      "locationPermissionDeniedAlert": "Zugriff auf Standort wurde verweigert",
+      "noAreaSelected": "Kein Bereich ausgewählt",
+      "noAreaSelectedMessage": "Bitte wählen Sie einen Bereich zum Herunterladen",
+      "errorTitle": "Fehler",
+      "errorDeleting": "Fehler beim Löschen des Pakets",
+      "errorDownloadingTitle": "Download-Fehler",
+      "errorDownloading": "Fehler beim Starten des Downloads"
+    },
+    "mapLoading": "Karte wird geladen",
+    "addPlot": {
+      "newPlot": "Neue Parzelle",
+      "addCurrentLocation": "Aktuellen Standort hinzufügen",
+      "cancel": "Abbrechen",
+      "savePlotShape": "Parzellenform speichern",
+      "lowGPSAccuracy": "Niedrige GPS-Genauigkeit (%{accuracy}m)",
+      "mediumGPSAccuracy": "Mittlere GPS-Genauigkeit (%{accuracy}m)",
+      "highGPSAccuracy": "Hohe GPS-Genauigkeit (%{accuracy}m)",
+      "undo": "Rückgängig",
+      "redo": "Wiederholen",
+      "notEnoughPointsTitle": "Nicht genügend Punkte",
+      "notEnoughPointsMessage": "Bitte fügen Sie mindestens 3 Punkte hinzu, um eine Parzelle zu erstellen",
+      "plotInformation": "Parzelleninformation",
+      "plotName": "Parzellenname",
+      "crop": "Anbau",
+      "numberOfPlants": "Anzahl der Pflanzen",
+      "size": "Größe",
+      "geoId": "Geo-ID",
+      "certification": "Zertifizierung",
+      "organicStartOfTransition": "Beginn der Umstellung auf Bio",
+      "savePlot": "Parzelle speichern"
+    },
+    "totalArea": "Gesamtfläche",
+    "summaryTitle": "Zusammenfassung",
+    "plotsTitle": "Parzellen"
+  },
+  "synced": {
+    "itemNotSynced": "Element nicht synchronisiert",
+    "noFarmers": "Keine Bauern zu synchronisieren",
+    "noPlots": "Keine Parzellen zu synchronisieren",
+    "name": "Name",
+    "title": "Titel"
   }
 }

@@ -225,8 +225,6 @@ export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
         });
       }
 
-      console.log('farmerPlots', farmerPlots);
-
       setData([...dataToDisplay, ...farmerPlots]);
     } catch (error) {
       console.error('Failed to load plots:', error);

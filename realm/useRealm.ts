@@ -14,7 +14,6 @@ const realmWrite = async (schema: any, data: any) => {
     console.error('Failed to write to the Realm database:', error);
     throw error;
   } finally {
-    console.log('Successfully wrote to the Realm database');
     realm.close();
   }
 };
@@ -79,7 +78,32 @@ const realmRead = async (
     console.error('Failed to query the Realm database:', error);
     throw error;
   } finally {
-    console.log('Successfully queried the Realm database');
+    realm.close();
+  }
+};
+
+const realmDeleteOne = async (schema: any, filter: string) => {
+  const realm = await Realm.open({
+    path: 'myrealm',
+    schema: [schema],
+  });
+
+  try {
+    realm.write(() => {
+      let objects = realm.objects(schema.name);
+      if (filter && filter.trim() !== '') {
+        objects = objects.filtered(filter);
+      }
+      if (objects.length > 0) {
+        realm.delete(objects[0]);
+      } else {
+        console.log('No object found matching the filter.');
+      }
+    });
+  } catch (error) {
+    console.error('Failed to delete from the Realm database:', error);
+    throw error;
+  } finally {
     realm.close();
   }
 };
@@ -102,7 +126,6 @@ const realmDeleteAll = async (schema: any, filter?: string) => {
     console.error('Failed to delete from the Realm database:', error);
     throw error;
   } finally {
-    console.log('Successfully deleted objects from the Realm database');
     realm.close();
   }
 };
@@ -111,5 +134,6 @@ export default {
   realmWrite,
   realmWriteMultiple,
   realmRead,
+  realmDeleteOne,
   realmDeleteAll,
 };

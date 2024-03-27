@@ -8,8 +8,6 @@ import realm from '@/realm/useRealm';
 import { FarmerSchema, PlotSchema } from '@/realm/schemas';
 import Card, { ItemProps } from '@/components/common/Card';
 import i18n from '@/locales/i18n';
-import { emptyComponent } from '@/components/common/FlashListComponents';
-import { ButtonWrapper } from '@/components/farmers/NewFarmerButton';
 import cn from '@/utils/cn';
 import { AuthContext } from '@/context/AuthContext';
 
@@ -57,7 +55,7 @@ export default function DataSync() {
         undefined,
         undefined,
         undefined,
-        `synced = false AND userId == '${user?.id}'`
+        `synced == false AND userId == '${user?.id}'`
       )) as any;
       const plots = (await realm.realmRead(
         PlotSchema,
@@ -65,7 +63,7 @@ export default function DataSync() {
         undefined,
         undefined,
         undefined,
-        `synced = false AND userId == '${user?.id}'`
+        `synced == false AND userId == '${user?.id}'`
       )) as any;
 
       let farmersData: any = [];
@@ -78,8 +76,8 @@ export default function DataSync() {
 
         return {
           type: 'view',
-          name: farmer.name + ' ' + farmer.surname,
-          value: '',
+          name: i18n.t('synced.name'),
+          value: farmer.name + ' ' + farmer.surname,
           editable: false,
         } as ItemProps;
       });
@@ -90,8 +88,8 @@ export default function DataSync() {
 
         return {
           type: 'view',
-          name: data.plotName,
-          value: '',
+          name: i18n.t('synced.title'),
+          value: data.plotName,
           editable: false,
         } as ItemProps;
       });
@@ -114,17 +112,20 @@ export default function DataSync() {
     }
 
     setSyncing(true);
+
     try {
-      const farmerPromises = await farmersToSyncData.forEach(
+      let farmerPlots: any = [];
+      const farmerPromises = await farmersToSyncData.map(
         async (farmer: any) => {
-          const farmerPlots = plotsToSyncData.filter(
+          const fp = plotsToSyncData.filter(
             (plot: any) => plot.farmerId === farmer.id
           );
 
           const farmerBody = {
             ...farmer.data,
+            id: null,
             plots:
-              farmerPlots?.map((plot: any) => {
+              fp?.map((plot: any) => {
                 return {
                   plotName: plot.data.plotName,
                   crop: { id: parseInt(plot.data.crop, 10) },
@@ -153,21 +154,83 @@ export default function DataSync() {
               }) ?? [],
           };
 
-          return await makeRequest({
+          farmerPlots = [...farmerPlots, ...fp];
+
+          return makeRequest({
             url: `/api/company/userCustomers/add/${selectedCompany}`,
             method: 'POST',
             body: farmerBody,
-          });
+          }).then((result: any) => ({
+            result,
+            farmerId: farmer.id,
+            plotIds: fp.map((plot: any) => plot.id),
+          }));
         }
       );
 
       const farmerPromiseResults = await Promise.all(farmerPromises);
 
-      console.log(farmerPromiseResults);
+      for (const { result, farmerId, plotIds } of farmerPromiseResults) {
+        if (result.data.status === 'OK') {
+          await realm.realmDeleteOne(FarmerSchema, `id == '${farmerId}'`);
+          for (const plotId of plotIds) {
+            await realm.realmDeleteOne(PlotSchema, `id == '${plotId}'`);
+          }
+        }
+      }
+
+      const plotsLeft = plotsToSyncData.filter(
+        (plot: any) => !farmerPlots.includes(plot)
+      );
+
+      const plotPromises = await plotsLeft.map(async (plot: any) => {
+        const plotBody = {
+          plotName: plot.data.plotName,
+          crop: { id: parseInt(plot.data.crop, 10) },
+          numberOfPlants: plot.data.numberOfPlants
+            ? parseInt(plot.data.numberOfPlants, 10)
+            : null,
+          unit: plot.data.size.split(' ')[1],
+          size: parseFloat(plot.data.size.split(' ')[0]),
+          geoId: '',
+          organicStartOfTransition: plot.data.organicStartOfTransition
+            ? plot.data.organicStartOfTransition
+            : null,
+          certification: plot.data.certification
+            ? plot.data.certification
+            : null,
+          coordinates: plot.data.featureInfo.geometry.coordinates[0].map(
+            (coordinate: number[]) => {
+              return {
+                latitude: coordinate[1],
+                longitude: coordinate[0],
+              };
+            }
+          ),
+        };
+
+        return makeRequest({
+          url: `/api/company/userCustomers/${plot.farmerId.toString()}/plots/add`,
+          method: 'POST',
+          body: plotBody,
+        }).then((result: any) => ({
+          result,
+          plotId: plot.id,
+        }));
+      });
+
+      const plotPromiseResults = await Promise.all(plotPromises);
+
+      for (const { result, plotId } of plotPromiseResults) {
+        if (result.data.status === 'OK') {
+          await realm.realmDeleteOne(PlotSchema, `id == '${plotId}'`);
+        }
+      }
     } catch (error) {
       console.error(error);
     } finally {
       setSyncing(false);
+      await getItemsToSync();
     }
   };
 
@@ -178,22 +241,34 @@ export default function DataSync() {
           {i18n.t('farmers.title')}
         </Text>
         {loading ? (
-          emptyComponent(i18n.t('loading'))
+          <View className="flex flex-row items-center justify-center p-5 py-10">
+            <Text className="text-[16px] font-medium">{i18n.t('loading')}</Text>
+          </View>
         ) : farmersToSync.length > 0 ? (
           <Card items={farmersToSync} />
         ) : (
-          emptyComponent(i18n.t('synced.noFarmers'))
+          <View className="flex flex-row items-center justify-center p-5 py-10">
+            <Text className="text-[16px] font-medium">
+              {i18n.t('synced.noFarmers')}
+            </Text>
+          </View>
         )}
 
         <Text className="text-[18px] font-medium mx-5">
           {i18n.t('plots.title')}
         </Text>
         {loading ? (
-          emptyComponent(i18n.t('loading'))
+          <View className="flex flex-row items-center justify-center p-5 py-10">
+            <Text className="text-[16px] font-medium">{i18n.t('loading')}</Text>
+          </View>
         ) : plotsToSync.length > 0 ? (
           <Card items={plotsToSync} />
         ) : (
-          emptyComponent(i18n.t('synced.noPlots'))
+          <View className="flex flex-row items-center justify-center p-5 py-10">
+            <Text className="text-[16px] font-medium">
+              {i18n.t('synced.noPlots')}
+            </Text>
+          </View>
         )}
       </ScrollView>
       <Pressable className="bg-White" onPress={syncData}>

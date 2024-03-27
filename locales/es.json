@@ -1,54 +1,194 @@
 {
+  "yes": "Sí",
+  "no": "No",
+  "loading": "Cargando...",
+  "input": {
+    "type": "Escriba...",
+    "select": "Seleccione"
+  },
   "login": {
-    "welcomeBack": "Welcome back!",
-    "welcomeBackSubtitle": "Log in to continue",
-    "username": "Username",
-    "usernamePlaceholder": "Enter your username",
-    "password": "Password",
-    "passwordPlaceholder": "Enter your password",
-    "forgotPassword": "Forgot password?",
-    "login": "Log in",
-    "genericError": "Something went wrong, please try again later",
-    "authError": "Wrong username or password"
+    "welcomeBack": "¡Bienvenido de nuevo!",
+    "welcomeBackSubtitle": "Inicie sesión para continuar",
+    "username": "Nombre de usuario",
+    "usernamePlaceholder": "Ingrese su nombre de usuario",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Ingrese su contraseña",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "login": "Iniciar sesión",
+    "genericError": "Algo salió mal, por favor intente nuevamente más tarde",
+    "authError": "Usuario o contraseña incorrectos"
   },
   "userSettings": {
-    "title": "User settings",
-    "userInformation": "User information",
-    "name": "Name",
-    "surname": "Surname",
-    "username": "Username",
-    "companyInformation": "Company information",
-    "company": "Company",
-    "language": "Language",
-    "english": "English",
-    "spanish": "Spanish",
-    "german": "German",
+    "title": "Configuración de usuario",
+    "userInformation": "Información del usuario",
+    "name": "Nombre",
+    "surname": "Apellido",
+    "username": "Nombre de usuario",
+    "companyInformation": "Información de la empresa",
+    "company": "Empresa",
+    "language": "Idioma",
+    "english": "Inglés",
+    "spanish": "Español",
+    "german": "Alemán",
     "kinyarwanda": "Kinyarwanda",
-    "resetPassword": "Reset password",
-    "logOut": "Log out"
+    "offlineMaps": "Mapas sin conexión",
+    "offlineMapsSettings": "Configuración de mapas sin conexión",
+    "resetPassword": "Restablecer contraseña",
+    "logOut": "Cerrar sesión"
   },
   "home": {
-    "title": "Home",
-    "farmers": "Farmers",
-    "newPlot": "New plot",
-    "syncData": "Sync data"
+    "title": "Inicio",
+    "farmers": "Agricultores",
+    "newPlot": "Nueva parcela",
+    "syncData": "Sincronizar datos"
   },
   "farmers": {
-    "title": "Farmers",
-    "newFarmer": "New farmer",
-    "search": "Search",
+    "title": "Agricultores",
+    "titleNewPlot": "Nueva parcela",
+    "newFarmer": "Nuevo agricultor",
+    "search": "Buscar",
+    "noData": "No se encontraron agricultores",
     "sort": {
-      "name_asc": "Name ↑",
-      "name_desc": "Name ↓",
-      "surname_asc": "Surname ↑",
-      "surname_desc": "Surname ↓",
-      "id_asc": "ID ↑",
-      "id_desc": "ID ↓"
+      "sortBy": "Ordenar por",
+      "name": "Nombre",
+      "surname": "Apellido",
+      "id": "ID"
     },
     "filter": {
-      "name": "First name",
-      "surname": "Last name"
+      "filterBy": "Buscar por",
+      "name": "Nombre",
+      "surname": "Apellido"
     },
-    "errorFetch": "Error fetching farmers"
+    "errorFetch": "Error al obtener agricultores",
+    "card": {
+      "villageAndCell": "Pueblo & Celda",
+      "gender": "Género"
+    },
+    "info": {
+      "viewAllPlots": "Ver todas las parcelas",
+      "basicInformation": {
+        "title": "Información básica",
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "gender": "Género",
+        "userId": "ID de usuario",
+        "companyInternalFarmerId": "ID interno de agricultor de la empresa"
+      },
+      "address": {
+        "title": "Dirección",
+        "country": "País",
+        "village": "Pueblo",
+        "cell": "Celda",
+        "sector": "Sector",
+        "address": "Dirección",
+        "city": "Ciudad",
+        "state": "Estado / Provincia / Región",
+        "zip": "Código postal / Apartado postal",
+        "hondurasFarm": "Granja",
+        "hondurasVillage": "Pueblo",
+        "hondurasMunicipality": "Municipio",
+        "hondurasDepartment": "Departamento"
+      },
+      "contact": {
+        "title": "Contacto",
+        "phoneNumber": "Número de teléfono",
+        "email": "Correo electrónico"
+      },
+      "farmInformation": {
+        "title": "Información de la granja",
+        "areaUnit": "Unidad de área",
+        "totalFarmSize": "Tamaño total de la granja",
+        "productType": "Tipo de producto",
+        "area": "Área",
+        "plants": "Plantas",
+        "organicFarm": "Granja orgánica",
+        "startedTransitionToOrganic": "Inicio de la transición a orgánico"
+      },
+      "bankInformation": {
+        "title": "Información bancaria",
+        "bankName": "Nombre del banco",
+        "bankAccountNumber": "Número de cuenta",
+        "bankAccountHolder": "Titular de la cuenta"
+      },
+      "productTypes": {
+        "title": "Tipos de productos",
+        "productType": "Tipo de producto"
+      }
+    },
+    "newFarmerCreation": {
+      "gender": {
+        "male": "Masculino",
+        "female": "Femenino",
+        "n/a": "N/D"
+      },
+      "saveFarmer": "Guardar agricultor",
+      "success": "Éxito",
+      "successMessage": "Agricultor creado con éxito",
+      "ok": "OK",
+      "error": "Error",
+      "errorMessage": "Hubo un error al crear el agricultor"
+    }
+  },
+  "plots": {
+    "title": "Ver parcelas",
+    "listView": "Vista de lista",
+    "mapView": "Vista de mapa",
+    "mapDownload": "Descarga de mapa",
+    "mapTitle": "Título del mapa",
+    "noData": "No se encontraron parcelas",
+    "plots": "parcela/s",
+    "offlineMapsScreen": {
+      "downloadedMaps": "Mapas descargados",
+      "noMapsDownloaded": "No hay mapas sin conexión descargados",
+      "selectYourOwnMap": "Seleccione su propio mapa",
+      "downloadThisMap": "¿Descargar este mapa?",
+      "cancel": "Cancelar",
+      "download": "Descargar",
+      "confirm": "Confirmar",
+      "sizeWarning": "Las descargas pueden ocupar hasta %{size} MB de su espacio libre",
+      "expires": "Expira %{date}",
+      "delete": "Eliminar",
+      "deleteAlert": "¿Está seguro de que quiere eliminar este mapa?",
+      "locationPermissionDeniedAlert": "Permiso para acceder a la ubicación fue denegado",
+      "noAreaSelected": "No se seleccionó ninguna área",
+      "noAreaSelectedMessage": "Por favor, seleccione un área para descargar",
+      "errorTitle": "Error",
+      "errorDeleting": "Hubo un error al eliminar el paquete",
+      "errorDownloadingTitle": "Error de descarga",
+      "errorDownloading": "Hubo un error al iniciar la descarga"
+    },
+    "mapLoading": "Cargando mapa",
+    "addPlot": {
+      "newPlot": "Nueva parcela",
+      "addCurrentLocation": "Agregar ubicación actual",
+      "cancel": "Cancelar",
+      "savePlotShape": "Guardar forma de la parcela",
+      "lowGPSAccuracy": "Baja precisión del GPS (%{accuracy}m)",
+      "mediumGPSAccuracy": "Precisión media del GPS (%{accuracy}m)",
+      "highGPSAccuracy": "Alta precisión del GPS (%{accuracy}m)",
+      "undo": "Deshacer",
+      "redo": "Rehacer",
+      "notEnoughPointsTitle": "No hay suficientes puntos",
+      "notEnoughPointsMessage": "Por favor, agregue al menos 3 puntos para crear una parcela",
+      "plotInformation": "Información de la parcela",
+      "plotName": "Nombre de la parcela",
+      "crop": "Cultivo",
+      "numberOfPlants": "Número de plantas",
+      "size": "Tamaño",
+      "geoId": "Geo-ID",
+      "certification": "Certificación",
+      "organicStartOfTransition": "Inicio de la transición a orgánico",
+      "savePlot": "Guardar parcela"
+    },
+    "totalArea": "área total",
+    "summaryTitle": "Resumen",
+    "plotsTitle": "Parcelas"
+  },
+  "synced": {
+    "itemNotSynced": "Elemento no sincronizado",
+    "noFarmers": "No hay agricultores para sincronizar",
+    "noPlots": "No hay parcelas para sincronizar",
+    "name": "Nombre",
+    "title": "Título"
   }
 }
