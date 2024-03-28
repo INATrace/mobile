@@ -78,7 +78,9 @@ export default function Farmers() {
   }, [selectedSort, selectedFilter, search, selectedCompany, segments]);
 
   useEffect(() => {
-    handleFarmers(limit, offset, false);
+    if (!isLoading) {
+      handleFarmers(limit, offset, false);
+    }
   }, [offset]);
 
   const handleFarmers = async (
