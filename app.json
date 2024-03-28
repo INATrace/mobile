@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "inatrace-mobile",
+    "name": "Inatrace",
     "slug": "inatrace-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -14,7 +14,8 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pinokokol.inatracemobile"
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +23,12 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pinokokol.inatracemobile",
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -35,7 +41,7 @@
         "@rnmapbox/maps",
         {
           "RNMapboxMapsImpl": "mapbox",
-          "RNMapboxMapsDownloadToken": "sk.eyJ1IjoicGlub2tva29sIiwiYSI6ImNsdHdha256NTFtam4ycXVsczE4Z3YzbXMifQ.7KMT24GaM5lEsvJAAqm_dA"
+          "RNMapboxMapsDownloadToken": ""
         }
       ],
       [
@@ -47,6 +53,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "92b692fc-0be1-40d1-9c1d-bd10d94be7d0"
+      }
     }
   }
 }

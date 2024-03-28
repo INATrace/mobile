@@ -189,6 +189,8 @@
     "noFarmers": "No farmers to sync",
     "noPlots": "No plots to sync",
     "name": "Name",
-    "title": "Title"
+    "title": "Title",
+    "syncedTitle": "Synced",
+    "syncedMessage": "Data successfully synced"
   }
 }

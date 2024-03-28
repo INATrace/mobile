@@ -74,12 +74,12 @@ export default function Farmers() {
   const segments = useSegments();
 
   useEffect(() => {
-    if (offset !== 0) {
-      handleFarmers(limit, offset, false);
-    } else {
-      handleFarmers(limit, offset, true);
-    }
-  }, [selectedSort, selectedFilter, search, selectedCompany, offset, segments]);
+    handleFarmers(limit, offset, true);
+  }, [selectedSort, selectedFilter, search, selectedCompany, segments]);
+
+  useEffect(() => {
+    handleFarmers(limit, offset, false);
+  }, [offset]);
 
   const handleFarmers = async (
     limitHF: number,
@@ -184,6 +184,7 @@ export default function Farmers() {
             ? 1
             : response.data.data.count + offlineData.length
         );
+
         if (resetData) {
           setData([...offlineData, ...farmers]);
           setOffset(0);
@@ -253,6 +254,7 @@ export default function Farmers() {
       );
 
       setDataCount(offlineData.length === 0 ? 1 : offlineData.length);
+
       if (resetData) {
         setData(offlineData);
         setOffset(0);
@@ -324,7 +326,7 @@ export default function Farmers() {
             isLoading ? i18n.t('loading') : i18n.t('farmers.noData')
           )}
           ListFooterComponent={renderFooter}
-          onEndReached={data.length > 0 ? onEndReached : () => {}}
+          onEndReached={onEndReached}
           onEndReachedThreshold={0.5}
           refreshControl={
             <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />

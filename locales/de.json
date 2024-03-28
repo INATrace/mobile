@@ -189,6 +189,8 @@
     "noFarmers": "Keine Bauern zu synchronisieren",
     "noPlots": "Keine Parzellen zu synchronisieren",
     "name": "Name",
-    "title": "Titel"
+    "title": "Titel",
+    "syncedTitle": "Synchronisiert",
+    "syncedMessage": "Daten erfolgreich synchronisiert"
   }
 }

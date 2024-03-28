@@ -189,6 +189,8 @@
     "noFarmers": "No hay agricultores para sincronizar",
     "noPlots": "No hay parcelas para sincronizar",
     "name": "Nombre",
-    "title": "Título"
+    "title": "Título",
+    "syncedTitle": "Sincronizado",
+    "syncedMessage": "Datos sincronizados con éxito"
   }
 }

@@ -83,21 +83,22 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
       if (status !== 'granted') {
         return;
       }
-
-      let locationSubscription = await Location.watchPositionAsync(
-        { accuracy: Location.Accuracy.High, timeInterval: 1000 },
-        (newLocation) => {
-          setLocation(newLocation);
-        }
-      );
-
-      return () => {
-        if (locationSubscription) {
-          locationSubscription.remove();
-        }
-      };
     })();
+
+    updateLocation();
   }, []);
+
+  const updateLocation = async () => {
+    let newLocation = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.High,
+    });
+
+    setLocation(newLocation);
+
+    setTimeout(() => {
+      updateLocation();
+    }, 1000);
+  };
 
   useEffect(() => {
     if (selectedFarmer) {

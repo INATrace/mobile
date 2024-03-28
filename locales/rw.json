@@ -188,6 +188,8 @@
     "noFarmers": "Nta bahinzi bo guhuza",
     "noPlots": "Nta bibanza byo guhuza",
     "name": "Izina",
-    "title": "Umutwe"
+    "title": "Umutwe",
+    "syncedTitle": "Byahuje",
+    "syncedMessage": "Imyirondoro yahuje neza"
   }
 }

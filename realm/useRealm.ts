@@ -18,6 +18,34 @@ const realmWrite = async (schema: any, data: any) => {
   }
 };
 
+const realmUpdate = async (
+  schema: any,
+  id: string,
+  property: any,
+  value: any
+) => {
+  const realm = await Realm.open({
+    path: 'myrealm',
+    schema: [schema],
+  });
+
+  try {
+    realm.write(() => {
+      let object = realm.objectForPrimaryKey(schema.name, id);
+      if (!object) {
+        console.log('No object found with the primary key:', id);
+        return;
+      }
+      object[property] = value;
+    });
+  } catch (error) {
+    console.error('Failed to update the Realm database:', error);
+    throw error;
+  } finally {
+    realm.close();
+  }
+};
+
 const realmWriteMultiple = async (schema: any, data: any[]) => {
   const realm = await Realm.open({
     path: 'myrealm',
@@ -133,6 +161,7 @@ const realmDeleteAll = async (schema: any, filter?: string) => {
 export default {
   realmWrite,
   realmWriteMultiple,
+  realmUpdate,
   realmRead,
   realmDeleteOne,
   realmDeleteAll,

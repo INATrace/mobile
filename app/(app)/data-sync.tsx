@@ -2,7 +2,7 @@ import { Farmer } from '@/types/farmer';
 import { useNavigation } from 'expo-router';
 import { ChevronLeft, RefreshCw } from 'lucide-react-native';
 import { useContext, useEffect, useState } from 'react';
-import { View, Text, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import realm from '@/realm/useRealm';
 import { FarmerSchema, PlotSchema } from '@/realm/schemas';
@@ -172,7 +172,7 @@ export default function DataSync() {
 
       for (const { result, farmerId, plotIds } of farmerPromiseResults) {
         if (result.data.status === 'OK') {
-          await realm.realmDeleteOne(FarmerSchema, `id == '${farmerId}'`);
+          await realm.realmUpdate(FarmerSchema, farmerId, 'synced', true);
           for (const plotId of plotIds) {
             await realm.realmDeleteOne(PlotSchema, `id == '${plotId}'`);
           }
@@ -231,6 +231,7 @@ export default function DataSync() {
     } finally {
       setSyncing(false);
       await getItemsToSync();
+      Alert.alert(i18n.t('synced.syncedTitle'), i18n.t('synced.syncedMessage'));
     }
   };
 

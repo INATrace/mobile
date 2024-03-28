@@ -5,8 +5,10 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import i18n from '@/locales/i18n';
 
-import MapboxGL from '@rnmapbox/maps';
+import Mapbox from '@rnmapbox/maps';
 import OfflinePack from '@rnmapbox/maps/lib/typescript/src/modules/offline/OfflinePack';
+
+Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '');
 
 export const unstable_settings = {
   initialRouteName: 'index',
@@ -42,7 +44,7 @@ export default function AppLayout() {
 
   const checkForOfflineMaps = async () => {
     try {
-      const packs: OfflinePack[] = await MapboxGL.offlineManager.getPacks();
+      const packs: OfflinePack[] = await Mapbox.offlineManager.getPacks();
       if (packs.length === 0 && !hasNavigatedToMapDownload.current) {
         hasNavigatedToMapDownload.current = true;
         router.push('/map-download');

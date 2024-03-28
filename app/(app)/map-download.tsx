@@ -1,6 +1,6 @@
 import { useNavigation } from 'expo-router';
 import { Check, ChevronLeft, Download, Trash, X } from 'lucide-react-native';
-import { createRef, useEffect, useState } from 'react';
+import { createRef, useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -15,10 +15,12 @@ import Mapbox from '@rnmapbox/maps';
 import i18n from '@/locales/i18n';
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
-import * as turf from '@turf/turf';
-import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position';
 import { Input } from '@/components/common/Input';
 import Modal from 'react-native-modalbox';
+import { AuthContext } from '@/context/AuthContext';
+import cn from '@/utils/cn';
+
+Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '');
 
 type OfflinePack = {
   name: string;
@@ -30,6 +32,8 @@ type OfflinePack = {
 
 export default function MapDownload() {
   const navigation = useNavigation();
+
+  const { isConnected } = useContext(AuthContext) as { isConnected: boolean };
 
   const [location, setLocation] = useState<LocationObject | null>(null);
 
@@ -120,43 +124,14 @@ export default function MapDownload() {
     }
   };
 
-  function deg2num(latLon: Position, zoom: number): [number, number] {
-    const latRad = (latLon[0] * Math.PI) / 180;
-    const n = Math.pow(2, zoom);
-    const xTile = Math.floor(((latLon[1] + 180) / 360) * n);
-    const yTile = Math.floor(
-      ((1 -
-        Math.abs(Math.log(Math.abs(Math.tan(latRad) + 1 / Math.cos(latRad)))) /
-          Math.PI) /
-        2) *
-        n
-    );
-    return [xTile, yTile];
-  }
-
-  function getTotalTileCount(
-    leftBottom: Position,
-    rightTop: Position,
-    fromZoom: number,
-    toZoom: number
-  ): number {
-    let totalTileCount = 0;
-    for (let zoom = fromZoom; zoom <= toZoom; zoom++) {
-      const leftBottomTiles = deg2num(leftBottom, zoom);
-      const rightTopTiles = deg2num(rightTop, zoom);
-
-      const currentTileCount =
-        (rightTopTiles[0] - leftBottomTiles[0] + 1) *
-        (leftBottomTiles[1] - rightTopTiles[1] + 1);
-
-      totalTileCount += currentTileCount;
-    }
-
-    return totalTileCount;
-  }
-
   const estimateOfflinePackSize = (zoomLevel: number) => {
-    setEstimatedSize(parseFloat(((20 - zoomLevel) * 6).toFixed(2)));
+    if (zoomLevel < 13) {
+      setEstimatedSize(parseFloat((Math.abs(20 - zoomLevel) * 20).toFixed(2)));
+    } else if (zoomLevel < 14) {
+      setEstimatedSize(parseFloat((Math.abs(20 - zoomLevel) * 10).toFixed(2)));
+    } else {
+      setEstimatedSize(parseFloat((Math.abs(20 - zoomLevel) * 6).toFixed(2)));
+    }
   };
 
   const onDownloadArea = async () => {
@@ -363,8 +338,12 @@ export default function MapDownload() {
       ) : (
         <View className="m-5">
           <Pressable
-            onPress={() => setSelectingMap(true)}
-            className="flex flex-row items-center justify-center h-12 px-2 rounded-md bg-Orange"
+            onPress={() => (isConnected ? setSelectingMap(true) : null)}
+            className={cn(
+              isConnected ? 'bg-Orange' : 'bg-Orange/50',
+              'flex flex-row items-center justify-center h-12 px-2 rounded-md'
+            )}
+            disabled={!isConnected}
           >
             <Download className="mr-2 text-White" size={20} />
             <Text className="font-semibold text-[16px] text-White">
