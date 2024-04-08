@@ -74,7 +74,12 @@ export default function Farmers() {
   const segments = useSegments();
 
   useEffect(() => {
-    handleFarmers(limit, offset, true);
+    if (
+      segments.find((segment) => segment === 'info' || segment === 'view') ===
+      undefined
+    ) {
+      handleFarmers(limit, offset, true);
+    }
   }, [selectedSort, selectedFilter, search, selectedCompany, segments]);
 
   useEffect(() => {

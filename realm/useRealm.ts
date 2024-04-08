@@ -1,4 +1,5 @@
 import Realm from 'realm';
+import { uuid } from 'expo-modules-core';
 
 const realmWrite = async (schema: any, data: any) => {
   const realm = await Realm.open({

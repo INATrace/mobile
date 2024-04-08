@@ -91,21 +91,74 @@ export default function FarmersInfo() {
             name: i18n.t('farmers.info.address.country'),
             value: selectedFarmer?.location.address.country.name ?? '',
           },
-          {
-            type: 'view',
-            name: i18n.t('farmers.info.address.village'),
-            value: selectedFarmer?.location.address.village ?? '',
-          },
-          {
-            type: 'view',
-            name: i18n.t('farmers.info.address.cell'),
-            value: selectedFarmer?.location.address.cell ?? '',
-          },
-          {
-            type: 'view',
-            name: i18n.t('farmers.info.address.sector'),
-            value: selectedFarmer?.location.address.sector ?? '',
-          },
+          ...((selectedFarmer?.location?.address?.country?.code === 'HN'
+            ? [
+                {
+                  type: 'view',
+                  name: i18n.t('farmers.info.address.hondurasFarm') + '*',
+                  value: selectedFarmer?.location?.address?.hondurasFarm ?? '',
+                },
+                {
+                  type: 'view',
+                  name: i18n.t('farmers.info.address.hondurasVillage') + '*',
+                  value:
+                    selectedFarmer?.location?.address?.hondurasVillage ?? '',
+                },
+                {
+                  type: 'view',
+                  name:
+                    i18n.t('farmers.info.address.hondurasMunicipality') + '*',
+                  value:
+                    selectedFarmer?.location?.address?.hondurasMunicipality ??
+                    '',
+                },
+                {
+                  type: 'view',
+                  name: i18n.t('farmers.info.address.hondurasDepartment') + '*',
+                  value:
+                    selectedFarmer?.location?.address?.hondurasDepartment ?? '',
+                },
+              ]
+            : selectedFarmer?.location?.address?.country?.code === 'RW'
+              ? [
+                  {
+                    type: 'view',
+                    name: i18n.t('farmers.info.address.village') + '*',
+                    value: selectedFarmer?.location?.address?.village ?? '',
+                  },
+                  {
+                    type: 'view',
+                    name: i18n.t('farmers.info.address.cell') + '*',
+                    value: selectedFarmer?.location?.address?.cell ?? '',
+                  },
+                  {
+                    type: 'view',
+                    name: i18n.t('farmers.info.address.sector') + '*',
+                    value: selectedFarmer?.location?.address?.sector ?? '',
+                  },
+                ]
+              : [
+                  {
+                    type: 'view',
+                    name: i18n.t('farmers.info.address.address') + '*',
+                    value: selectedFarmer?.location?.address?.address ?? '',
+                  },
+                  {
+                    type: 'view',
+                    name: i18n.t('farmers.info.address.city') + '*',
+                    value: selectedFarmer?.location?.address?.city ?? '',
+                  },
+                  {
+                    type: 'view',
+                    name: i18n.t('farmers.info.address.state') + '*',
+                    value: selectedFarmer?.location?.address?.state ?? '',
+                  },
+                  {
+                    type: 'view',
+                    name: i18n.t('farmers.info.address.zip') + '*',
+                    value: selectedFarmer?.location?.address?.zip ?? '',
+                  },
+                ]) as ItemProps[]),
         ]}
       />
       <Text className="text-[18px] font-medium mt-5 mx-5">

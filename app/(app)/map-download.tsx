@@ -1,6 +1,13 @@
 import { useNavigation } from 'expo-router';
-import { Check, ChevronLeft, Download, Trash, X } from 'lucide-react-native';
-import { createRef, useContext, useEffect, useState } from 'react';
+import {
+  Check,
+  ChevronLeft,
+  Download,
+  Navigation,
+  Trash,
+  X,
+} from 'lucide-react-native';
+import { createRef, useContext, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -10,6 +17,7 @@ import {
   ScrollView,
   Text,
   View,
+  StyleSheet,
 } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import i18n from '@/locales/i18n';
@@ -19,6 +27,7 @@ import { Input } from '@/components/common/Input';
 import Modal from 'react-native-modalbox';
 import { AuthContext } from '@/context/AuthContext';
 import cn from '@/utils/cn';
+import { CameraRef } from '@rnmapbox/maps/lib/typescript/src/components/Camera';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '');
 
@@ -46,6 +55,7 @@ export default function MapDownload() {
   const [hasInputError, setHasInputError] = useState<boolean>(false);
 
   const mapRef = createRef<Mapbox.MapView>();
+  const cameraRef = useRef<CameraRef>(null);
 
   useEffect(() => {
     navigation.setOptions({
@@ -210,6 +220,16 @@ export default function MapDownload() {
     );
   };
 
+  const focusOnCurrentLocation = () => {
+    if (location && cameraRef.current) {
+      cameraRef.current.setCamera({
+        centerCoordinate: [location.coords.longitude, location.coords.latitude],
+        zoomLevel: 16,
+        animationDuration: 500,
+      });
+    }
+  };
+
   return (
     <KeyboardAvoidingView className="h-full bg-White" behavior="padding">
       <Modal
@@ -288,6 +308,7 @@ export default function MapDownload() {
                   location.coords.longitude,
                   location.coords.latitude,
                 ]}
+                ref={cameraRef}
               />
               <Mapbox.PointAnnotation
                 coordinate={[
@@ -313,6 +334,13 @@ export default function MapDownload() {
             })}
           </Text>
           <View className="flex flex-row items-center justify-between px-5 pb-5 bg-White">
+            <Pressable
+              className="absolute flex flex-row items-center self-end justify-center w-16 h-16 mb-5 border-2 border-blue-500 rounded-full bottom-32 right-5 bg-White"
+              onPress={focusOnCurrentLocation}
+              style={style.shadowMedium}
+            >
+              <Navigation className="text-blue-500" size={30} />
+            </Pressable>
             <Pressable
               onPress={() => setSelectingMap(false)}
               className="w-[48%] px-5 py-3 rounded-md bg-Green flex flex-row items-center justify-center"
@@ -417,3 +445,16 @@ export default function MapDownload() {
     </KeyboardAvoidingView>
   );
 }
+
+const style = StyleSheet.create({
+  shadowMedium: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 2,
+  },
+});

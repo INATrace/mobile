@@ -188,7 +188,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     setProductTypes(null);
     setCountries(null);
 
-    await realm.realmDeleteAll(FarmerSchema);
+    await realm.realmDeleteAll(FarmerSchema, 'synced == true');
 
     clearImageCache();
   };
