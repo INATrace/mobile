@@ -10,6 +10,7 @@ import ViewSwitcher, { ViewSwitcherProps } from './ViewSwitcher';
 import Mapbox from '@rnmapbox/maps';
 import { useContext, useEffect, useRef, useState } from 'react';
 import * as Location from 'expo-location';
+import * as Crypto from 'expo-crypto';
 import {
   LocateFixed,
   MapPin,
@@ -24,7 +25,7 @@ import Colors from '@/constants/Colors';
 import MarkerSvg from '../svg/MarkerSvg';
 import { CameraRef } from '@rnmapbox/maps/lib/typescript/src/components/Camera';
 import cn from '@/utils/cn';
-import { router, useNavigation } from 'expo-router';
+import { router, useNavigation, useSegments } from 'expo-router';
 import { AuthContext } from '@/context/AuthContext';
 import { uuid } from 'expo-modules-core';
 import { FeatureInfo, Plot } from '@/types/plot';
@@ -34,6 +35,7 @@ import { PlotSchema } from '@/realm/schemas';
 import { Farmer, ProductTypeWithCompanyId } from '@/types/farmer';
 import { User } from '@/types/user';
 import Card, { CardProps } from '../common/Card';
+import { S2CellId, S2LatLng } from 'nodes2ts';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '');
 
@@ -55,19 +57,28 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
     });
 
   const cameraRef = useRef<CameraRef>(null);
-  const { setNewPlot, selectedFarmer, user, selectedCompany, productTypes } =
-    useContext(AuthContext) as {
-      selectedCompany: number;
-      setNewPlot: (plot: Plot) => void;
-      selectedFarmer: Farmer;
-      user: User;
-      productTypes: ProductTypeWithCompanyId[];
-    };
+  const {
+    newPlot,
+    setNewPlot,
+    selectedFarmer,
+    user,
+    selectedCompany,
+    productTypes,
+  } = useContext(AuthContext) as {
+    newPlot: Plot | null;
+    selectedCompany: number;
+    setNewPlot: (plot: Plot) => void;
+    selectedFarmer: Farmer;
+    user: User;
+    productTypes: ProductTypeWithCompanyId[];
+  };
   const [isMapLoading, setIsMapLoading] = useState<boolean>(true);
   const [cardInfoCollection, setCardInfoCollection] = useState<any[]>([]);
   const [cardInfo, setCardInfo] = useState<CardProps | null>(null);
 
   const navigation = useNavigation();
+
+  const segments = useSegments();
 
   useEffect(() => {
     navigation.setOptions({
@@ -201,12 +212,13 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
     if (locationsForFeature.length > 0) {
       addPointToFeature();
     }
-  }, [locationsForFeature]);
+  }, [locationsForFeature, segments]);
 
   const addPointToFeature = () => {
     if (locationsForFeature.length < 3) {
       const filteredFeatures = featureCollection.features.filter(
-        (f: GeoJSON.Feature) => f.id !== 'NewFeature'
+        (f: GeoJSON.Feature) =>
+          f.id !== 'NewFeature' && f.id !== newPlot?.featureInfo.id
       ) as GeoJSON.Feature[];
 
       setFeatureCollection({
@@ -243,7 +255,8 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
     ];
 
     const filteredFeatures = featureCollection.features.filter(
-      (f: GeoJSON.Feature) => f.id !== 'NewFeature'
+      (f: GeoJSON.Feature) =>
+        f.id !== 'NewFeature' && f.id !== newPlot?.featureInfo.id
     ) as GeoJSON.Feature[];
 
     setFeatureCollection({
@@ -252,7 +265,7 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
     });
   };
 
-  const savePlotShape = () => {
+  const savePlotShape = async () => {
     if (locationsForFeature.length < 3) {
       Alert.alert(
         i18n.t('plots.addPlot.notEnoughPointsTitle'),
@@ -269,6 +282,24 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
       return;
     }
 
+    const s2CellIdentifiers = featureInfo.geometry.coordinates[0].map(
+      (vertex) =>
+        S2CellId.fromPoint(S2LatLng.fromDegrees(vertex[1], vertex[0]).toPoint())
+    );
+
+    const concatenatedPos = s2CellIdentifiers
+      .slice(0, -1)
+      .map((id) => {
+        const match = id.toString().match(/pos=([a-f0-9]+)/);
+        return match ? match[1] : '';
+      })
+      .join('_');
+
+    const hash = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      concatenatedPos
+    );
+
     featureInfo.id = uuid.v4();
 
     setNewPlot({
@@ -277,7 +308,7 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
       crop: '',
       numberOfPlants: 0,
       size: (area(featureInfo.geometry) / 1000).toFixed(2) + ' ha',
-      geoId: 'XXXXXXXXXXXX',
+      geoId: hash,
       certification: '',
       organicStartOfTransition: '',
       featureInfo,
@@ -386,7 +417,8 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
     setLocationsForFeatureCache([]);
 
     const filteredFeatures = featureCollection.features.filter(
-      (f: GeoJSON.Feature) => f.id !== 'NewFeature'
+      (f: GeoJSON.Feature) =>
+        f.id !== 'NewFeature' && f.id !== newPlot?.featureInfo.id
     ) as GeoJSON.Feature[];
 
     setFeatureCollection({
