@@ -307,7 +307,7 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
       plotName: '',
       crop: '',
       numberOfPlants: 0,
-      size: (area(featureInfo.geometry) / 1000).toFixed(2) + ' ha',
+      size: (area(featureInfo.geometry) / 100).toFixed(2) + ' ha',
       geoId: hash,
       certification: '',
       organicStartOfTransition: '',
