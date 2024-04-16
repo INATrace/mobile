@@ -25,6 +25,7 @@ export const AuthContext = createContext<{
   selectFarmer: (farmer: Farmer) => void;
   selectCompany: (company: number | string | null) => void;
   setNewPlot: (plot: Plot) => void;
+  setAskLanguage: (askLanguage: boolean) => void;
   makeRequest: ({ url, method, body, headers }: RequestParams) => Promise<any>;
   accessToken: string | null;
   user: User | null;
@@ -36,6 +37,7 @@ export const AuthContext = createContext<{
   isConnected: boolean;
   selectedFarmer: Farmer | string | null;
   newPlot: Plot | null;
+  askLanguage: boolean | string;
 }>({
   logIn: async () => ({ success: false, errorStatus: '' }),
   logOut: () => null,
@@ -44,6 +46,7 @@ export const AuthContext = createContext<{
   selectFarmer: () => null,
   selectCompany: () => null,
   setNewPlot: () => null,
+  setAskLanguage: () => null,
   accessToken: null,
   user: null,
   companies: null,
@@ -54,6 +57,7 @@ export const AuthContext = createContext<{
   isConnected: false,
   selectedFarmer: null,
   newPlot: null,
+  askLanguage: false,
 });
 
 const isTokenExpired = (token: string): boolean => {
@@ -90,6 +94,11 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   const [countries, setCountries] = useStorageState<Country[] | string | null>(
     'countries',
     null,
+    'asyncStorage'
+  );
+  const [askLanguage, setAskLanguage] = useStorageState<boolean>(
+    'ask_language',
+    false,
     'asyncStorage'
   );
 
@@ -187,6 +196,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     setSelectedFarmer(null);
     setProductTypes(null);
     setCountries(null);
+    setNewPlot(null);
+    setAskLanguage(false);
 
     await realm.realmDeleteAll(FarmerSchema, 'synced == true');
 
@@ -319,6 +330,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         selectedFarmer,
         newPlot,
         setNewPlot,
+        askLanguage,
+        setAskLanguage,
       }}
     >
       {props.children}

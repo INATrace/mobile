@@ -13,7 +13,7 @@ export default function FarmersLayout() {
       />
       <Stack.Screen name="info/[id]" options={{ presentation: 'modal' }} />
       <Stack.Screen
-        name="view/[id]"
+        name="view/[type]"
         options={{
           presentation: 'modal',
           title: i18n.t('plots.title'),

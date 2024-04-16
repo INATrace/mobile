@@ -166,6 +166,9 @@
       "lowGPSAccuracy": "Low GPS accuracy (%{accuracy}m)",
       "mediumGPSAccuracy": "Medium GPS accuracy (%{accuracy}m)",
       "highGPSAccuracy": "High GPS accuracy (%{accuracy}m)",
+      "GPSAccuracyTitle": "GPS accuracy insufficient",
+      "GPSAccuracyMessage": "GPS accuracy not sufficient yet, please wait a few seconds",
+      "ok": "OK",
       "undo": "Undo",
       "redo": "Redo",
       "notEnoughPointsTitle": "Not enough points",
@@ -178,7 +181,10 @@
       "geoId": "Geo-ID",
       "certification": "Certification",
       "organicStartOfTransition": "Organic start of transition",
-      "savePlot": "Save plot"
+      "savePlot": "Save plot",
+      "discardChangesTitle": "Unsaved changes",
+      "discardChangesMessage": "Are you sure you want to leave the mapping mode? The points registered will be lost.",
+      "discardChangesButton": "Confirm"
     },
     "totalArea": "total area",
     "summaryTitle": "Summary",

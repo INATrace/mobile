@@ -134,7 +134,7 @@ export default function Farmers() {
               },
             ] as ItemProps[],
             navigationPath:
-              type === 'farmers' ? `info/${farmer.id}` : `view/${farmer.id}`,
+              type === 'farmers' ? `info/${farmer.id}` : `view/new`,
             navigationParams: {
               type: 'farmer',
               data: farmer,
@@ -175,9 +175,7 @@ export default function Farmers() {
                 },
               ] as ItemProps[],
               navigationPath:
-                type === 'farmers'
-                  ? `info/${farmer.data.id}`
-                  : `view/${farmer.data.id}`,
+                type === 'farmers' ? `info/${farmer.data.id}` : `view/new`,
               navigationParams: {
                 type: 'farmer',
                 data: farmer.data,
@@ -249,9 +247,7 @@ export default function Farmers() {
               },
             ] as ItemProps[],
             navigationPath:
-              type === 'farmers'
-                ? `info/${farmer.data.id}`
-                : `view/${farmer.data.id}`,
+              type === 'farmers' ? `info/${farmer.data.id}` : `view/new`,
             navigationParams: {
               type: 'farmer',
               data: farmer.data,

@@ -86,19 +86,22 @@ export default function Card({
         </View>
       )}
       {title && (
-        <View className="flex flex-row items-center justify-between p-4 bg-Green rounded-t-md">
+        <Pressable
+          className="flex flex-row items-center justify-between p-4 bg-Green rounded-t-md"
+          onPress={() => (navigationPath ? navigateToDetails() : null)}
+        >
           <Text className="text-White text-[18px] font-semibold">{title}</Text>
           {navigationPath && (
-            <Pressable onPress={() => navigateToDetails()}>
+            <View>
               <MoveDiagonal className="text-White" />
-            </Pressable>
+            </View>
           )}
           {canClose && (
             <Pressable onPress={onClose}>
               <X className="text-White" />
             </Pressable>
           )}
-        </View>
+        </Pressable>
       )}
       <View
         className={cn(

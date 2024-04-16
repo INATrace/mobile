@@ -166,6 +166,9 @@
       "lowGPSAccuracy": "Niedrige GPS-Genauigkeit (%{accuracy}m)",
       "mediumGPSAccuracy": "Mittlere GPS-Genauigkeit (%{accuracy}m)",
       "highGPSAccuracy": "Hohe GPS-Genauigkeit (%{accuracy}m)",
+      "GPSAccuracyTitle": "GPS-Genauigkeit unzureichend",
+      "GPSAccuracyMessage": "GPS-Genauigkeit noch nicht ausreichend, bitte warten Sie einige Sekunden",
+      "ok": "OK",
       "undo": "Rückgängig",
       "redo": "Wiederholen",
       "notEnoughPointsTitle": "Nicht genügend Punkte",
@@ -178,7 +181,10 @@
       "geoId": "Geo-ID",
       "certification": "Zertifizierung",
       "organicStartOfTransition": "Beginn der Umstellung auf Bio",
-      "savePlot": "Parzelle speichern"
+      "savePlot": "Parzelle speichern",
+      "discardChangesTitle": "Nicht gespeicherte Änderungen",
+      "discardChangesMessage": "Sind Sie sicher, dass Sie den Zuordnungsmodus verlassen möchten? Die registrierten Punkte gehen verloren.",
+      "discardChangesButton": "Bestätigen"
     },
     "totalArea": "Gesamtfläche",
     "summaryTitle": "Zusammenfassung",

@@ -11,6 +11,7 @@ import Mapbox from '@rnmapbox/maps';
 import { useContext, useEffect, useRef, useState } from 'react';
 import * as Location from 'expo-location';
 import * as Crypto from 'expo-crypto';
+import * as Haptics from 'expo-haptics';
 import {
   LocateFixed,
   MapPin,
@@ -39,7 +40,11 @@ import { S2CellId, S2LatLng } from 'nodes2ts';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '');
 
-export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
+export default function MapView({
+  viewType,
+  setViewType,
+  type,
+}: ViewSwitcherProps) {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
   );
@@ -81,11 +86,48 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
   const segments = useSegments();
 
   useEffect(() => {
+    if (type === 'new') {
+      setAddingNewPlot(true);
+    }
+  }, [type]);
+
+  useEffect(() => {
     navigation.setOptions({
       title: addingNewPlot
         ? i18n.t('plots.addPlot.newPlot')
         : i18n.t('plots.title'),
     });
+
+    const handleBeforeRemove = (e: any) => {
+      e.preventDefault();
+      Alert.alert(
+        i18n.t('plots.addPlot.discardChangesTitle'),
+        i18n.t('plots.addPlot.discardChangesMessage'),
+        [
+          {
+            text: i18n.t('plots.addPlot.cancel'),
+            style: 'cancel',
+          },
+          {
+            text: i18n.t('plots.addPlot.discardChangesButton'),
+            onPress: () => {
+              setAddingNewPlot(false);
+              navigation.dispatch(e.data.action);
+            },
+          },
+        ]
+      );
+    };
+
+    if (addingNewPlot) {
+      navigation.addListener('beforeRemove', handleBeforeRemove);
+    } else {
+      navigation.removeListener('beforeRemove', handleBeforeRemove);
+    }
+
+    return () => {
+      navigation.removeListener('beforeRemove', handleBeforeRemove);
+    };
   }, [addingNewPlot]);
 
   useEffect(() => {
@@ -200,6 +242,17 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
 
   const addLocationToLocations = () => {
     if (location) {
+      if (!location?.coords?.accuracy || location?.coords?.accuracy > 10) {
+        Alert.alert(
+          i18n.t('plots.addPlot.GPSAccuracyTitle'),
+          i18n.t('plots.addPlot.GPSAccuracyMessage'),
+          [{ text: i18n.t('plots.addPlot.ok') }]
+        );
+        return;
+      }
+
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
       setLocationsForFeatureCache([]);
       setLocationsForFeature([
         ...locationsForFeature,
@@ -540,7 +593,7 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
               )}
             </View>
           )}
-          <View className="flex flex-col">
+          <View className="absolute bottom-0 flex flex-col w-full">
             <View className="flex flex-row items-center justify-between mx-5">
               <View className="flex flex-row items-center">
                 {/* Undo */}
@@ -653,7 +706,11 @@ export default function MapView({ viewType, setViewType }: ViewSwitcherProps) {
         </View>
       ) : (
         <View className="flex flex-col justify-between h-full p-5">
-          <ViewSwitcher viewType={viewType} setViewType={setViewType} />
+          {type === 'new' ? (
+            <View />
+          ) : (
+            <ViewSwitcher viewType={viewType} setViewType={setViewType} />
+          )}
           <View className="flex flex-col">
             {cardInfo && <Card {...cardInfo} />}
             {/* Location button */}

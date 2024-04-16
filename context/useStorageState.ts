@@ -2,7 +2,7 @@ import { deleteItemAsync, setItemAsync, getItemAsync } from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useReducer, useEffect, useCallback } from 'react';
 
-type StorageValue = string | object | number | null;
+type StorageValue = string | object | number | null | boolean;
 type StorageType = 'secureStore' | 'asyncStorage';
 
 type UseStateHook<T> = [T, (value: T) => void];

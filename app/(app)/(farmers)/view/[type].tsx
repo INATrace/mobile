@@ -1,12 +1,13 @@
 import ListView from '@/components/plots/ListView';
 import MapView from '@/components/plots/MapView';
-import { useNavigation } from 'expo-router';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 
 export default function ViewPlots() {
   const navigation = useNavigation();
+  const { type } = useLocalSearchParams();
 
   const [viewType, setViewType] = useState<'list' | 'map'>('list');
 
@@ -26,10 +27,10 @@ export default function ViewPlots() {
 
   return (
     <View className="h-full border-t bg-White border-t-LightGray">
-      {viewType === 'list' ? (
+      {viewType === 'list' && type !== 'new' ? (
         <ListView viewType={viewType} setViewType={setViewType} />
       ) : (
-        <MapView viewType={viewType} setViewType={setViewType} />
+        <MapView viewType={viewType} setViewType={setViewType} type={type} />
       )}
     </View>
   );

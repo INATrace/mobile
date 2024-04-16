@@ -165,6 +165,10 @@
       "savePlotShape": "Bika imiterere y'ikibanza",
       "lowGPSAccuracy": "Ukuri k'umwanya wa GPS kuri hasi (%{accuracy}m)",
       "mediumGPSAccuracy": "Ukuri k'umwanya wa GPS ku rwego ruringaniye (%{accuracy}m)",
+      "highGPSAccuracy": "Ukuri kw'icyogajuru kuri hejuru (%{accuracy}m)",
+      "GPSAccuracyTitle": "Ukuri kw'icyogajuru kurahagije",
+      "GPSAccuracyMessage": "Ukuri kw'icyogajuru ntikurahagije, tegereza amasegonda make",
+      "ok": "OK",
       "undo": "Subira inyuma",
       "redo": "Kora bundi bushya",
       "notEnoughPointsTitle": "Amabara ntahagije",
@@ -177,7 +181,10 @@
       "geoId": "Geo-ID",
       "certification": "Icyemezo",
       "organicStartOfTransition": "Intangiriro yo guhindura ku bihingwa by'umwimerere",
-      "savePlot": "Bika ikibanza"
+      "savePlot": "Bika ikibanza",
+      "discardChangesTitle": "Impinduka zitabitswe",
+      "discardChangesMessage": "Urashaka koko kuva muri modi yo guhuza? Amapointi yanditswe azatakara.",
+      "discardChangesButton": "Emeza"
     },
     "totalArea": "ubuso bwose",
     "summaryTitle": "Isummari",

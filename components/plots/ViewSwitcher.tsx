@@ -6,6 +6,7 @@ import { Pressable, View, Text } from 'react-native';
 export type ViewSwitcherProps = {
   viewType: 'list' | 'map';
   setViewType: (viewType: 'list' | 'map') => void;
+  type?: string | string[];
   padding?: boolean;
 };
 

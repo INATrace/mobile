@@ -15,14 +15,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import i18n from '@/locales/i18n';
 import { Input, InputPassword } from '@/components/common/Input';
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 
 import { AuthContext } from '@/context/AuthContext';
 import { router } from 'expo-router';
 
 export default function Login() {
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [username, setUsername] = useState<string>('pino.kokol@sunesis.si');
+  const [password, setPassword] = useState<string>('Pino9999');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string | null>(null);
