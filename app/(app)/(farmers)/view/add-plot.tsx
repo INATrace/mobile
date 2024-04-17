@@ -143,6 +143,12 @@ export default function AddPlot() {
             value: product.id.toString(),
           }))
         );
+
+        const firstProduct = products.productTypes[0];
+        setPlotInfo((currentInfo) => ({
+          ...currentInfo,
+          crop: firstProduct.id.toString(),
+        }));
       }
     }
   }, [productTypes, selectedCompany]);

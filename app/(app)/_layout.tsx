@@ -1,5 +1,5 @@
 import { Stack, router, useSegments } from 'expo-router';
-
+import { Pressable, Text } from 'react-native';
 import { useContext, useEffect, useRef, useState } from 'react';
 
 import { AuthContext } from '@/context/AuthContext';
@@ -7,6 +7,7 @@ import i18n from '@/locales/i18n';
 
 import Mapbox from '@rnmapbox/maps';
 import OfflinePack from '@rnmapbox/maps/lib/typescript/src/modules/offline/OfflinePack';
+import { ChevronLeft } from 'lucide-react-native';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '');
 
@@ -63,13 +64,28 @@ export default function AppLayout() {
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen
         name="data-sync"
-        options={{ presentation: 'modal', title: i18n.t('home.syncData') }}
+        options={{
+          presentation: 'modal',
+          title: i18n.t('home.syncData'),
+          headerLeft: () => <LeftHeader />,
+        }}
       />
       <Stack.Screen name="(farmers)" options={{ headerShown: false }} />
       <Stack.Screen
         name="user-settings"
-        options={{ presentation: 'modal', title: i18n.t('userSettings.title') }}
+        options={{
+          presentation: 'modal',
+          title: i18n.t('userSettings.title'),
+          headerLeft: () => <LeftHeader />,
+        }}
       />
     </Stack>
   );
 }
+
+const LeftHeader = () => (
+  <Pressable className="flex flex-row items-center justify-center mr-3">
+    <ChevronLeft className="text-Orange" />
+    <Text className="font-medium text-Orange text-[18px]">Back</Text>
+  </Pressable>
+);

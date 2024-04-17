@@ -37,6 +37,8 @@ import { Farmer, ProductTypeWithCompanyId } from '@/types/farmer';
 import { User } from '@/types/user';
 import Card, { CardProps } from '../common/Card';
 import { S2CellId, S2LatLng } from 'nodes2ts';
+import * as turf from '@turf/turf';
+import MarkerPlotSvg from '../svg/MarkerPlotSvg';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '');
 
@@ -60,6 +62,8 @@ export default function MapView({
       type: 'FeatureCollection',
       features: [],
     });
+  const [centroidCollection, setCentroidCollection] =
+    useState<GeoJSON.FeatureCollection | null>(null);
 
   const cameraRef = useRef<CameraRef>(null);
   const {
@@ -100,6 +104,11 @@ export default function MapView({
 
     const handleBeforeRemove = (e: any) => {
       e.preventDefault();
+      if ((segments as string[]).includes('add-plot')) {
+        setAddingNewPlot(false);
+        navigation.dispatch(e.data.action);
+        return;
+      }
       Alert.alert(
         i18n.t('plots.addPlot.discardChangesTitle'),
         i18n.t('plots.addPlot.discardChangesMessage'),
@@ -128,7 +137,7 @@ export default function MapView({
     return () => {
       navigation.removeListener('beforeRemove', handleBeforeRemove);
     };
-  }, [addingNewPlot]);
+  }, [addingNewPlot, segments]);
 
   useEffect(() => {
     (async () => {
@@ -229,11 +238,22 @@ export default function MapView({
         }
       }
 
+      const centroids = features.map((feature) => {
+        const centroid = turf.centroid(feature as any);
+        centroid.properties = { id: feature.id };
+        return centroid;
+      });
+
       setCardInfoCollection(cardInfos);
 
       setFeatureCollection({
         type: 'FeatureCollection',
         features,
+      });
+
+      setCentroidCollection({
+        type: 'FeatureCollection',
+        features: centroids,
       });
     } catch (error) {
       console.error(error);
@@ -382,7 +402,15 @@ export default function MapView({
 
   const handlePolygonPress = (e: any) => {
     const cardInfoId = e.features[0].id;
+    handleSettingCardInfo(cardInfoId);
+  };
+
+  const handleSettingCardInfo = (cardInfoId: string) => {
     const plot = cardInfoCollection.find((c) => c.id.toString() === cardInfoId);
+
+    if (!plot) {
+      return;
+    }
 
     const products = productTypes?.find((product: ProductTypeWithCompanyId) => {
       return product.companyId === selectedCompany;
@@ -390,10 +418,6 @@ export default function MapView({
     const crop = products?.productTypes.find(
       (product) => product.id === plot.crop.id
     );
-
-    if (!plot) {
-      return;
-    }
 
     setCardInfo({
       canClose: true,
@@ -529,6 +553,29 @@ export default function MapView({
                   </View>
                 </Mapbox.MarkerView>
               ))}
+
+            {centroidCollection &&
+              centroidCollection.features.map(
+                (centroid: any, index: number) => (
+                  <Mapbox.MarkerView
+                    coordinate={[
+                      centroid.geometry.coordinates[0],
+                      centroid.geometry.coordinates[1],
+                    ]}
+                    key={index}
+                    id={`centroid-${index}`}
+                  >
+                    <Pressable
+                      className="relative z-10 mb-3"
+                      onPress={() =>
+                        handleSettingCardInfo(centroid.properties.id.toString())
+                      }
+                    >
+                      <MarkerPlotSvg />
+                    </Pressable>
+                  </Mapbox.MarkerView>
+                )
+              )}
 
             <Mapbox.ShapeSource
               id={'some-feature'}

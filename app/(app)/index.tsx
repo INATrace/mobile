@@ -26,13 +26,6 @@ export default function Home() {
     return unsubscribe;
   }, []);
 
-  useEffect(() => {
-    console.log('askLanguage', askLanguage);
-    if (askLanguage === 'none') {
-      console.log('askLanguage', askLanguage);
-    }
-  }, [askLanguage]);
-
   return (
     <SafeAreaView
       className="flex flex-col justify-between h-full bg-Background"
@@ -46,7 +39,7 @@ export default function Home() {
             position={'center'}
             backdropPressToClose={true}
             style={{
-              height: 200,
+              height: 286,
               width: '90%',
               marginRight: 250,
               borderRadius: 8,
@@ -57,7 +50,7 @@ export default function Home() {
             <View>
               <View className="flex flex-row items-center justify-between mb-2">
                 <Text className="text-[18px] font-medium">
-                  {i18n.t('plots.mapTitle')}
+                  {i18n.t('userSettings.language')}
                 </Text>
                 <Pressable onPress={() => setAskLanguage(true)} className="">
                   <X size={20} className="text-black" />
