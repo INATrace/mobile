@@ -140,6 +140,9 @@
     "mapTitle": "Título del mapa",
     "noData": "No se encontraron parcelas",
     "plots": "parcela/s",
+    "refreshGeoId": "Actualizar Geo-ID",
+    "refreshGeoIdSuccess": "Geo-ID actualizado con éxito",
+    "refreshGeoIdError": "Hubo un error al actualizar el Geo-ID",
     "offlineMapsScreen": {
       "downloadedMaps": "Mapas descargados",
       "noMapsDownloaded": "No hay mapas sin conexión descargados",

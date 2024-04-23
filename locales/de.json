@@ -140,6 +140,9 @@
     "mapTitle": "Kartentitel",
     "noData": "Keine Parzellen gefunden",
     "plots": "Parzelle/n",
+    "refreshGeoId": "Geo-ID aktualisieren",
+    "refreshGeoIdSuccess": "Geo-ID erfolgreich aktualisiert",
+    "refreshGeoIdError": "Fehler beim Aktualisieren der Geo-ID",
     "offlineMapsScreen": {
       "downloadedMaps": "Heruntergeladene Karten",
       "noMapsDownloaded": "Keine Offline-Karten heruntergeladen",

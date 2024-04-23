@@ -24,6 +24,7 @@ import Colors from '@/constants/Colors';
 import i18n from '@/locales/i18n';
 
 export type CardProps = {
+  id?: number;
   items: Array<ItemProps>;
   title?: string;
   navigationPath?: string;

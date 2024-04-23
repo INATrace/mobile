@@ -140,6 +140,9 @@
     "mapTitle": "Umutwe w'Ikarita",
     "noData": "Nta bibanza bibonetse",
     "plots": "ikibanza/ibibanza",
+    "refreshGeoId": "Hindura Geo-ID",
+    "refreshGeoIdSuccess": "Geo-ID yavuguruwe neza",
+    "refreshGeoIdError": "Habaye ikosa mu kuvugurura Geo-ID",
     "offlineMapsScreen": {
       "downloadedMaps": "Ikarita zikumanuwe",
       "noMapsDownloaded": "Nta karita zikumanuwe ziriho",

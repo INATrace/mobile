@@ -140,6 +140,9 @@
     "mapTitle": "Map title",
     "noData": "No plots found",
     "plots": "plot/s",
+    "refreshGeoId": "Refresh Geo-ID",
+    "refreshGeoIdSuccess": "Geo-ID successfully refreshed",
+    "refreshGeoIdError": "There was an error refreshing the Geo-ID",
     "offlineMapsScreen": {
       "downloadedMaps": "Downloaded maps",
       "noMapsDownloaded": "No offline maps downloaded",

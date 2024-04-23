@@ -79,6 +79,8 @@ export default function Farmers() {
       undefined
     ) {
       handleFarmers(limit, offset, true);
+    } else {
+      setOffset(0);
     }
   }, [selectedSort, selectedFilter, search, selectedCompany, segments]);
 
