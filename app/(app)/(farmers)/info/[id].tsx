@@ -16,7 +16,7 @@ export default function FarmersInfo() {
 
   useEffect(() => {
     navigation.setOptions({
-      title: `${selectedFarmer?.name} ${selectedFarmer?.surname}`,
+      title: `${selectedFarmer?.name ?? ''} ${selectedFarmer?.surname}`,
       headerLeft: () => (
         <Pressable
           onPress={() => navigation.goBack()}
@@ -137,28 +137,37 @@ export default function FarmersInfo() {
                     value: selectedFarmer?.location?.address?.sector ?? '',
                   },
                 ]
-              : [
-                  {
-                    type: 'view',
-                    name: i18n.t('farmers.info.address.address') + '*',
-                    value: selectedFarmer?.location?.address?.address ?? '',
-                  },
-                  {
-                    type: 'view',
-                    name: i18n.t('farmers.info.address.city') + '*',
-                    value: selectedFarmer?.location?.address?.city ?? '',
-                  },
-                  {
-                    type: 'view',
-                    name: i18n.t('farmers.info.address.state') + '*',
-                    value: selectedFarmer?.location?.address?.state ?? '',
-                  },
-                  {
-                    type: 'view',
-                    name: i18n.t('farmers.info.address.zip') + '*',
-                    value: selectedFarmer?.location?.address?.zip ?? '',
-                  },
-                ]) as ItemProps[]),
+              : selectedFarmer?.location?.address?.otherAddress
+                ? [
+                    {
+                      type: 'view',
+                      name: i18n.t('farmers.info.address.customAddress') + '*',
+                      value:
+                        selectedFarmer?.location?.address?.otherAddress ?? '',
+                    },
+                  ]
+                : [
+                    {
+                      type: 'view',
+                      name: i18n.t('farmers.info.address.address') + '*',
+                      value: selectedFarmer?.location?.address?.address ?? '',
+                    },
+                    {
+                      type: 'view',
+                      name: i18n.t('farmers.info.address.city') + '*',
+                      value: selectedFarmer?.location?.address?.city ?? '',
+                    },
+                    {
+                      type: 'view',
+                      name: i18n.t('farmers.info.address.state') + '*',
+                      value: selectedFarmer?.location?.address?.state ?? '',
+                    },
+                    {
+                      type: 'view',
+                      name: i18n.t('farmers.info.address.zip') + '*',
+                      value: selectedFarmer?.location?.address?.zip ?? '',
+                    },
+                  ]) as ItemProps[]),
         ]}
       />
       <Text className="text-[18px] font-medium mt-5 mx-5">

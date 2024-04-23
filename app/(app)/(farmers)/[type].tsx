@@ -120,7 +120,7 @@ export default function Farmers() {
       if (response.data.status === 'OK') {
         const farmers = response.data.data.items.map((farmer: Farmer) => {
           return {
-            title: `${farmer.name} ${farmer.surname}`,
+            title: `${farmer.name ?? ''} ${farmer.surname ?? ''}`,
             items: [
               {
                 type: 'view',
@@ -160,7 +160,7 @@ export default function Farmers() {
         const offlineData = farmersRealmData.map(
           (farmer: { data: Farmer; synced: boolean }) => {
             return {
-              title: `${farmer.data.name} ${farmer.data.surname}`,
+              title: `${farmer.data.name ?? ''} ${farmer.data.surname ?? ''}`,
               synced: farmer.synced,
               items: [
                 {
@@ -232,7 +232,7 @@ export default function Farmers() {
       const offlineData = farmersRealmData.map(
         (farmer: { data: Farmer; synced: boolean }) => {
           return {
-            title: `${farmer.data.name} ${farmer.data.surname}`,
+            title: `${farmer.data.name ?? ''} ${farmer.data.surname ?? ''}`,
             synced: farmer.synced,
             items: [
               {

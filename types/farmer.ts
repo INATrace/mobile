@@ -23,6 +23,7 @@ export interface Farmer {
       hondurasVillage?: string;
       hondurasMunicipality?: string;
       hondurasDepartment?: string;
+      otherAddress?: string;
       country: {
         id: number;
         code: string;

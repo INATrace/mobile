@@ -9,7 +9,11 @@ export default function FarmersLayout() {
       <Stack.Screen name="[type]" options={{ headerShown: false }} />
       <Stack.Screen
         name="new-farmer"
-        options={{ presentation: 'modal', title: i18n.t('farmers.newFarmer') }}
+        options={{
+          presentation: 'modal',
+          title: i18n.t('farmers.newFarmer'),
+          headerLeft: () => <LeftHeader />,
+        }}
       />
       <Stack.Screen name="info/[id]" options={{ presentation: 'modal' }} />
       <Stack.Screen

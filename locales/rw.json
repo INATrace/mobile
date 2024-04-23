@@ -87,7 +87,9 @@
         "hondurasFarm": "Urugo rw'ubuhinzi",
         "hondurasVillage": "Umudugudu",
         "hondurasMunicipality": "Akarere",
-        "hondurasDepartment": "Intara"
+        "hondurasDepartment": "Intara",
+        "customAddress": "Adiresi yiyongereyeho / indi",
+        "customAddressEnabled": "Iyindi aderesi yashyizweho"
       },
       "contact": {
         "title": "Ibyerekeye Ihererekanyamakuru",
@@ -119,7 +121,8 @@
       "gender": {
         "male": "Gabo",
         "female": "Gore",
-        "n/a": "Ntibisobanutse"
+        "n/a": "Ntibisobanutse",
+        "diverse": "Inyuranye"
       },
       "saveFarmer": "Bika Umuhinzi",
       "success": "Byagenze Neza",

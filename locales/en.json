@@ -87,7 +87,9 @@
         "hondurasFarm": "Farm",
         "hondurasVillage": "Village",
         "hondurasMunicipality": "Municipality",
-        "hondurasDepartment": "Department"
+        "hondurasDepartment": "Department",
+        "customAddress": "Additional / Other address",
+        "customAddressEnabled": "Additional / Other address enabled"
       },
       "contact": {
         "title": "Contact",
@@ -119,7 +121,8 @@
       "gender": {
         "male": "Male",
         "female": "Female",
-        "n/a": "N/A"
+        "n/a": "N/A",
+        "diverse": "Diverse"
       },
       "saveFarmer": "Save farmer",
       "success": "Success",

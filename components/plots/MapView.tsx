@@ -10,7 +10,6 @@ import ViewSwitcher, { ViewSwitcherProps } from './ViewSwitcher';
 import Mapbox from '@rnmapbox/maps';
 import { useContext, useEffect, useRef, useState } from 'react';
 import * as Location from 'expo-location';
-import * as Crypto from 'expo-crypto';
 import * as Haptics from 'expo-haptics';
 import {
   LocateFixed,
@@ -36,7 +35,6 @@ import { PlotSchema } from '@/realm/schemas';
 import { Farmer, ProductTypeWithCompanyId } from '@/types/farmer';
 import { User } from '@/types/user';
 import Card, { CardProps } from '../common/Card';
-import { S2CellId, S2LatLng } from 'nodes2ts';
 import * as turf from '@turf/turf';
 import MarkerPlotSvg from '../svg/MarkerPlotSvg';
 
@@ -355,24 +353,6 @@ export default function MapView({
       return;
     }
 
-    const s2CellIdentifiers = featureInfo.geometry.coordinates[0].map(
-      (vertex) =>
-        S2CellId.fromPoint(S2LatLng.fromDegrees(vertex[1], vertex[0]).toPoint())
-    );
-
-    const concatenatedPos = s2CellIdentifiers
-      .slice(0, -1)
-      .map((id) => {
-        const match = id.toString().match(/pos=([a-f0-9]+)/);
-        return match ? match[1] : '';
-      })
-      .join('_');
-
-    const hash = await Crypto.digestStringAsync(
-      Crypto.CryptoDigestAlgorithm.SHA256,
-      concatenatedPos
-    );
-
     featureInfo.id = uuid.v4();
 
     setNewPlot({
@@ -381,7 +361,7 @@ export default function MapView({
       crop: '',
       numberOfPlants: 0,
       size: (area(featureInfo.geometry) / 100).toFixed(2) + ' ha',
-      geoId: hash,
+      geoId: '',
       certification: '',
       organicStartOfTransition: '',
       featureInfo,

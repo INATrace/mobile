@@ -34,6 +34,10 @@ const genderItems = [
     label: i18n.t('farmers.newFarmerCreation.gender.n/a'),
     value: 'N_A',
   },
+  {
+    label: i18n.t('farmers.newFarmerCreation.gender.diverse'),
+    value: 'DIVERSE',
+  },
 ];
 
 type NewFarmerErrors = {
@@ -51,6 +55,7 @@ type NewFarmerErrors = {
   city?: boolean;
   state?: boolean;
   zip?: boolean;
+  otherAddress?: boolean;
 };
 
 export default function NewFarmer() {
@@ -82,6 +87,7 @@ export default function NewFarmer() {
     []
   );
   const [errors, setErrors] = useState<NewFarmerErrors>({} as NewFarmerErrors);
+  const [customAddress, setCustomAddress] = useState<string>('No');
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
 
@@ -181,27 +187,33 @@ export default function NewFarmer() {
       } else if (
         key === 'address' &&
         farmer.location?.address?.country?.code !== 'HN' &&
-        farmer.location?.address?.country?.code !== 'RW'
+        farmer.location?.address?.country?.code !== 'RW' &&
+        customAddress !== 'Yes'
       ) {
         updatedErrors.address = false;
       } else if (
         key === 'city' &&
         farmer.location?.address?.country?.code !== 'HN' &&
-        farmer.location?.address?.country?.code !== 'RW'
+        farmer.location?.address?.country?.code !== 'RW' &&
+        customAddress !== 'Yes'
       ) {
         updatedErrors.city = false;
       } else if (
         key === 'state' &&
         farmer.location?.address?.country?.code !== 'HN' &&
-        farmer.location?.address?.country?.code !== 'RW'
+        farmer.location?.address?.country?.code !== 'RW' &&
+        customAddress !== 'Yes'
       ) {
         updatedErrors.state = false;
       } else if (
         key === 'zip' &&
         farmer.location?.address?.country?.code !== 'HN' &&
-        farmer.location?.address?.country?.code !== 'RW'
+        farmer.location?.address?.country?.code !== 'RW' &&
+        customAddress !== 'Yes'
       ) {
         updatedErrors.zip = false;
+      } else if (key === 'otherAddress' && customAddress === 'Yes') {
+        updatedErrors.otherAddress = false;
       }
 
       return updatedErrors;
@@ -259,19 +271,25 @@ export default function NewFarmer() {
       address:
         farmer?.location?.address?.country?.code !== 'HN' &&
         farmer?.location?.address?.country?.code !== 'RW' &&
+        customAddress !== 'Yes' &&
         !farmer.location?.address?.address,
       city:
         farmer?.location?.address?.country?.code !== 'HN' &&
         farmer?.location?.address?.country?.code !== 'RW' &&
+        customAddress !== 'Yes' &&
         !farmer.location?.address?.city,
       state:
         farmer?.location?.address?.country?.code !== 'HN' &&
         farmer?.location?.address?.country?.code !== 'RW' &&
+        customAddress !== 'Yes' &&
         !farmer.location?.address?.state,
       zip:
         farmer?.location?.address?.country?.code !== 'HN' &&
         farmer?.location?.address?.country?.code !== 'RW' &&
+        customAddress !== 'Yes' &&
         !farmer.location?.address?.zip,
+      otherAddress:
+        customAddress === 'Yes' && !farmer.location?.address?.otherAddress,
     };
 
     setErrors(errors);
@@ -305,6 +323,7 @@ export default function NewFarmer() {
           hondurasDepartment:
             farmer.location?.address?.hondurasDepartment ?? '',
           country: farmer.location?.address?.country,
+          otherAddress: farmer.location?.address?.otherAddress ?? '',
         },
       },
       gender: farmer.gender ?? '',
@@ -388,6 +407,55 @@ export default function NewFarmer() {
         i18n.t('farmers.newFarmerCreation.errorMessage')
       );
     }
+  };
+
+  const updateCustomAddress = (value: string) => {
+    if (value === 'Yes') {
+      setFarmer((currentFarmer: Farmer) => {
+        return {
+          ...currentFarmer,
+          location: {
+            ...currentFarmer.location,
+            address: {
+              ...currentFarmer.location?.address,
+              address: '',
+              city: '',
+              state: '',
+              zip: '',
+            },
+          },
+        };
+      });
+      setErrors((currentErrors) => {
+        return {
+          ...currentErrors,
+          address: false,
+          city: false,
+          state: false,
+          zip: false,
+        };
+      });
+    } else {
+      setFarmer((currentFarmer: Farmer) => {
+        return {
+          ...currentFarmer,
+          location: {
+            ...currentFarmer.location,
+            address: {
+              ...currentFarmer.location?.address,
+              otherAddress: '',
+            },
+          },
+        };
+      });
+      setErrors((currentErrors) => {
+        return {
+          ...currentErrors,
+          otherAddress: false,
+        };
+      });
+    }
+    setCustomAddress(value);
   };
 
   return (
@@ -540,44 +608,71 @@ export default function NewFarmer() {
                     error: errors.sector,
                   },
                 ]
-              : [
-                  {
-                    type: 'type',
-                    name: i18n.t('farmers.info.address.address') + '*',
-                    placeholder: i18n.t('input.type'),
-                    value: farmer?.location?.address?.address ?? '',
-                    setValue: (value: string) =>
-                      updateState(['location', 'address', 'address'], value),
-                    error: errors.address,
-                  },
-                  {
-                    type: 'type',
-                    name: i18n.t('farmers.info.address.city') + '*',
-                    placeholder: i18n.t('input.type'),
-                    value: farmer?.location?.address?.city ?? '',
-                    setValue: (value: string) =>
-                      updateState(['location', 'address', 'city'], value),
-                    error: errors.city,
-                  },
-                  {
-                    type: 'type',
-                    name: i18n.t('farmers.info.address.state') + '*',
-                    placeholder: i18n.t('input.type'),
-                    value: farmer?.location?.address?.state ?? '',
-                    setValue: (value: string) =>
-                      updateState(['location', 'address', 'state'], value),
-                    error: errors.state,
-                  },
-                  {
-                    type: 'type',
-                    name: i18n.t('farmers.info.address.zip') + '*',
-                    placeholder: i18n.t('input.type'),
-                    value: farmer?.location?.address?.zip ?? '',
-                    setValue: (value: string) =>
-                      updateState(['location', 'address', 'zip'], value),
-                    error: errors.zip,
-                  },
-                ]) as ItemProps[]),
+              : customAddress === 'Yes'
+                ? [
+                    {
+                      type: 'type',
+                      name: i18n.t('farmers.info.address.customAddress') + '*',
+                      placeholder: i18n.t('input.type'),
+                      value: farmer?.location?.address?.otherAddress ?? '',
+                      setValue: (value: string) =>
+                        updateState(
+                          ['location', 'address', 'otherAddress'],
+                          value
+                        ),
+                      error: errors.otherAddress,
+                    },
+                    {
+                      type: 'checkbox',
+                      name: i18n.t('farmers.info.address.customAddressEnabled'),
+                      value: customAddress,
+                      setValue: (value: string) => updateCustomAddress(value),
+                    },
+                  ]
+                : [
+                    {
+                      type: 'type',
+                      name: i18n.t('farmers.info.address.address') + '*',
+                      placeholder: i18n.t('input.type'),
+                      value: farmer?.location?.address?.address ?? '',
+                      setValue: (value: string) =>
+                        updateState(['location', 'address', 'address'], value),
+                      error: errors.address,
+                    },
+                    {
+                      type: 'type',
+                      name: i18n.t('farmers.info.address.city') + '*',
+                      placeholder: i18n.t('input.type'),
+                      value: farmer?.location?.address?.city ?? '',
+                      setValue: (value: string) =>
+                        updateState(['location', 'address', 'city'], value),
+                      error: errors.city,
+                    },
+                    {
+                      type: 'type',
+                      name: i18n.t('farmers.info.address.state') + '*',
+                      placeholder: i18n.t('input.type'),
+                      value: farmer?.location?.address?.state ?? '',
+                      setValue: (value: string) =>
+                        updateState(['location', 'address', 'state'], value),
+                      error: errors.state,
+                    },
+                    {
+                      type: 'type',
+                      name: i18n.t('farmers.info.address.zip') + '*',
+                      placeholder: i18n.t('input.type'),
+                      value: farmer?.location?.address?.zip ?? '',
+                      setValue: (value: string) =>
+                        updateState(['location', 'address', 'zip'], value),
+                      error: errors.zip,
+                    },
+                    {
+                      type: 'checkbox',
+                      name: i18n.t('farmers.info.address.customAddressEnabled'),
+                      value: customAddress,
+                      setValue: (value: string) => updateCustomAddress(value),
+                    },
+                  ]) as ItemProps[]),
         ]}
       />
 

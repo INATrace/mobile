@@ -21,8 +21,8 @@ import { AuthContext } from '@/context/AuthContext';
 import { router } from 'expo-router';
 
 export default function Login() {
-  const [username, setUsername] = useState<string>('pino.kokol@sunesis.si');
-  const [password, setPassword] = useState<string>('Pino9999');
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -42,6 +42,8 @@ export default function Login() {
 
   const handleLogIn = async () => {
     setIsLoading(true);
+
+    Keyboard.dismiss();
 
     const logInResult = await logIn(username, password);
 

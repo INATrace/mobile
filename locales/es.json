@@ -87,7 +87,9 @@
         "hondurasFarm": "Granja",
         "hondurasVillage": "Pueblo",
         "hondurasMunicipality": "Municipio",
-        "hondurasDepartment": "Departamento"
+        "hondurasDepartment": "Departamento",
+        "customAddress": "Dirección adicional / otra",
+        "customAddressEnabled": "Dirección adicional / Otra dirección habilitada"
       },
       "contact": {
         "title": "Contacto",
@@ -119,7 +121,8 @@
       "gender": {
         "male": "Masculino",
         "female": "Femenino",
-        "n/a": "N/D"
+        "n/a": "N/D",
+        "diverse": "Diverso"
       },
       "saveFarmer": "Guardar agricultor",
       "success": "Éxito",

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Inatrace",
     "slug": "inatrace-mobile",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -41,7 +41,7 @@
         "@rnmapbox/maps",
         {
           "RNMapboxMapsImpl": "mapbox",
-          "RNMapboxMapsDownloadToken": ""
+          "RNMapboxMapsDownloadToken": "sk.eyJ1IjoicGlub2tva29sIiwiYSI6ImNsdmJsYTg4dDA5YTAybW1raWUyZmZyM3kifQ.d7Dl2P3pvlxbxghD9bgW0Q"
         }
       ],
       [
