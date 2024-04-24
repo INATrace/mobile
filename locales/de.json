@@ -143,6 +143,7 @@
     "refreshGeoId": "Geo-ID aktualisieren",
     "refreshGeoIdSuccess": "Geo-ID erfolgreich aktualisiert",
     "refreshGeoIdError": "Fehler beim Aktualisieren der Geo-ID",
+    "refreshGeoIdErrorAGSTACK": "Es gab einen AgStack-Fehler beim Aktualisieren der Geo-ID",
     "offlineMapsScreen": {
       "downloadedMaps": "Heruntergeladene Karten",
       "noMapsDownloaded": "Keine Offline-Karten heruntergeladen",

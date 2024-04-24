@@ -264,6 +264,11 @@ export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
 
       const geoId = response.data.data.geoId;
 
+      if (!geoId) {
+        Alert.alert(i18n.t('plots.refreshGeoIdErrorAGSTACK'));
+        return;
+      }
+
       selectFarmer({
         ...selectedFarmer,
         plots: selectedFarmer.plots?.map((plot) => {
@@ -316,7 +321,11 @@ export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
                 onPress={() => refreshGeoId(item.id, item.synced)}
               >
                 {loadingGeoId === item.id && (
-                  <ActivityIndicator animating className="mr-2" />
+                  <ActivityIndicator
+                    animating
+                    color={'white'}
+                    className="mr-2"
+                  />
                 )}
                 <Text className="font-medium text-white">
                   {i18n.t('plots.refreshGeoId')}
