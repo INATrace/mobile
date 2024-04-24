@@ -6,13 +6,14 @@ import { Farmer, ProductTypeWithCompanyId } from '@/types/farmer';
 import { router, useNavigation } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useContext, useEffect, useState } from 'react';
-import { View, Text, Pressable, Alert } from 'react-native';
+import { View, Text, Pressable, Alert, ActivityIndicator } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import realm from '@/realm/useRealm';
 import { PlotSchema } from '@/realm/schemas';
 import { Plot } from '@/types/plot';
 import { User } from '@/types/user';
 import { RequestParams } from '@/types/auth';
+import cn from '@/utils/cn';
 
 type PlotInto = {
   plotName: string;
@@ -80,6 +81,8 @@ export default function AddPlot() {
       headers,
     }: RequestParams) => Promise<any>;
   };
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const navigation = useNavigation();
 
@@ -181,6 +184,8 @@ export default function AddPlot() {
   const savePlot = async () => {
     if (!validateFields()) return;
 
+    setLoading(true);
+
     try {
       if (isConnected && !isUUIDV4(selectedFarmer.id.toString())) {
         const response = await makeRequest({
@@ -245,6 +250,8 @@ export default function AddPlot() {
       router.replace(`view/${selectedFarmer?.id?.toString()}` as any);
     } catch (error) {
       console.error('Error saving plot', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -320,10 +327,15 @@ export default function AddPlot() {
         />
       </View>
       <Pressable
-        className="flex flex-row items-center justify-center h-12 mx-5 mt-5 mb-10 rounded-md bg-Orange"
+        className={cn(
+          'flex flex-row items-center justify-center h-12 mx-5 mt-5 mb-10 rounded-md',
+          loading ? 'bg-Orange/80' : 'bg-Orange'
+        )}
         style={ShadowButtonStyle}
         onPress={savePlot}
+        disabled={loading}
       >
+        <ActivityIndicator color="white" animating={loading} className="mr-2" />
         <Text className="text-White text-[18px] font-medium">
           {i18n.t('plots.addPlot.savePlot')}
         </Text>
