@@ -39,7 +39,7 @@
   "home": {
     "title": "Home",
     "farmers": "Farmers",
-    "newPlot": "New plot",
+    "newPlot": "New plot | Choose farmer",
     "syncData": "Sync data"
   },
   "farmers": {

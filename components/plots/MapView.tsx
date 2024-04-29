@@ -29,7 +29,6 @@ import { router, useNavigation, useSegments } from 'expo-router';
 import { AuthContext } from '@/context/AuthContext';
 import { uuid } from 'expo-modules-core';
 import { FeatureInfo, Plot } from '@/types/plot';
-import area from '@turf/area';
 import realm from '@/realm/useRealm';
 import { PlotSchema } from '@/realm/schemas';
 import { Farmer, ProductTypeWithCompanyId } from '@/types/farmer';
@@ -360,7 +359,7 @@ export default function MapView({
       plotName: '',
       crop: '',
       numberOfPlants: 0,
-      size: (area(featureInfo.geometry) / 100).toFixed(2) + ' ha',
+      size: (turf.area(featureInfo.geometry) / 10000).toFixed(2) + ' ha',
       geoId: '',
       certification: '',
       organicStartOfTransition: '',

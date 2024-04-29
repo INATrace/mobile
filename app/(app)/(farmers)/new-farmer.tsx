@@ -21,25 +21,6 @@ import realm from '@/realm/useRealm';
 import { FarmerSchema } from '@/realm/schemas';
 import { RequestParams } from '@/types/auth';
 
-const genderItems = [
-  {
-    label: i18n.t('farmers.newFarmerCreation.gender.male'),
-    value: 'MALE',
-  },
-  {
-    label: i18n.t('farmers.newFarmerCreation.gender.female'),
-    value: 'FEMALE',
-  },
-  {
-    label: i18n.t('farmers.newFarmerCreation.gender.n/a'),
-    value: 'N_A',
-  },
-  {
-    label: i18n.t('farmers.newFarmerCreation.gender.diverse'),
-    value: 'DIVERSE',
-  },
-];
-
 type NewFarmerErrors = {
   lastName: boolean;
   gender: boolean;
@@ -90,6 +71,25 @@ export default function NewFarmer() {
   const [customAddress, setCustomAddress] = useState<string>('No');
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+  const genderItems = [
+    {
+      label: i18n.t('farmers.newFarmerCreation.gender.female'),
+      value: 'FEMALE',
+    },
+    {
+      label: i18n.t('farmers.newFarmerCreation.gender.male'),
+      value: 'MALE',
+    },
+    {
+      label: i18n.t('farmers.newFarmerCreation.gender.diverse'),
+      value: 'DIVERSE',
+    },
+    {
+      label: i18n.t('farmers.newFarmerCreation.gender.n/a'),
+      value: 'N_A',
+    },
+  ];
 
   useEffect(() => {
     if (

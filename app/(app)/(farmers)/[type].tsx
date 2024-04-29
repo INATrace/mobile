@@ -25,32 +25,6 @@ import { emptyComponent } from '@/components/common/FlashListComponents';
 import realm from '@/realm/useRealm';
 import { FarmerSchema } from '@/realm/schemas';
 
-const sortItems = [
-  { label: i18n.t('farmers.sort.name'), value: 'BY_NAME_ASC', icon: ChevronUp },
-  {
-    label: i18n.t('farmers.sort.name'),
-    value: 'BY_NAME_DESC',
-    icon: ChevronDown,
-  },
-  {
-    label: i18n.t('farmers.sort.surname'),
-    value: 'BY_SURNAME_ASC',
-    icon: ChevronUp,
-  },
-  {
-    label: i18n.t('farmers.sort.surname'),
-    value: 'BY_SURNAME_DESC',
-    icon: ChevronDown,
-  },
-  { label: i18n.t('farmers.sort.id'), value: 'BY_ID_ASC', icon: ChevronUp },
-  { label: i18n.t('farmers.sort.id'), value: 'BY_ID_DESC', icon: ChevronDown },
-];
-
-const filterItems = [
-  { label: i18n.t('farmers.filter.name'), value: 'BY_NAME' },
-  { label: i18n.t('farmers.filter.surname'), value: 'BY_SURNAME' },
-];
-
 export default function Farmers() {
   const { type } = useLocalSearchParams();
   const [search, setSearch] = useState<string>('');
@@ -72,6 +46,40 @@ export default function Farmers() {
     useContext(AuthContext);
 
   const segments = useSegments();
+
+  const sortItems = [
+    {
+      label: i18n.t('farmers.sort.name'),
+      value: 'BY_NAME_ASC',
+      icon: ChevronUp,
+    },
+    {
+      label: i18n.t('farmers.sort.name'),
+      value: 'BY_NAME_DESC',
+      icon: ChevronDown,
+    },
+    {
+      label: i18n.t('farmers.sort.surname'),
+      value: 'BY_SURNAME_ASC',
+      icon: ChevronUp,
+    },
+    {
+      label: i18n.t('farmers.sort.surname'),
+      value: 'BY_SURNAME_DESC',
+      icon: ChevronDown,
+    },
+    { label: i18n.t('farmers.sort.id'), value: 'BY_ID_ASC', icon: ChevronUp },
+    {
+      label: i18n.t('farmers.sort.id'),
+      value: 'BY_ID_DESC',
+      icon: ChevronDown,
+    },
+  ];
+
+  const filterItems = [
+    { label: i18n.t('farmers.filter.name'), value: 'BY_NAME' },
+    { label: i18n.t('farmers.filter.surname'), value: 'BY_SURNAME' },
+  ];
 
   useEffect(() => {
     if (
