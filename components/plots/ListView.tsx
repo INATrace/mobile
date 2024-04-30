@@ -125,6 +125,7 @@ export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
                 name: i18n.t('plots.addPlot.geoId'),
                 value: plotData.geoId,
                 editable: false,
+                share: true,
               },
               {
                 type: 'view',
@@ -202,6 +203,7 @@ export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
                 name: i18n.t('plots.addPlot.geoId'),
                 value: plot.geoId,
                 editable: false,
+                share: true,
               },
               {
                 type: 'view',

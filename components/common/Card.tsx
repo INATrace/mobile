@@ -1,10 +1,18 @@
-import { View, Text, Pressable, Platform, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  Platform,
+  TextInput,
+  Share,
+} from 'react-native';
 import {
   AlertCircle,
   Check,
   ChevronDown,
   MoveDiagonal,
   Search,
+  Share2,
   X,
 } from 'lucide-react-native';
 import { router } from 'expo-router';
@@ -51,6 +59,7 @@ export type ItemProps = {
   snapPoints?: string;
   isNumeric?: boolean;
   error?: boolean;
+  share?: boolean;
 };
 
 export default function Card({
@@ -162,6 +171,16 @@ export default function Card({
 }
 
 const ItemView = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
+  const onShare = async (value: string) => {
+    try {
+      await Share.share({
+        message: value,
+      });
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+
   return (
     <View
       className={cn(
@@ -170,9 +189,24 @@ const ItemView = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
       )}
     >
       <Text className="text-[16px] max-w-[45%]">{item.name}</Text>
-      <Text className="text-DarkGray text-[16px] max-w-[50%]">
-        {item.value}
-      </Text>
+      <View className="max-w-[50%] flex flex-row items-center">
+        <Text
+          className={cn(
+            'text-DarkGray text-[16px]',
+            item.share && item?.value && 'mr-10'
+          )}
+        >
+          {item.value}
+        </Text>
+        {item.share && item?.value && (
+          <Pressable
+            className="flex flex-row items-center justify-center w-8 h-8 border rounded-md border-LightGray right-8"
+            onPress={() => onShare(item.value ?? '')}
+          >
+            <Share2 className="text-black" size={18} />
+          </Pressable>
+        )}
+      </View>
     </View>
   );
 };

@@ -1,6 +1,7 @@
 {
   "yes": "Yes",
   "no": "No",
+  "ok": "OK",
   "loading": "Loading...",
   "input": {
     "type": "Type...",
@@ -28,9 +29,9 @@
     "company": "Company",
     "language": "Language",
     "english": "English",
-    "spanish": "Spanish",
-    "german": "German",
-    "kinyarwanda": "Kinyarwanda",
+    "spanish": "Español",
+    "german": "Deutsch",
+    "kinyarwanda": "Ikinyarwanda",
     "offlineMaps": "Offline maps",
     "offlineMapsSettings": "Offline maps settings",
     "resetPassword": "Reset password",
@@ -39,12 +40,12 @@
   "home": {
     "title": "Home",
     "farmers": "Farmers",
-    "newPlot": "New plot | Choose farmer",
+    "newPlot": "New plot",
     "syncData": "Sync data"
   },
   "farmers": {
     "title": "Farmers",
-    "titleNewPlot": "New plot",
+    "titleNewPlot": "Choose farmer",
     "newFarmer": "New farmer",
     "search": "Search",
     "noData": "No farmers found",
@@ -65,6 +66,7 @@
       "gender": "Gender"
     },
     "info": {
+      "addNewPlot": "Add new plot",
       "viewAllPlots": "View all plots",
       "basicInformation": {
         "title": "Basic information",
@@ -142,8 +144,8 @@
     "plots": "plot/s",
     "refreshGeoId": "Refresh Geo-ID",
     "refreshGeoIdSuccess": "Geo-ID successfully refreshed",
-    "refreshGeoIdError": "There was an error refreshing the Geo-ID",
-    "refreshGeoIdErrorAGSTACK": "There was an AgStack error while refreshing the Geo-ID",
+    "refreshGeoIdError": "There was an error refreshing the Geo-ID, try again later",
+    "refreshGeoIdErrorAGSTACK": "There was an AgStack error while refreshing the Geo-ID, try again later",
     "offlineMapsScreen": {
       "downloadedMaps": "Downloaded maps",
       "noMapsDownloaded": "No offline maps downloaded",

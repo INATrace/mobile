@@ -39,7 +39,7 @@ export default function Home() {
             position={'center'}
             backdropPressToClose={true}
             style={{
-              height: 286,
+              height: 336,
               width: '90%',
               marginRight: 250,
               borderRadius: 8,
@@ -58,6 +58,12 @@ export default function Home() {
               </View>
 
               <LanguageSwitcher />
+              <Pressable
+                onPress={() => setAskLanguage(true)}
+                className="py-2 mt-4 rounded-md bg-Orange"
+              >
+                <Text className="text-center text-white">{i18n.t('ok')}</Text>
+              </Pressable>
             </View>
           </Modal>
         ))}

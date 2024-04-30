@@ -1,6 +1,7 @@
 {
   "yes": "Yego",
   "no": "Oya",
+  "ok": "OK",
   "loading": "Birimo birakorwa...",
   "input": {
     "type": "Andika...",
@@ -27,9 +28,9 @@
     "companyInformation": "Amakuru y'ikompanyi",
     "company": "Ikompanyi",
     "language": "Ururimi",
-    "english": "Icyongereza",
-    "spanish": "Icyespanyole",
-    "german": "Icyidage",
+    "english": "English",
+    "spanish": "Español",
+    "german": "Deutsch",
     "kinyarwanda": "Ikinyarwanda",
     "offlineMaps": "Ikarita zitari kuri murandasi",
     "offlineMapsSettings": "Igenamiterere ry'ikarita zitari kuri murandasi",
@@ -44,7 +45,7 @@
   },
   "farmers": {
     "title": "Abahinzi",
-    "titleNewPlot": "Ikibanza gishya",
+    "titleNewPlot": "Hitamo umuhinzi",
     "newFarmer": "Umuhinzi mushya",
     "search": "Shakisha",
     "noData": "Nta bahinzi babonetse",
@@ -65,6 +66,7 @@
       "gender": "Igitsina"
     },
     "info": {
+      "addNewPlot": "Ongeraho ikibanza gishya",
       "viewAllPlots": "Reba ibibanza byose",
       "basicInformation": {
         "title": "Amakuru y'ibanze",
@@ -142,8 +144,8 @@
     "plots": "ikibanza/ibibanza",
     "refreshGeoId": "Hindura Geo-ID",
     "refreshGeoIdSuccess": "Geo-ID yavuguruwe neza",
-    "refreshGeoIdError": "Habaye ikosa mu kuvugurura Geo-ID",
-    "refreshGeoIdErrorAGSTACK": "Habayeho ikosa rya AgStack mu gihe cyo kuvugurura Geo-ID",
+    "refreshGeoIdError": "Habayeho ikosa mu kuvugurura Geo-ID, gerageza kandi nyuma",
+    "refreshGeoIdErrorAGSTACK": "Habayeho ikosa rya AgStack mu kuvugurura Geo-ID, gerageza kandi nyuma",
     "offlineMapsScreen": {
       "downloadedMaps": "Ikarita zikumanuwe",
       "noMapsDownloaded": "Nta karita zikumanuwe ziriho",

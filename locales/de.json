@@ -1,6 +1,7 @@
 {
   "yes": "Ja",
   "no": "Nein",
+  "ok": "OK",
   "loading": "Lädt...",
   "input": {
     "type": "Eingeben...",
@@ -27,10 +28,10 @@
     "companyInformation": "Firmeninformationen",
     "company": "Firma",
     "language": "Sprache",
-    "english": "Englisch",
-    "spanish": "Spanisch",
+    "english": "English",
+    "spanish": "Español",
     "german": "Deutsch",
-    "kinyarwanda": "Kinyarwanda",
+    "kinyarwanda": "Ikinyarwanda",
     "offlineMaps": "Offline-Karten",
     "offlineMapsSettings": "Einstellungen für Offline-Karten",
     "resetPassword": "Passwort zurücksetzen",
@@ -44,7 +45,7 @@
   },
   "farmers": {
     "title": "Bauern",
-    "titleNewPlot": "Neue Parzelle",
+    "titleNewPlot": "Landwirt auswählen",
     "newFarmer": "Neuer Bauer",
     "search": "Suche",
     "noData": "Keine Bauern gefunden",
@@ -65,6 +66,7 @@
       "gender": "Geschlecht"
     },
     "info": {
+      "addNewPlot": "Neue Parzelle hinzufügen",
       "viewAllPlots": "Alle Parzellen ansehen",
       "basicInformation": {
         "title": "Grundinformation",
@@ -142,8 +144,8 @@
     "plots": "Parzelle/n",
     "refreshGeoId": "Geo-ID aktualisieren",
     "refreshGeoIdSuccess": "Geo-ID erfolgreich aktualisiert",
-    "refreshGeoIdError": "Fehler beim Aktualisieren der Geo-ID",
-    "refreshGeoIdErrorAGSTACK": "Es gab einen AgStack-Fehler beim Aktualisieren der Geo-ID",
+    "refreshGeoIdError": "Es gab einen Fehler beim Aktualisieren der Geo-ID, bitte versuchen Sie es später erneut",
+    "refreshGeoIdErrorAGSTACK": "Es gab einen AgStack-Fehler beim Aktualisieren der Geo-ID, bitte versuchen Sie es später erneut",
     "offlineMapsScreen": {
       "downloadedMaps": "Heruntergeladene Karten",
       "noMapsDownloaded": "Keine Offline-Karten heruntergeladen",

@@ -5,7 +5,7 @@ import { AuthContext } from '@/context/AuthContext';
 import QRCode from 'react-native-qrcode-svg';
 import i18n from '@/locales/i18n';
 import Card, { ItemProps } from '@/components/common/Card';
-import { ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft, Map, Plus } from 'lucide-react-native';
 import { Farmer } from '@/types/farmer';
 
 export default function FarmersInfo() {
@@ -33,6 +33,10 @@ export default function FarmersInfo() {
     router.push(`view/${selectedFarmer?.id?.toString()}` as any);
   };
 
+  const navigateToPlotsMapping = () => {
+    router.push('view/new' as any);
+  };
+
   return (
     <ScrollView className="h-full border-t bg-White border-t-LightGray">
       <View className="flex flex-col items-center justify-center pt-5 mx-5">
@@ -40,8 +44,18 @@ export default function FarmersInfo() {
         <Text className="mt-3 mb-5">{selectedFarmer?.id}</Text>
         <Pressable
           className="flex flex-row items-center justify-center w-full px-5 py-3 rounded-md bg-Orange"
+          onPress={navigateToPlotsMapping}
+        >
+          <Plus className="mr-2 text-White" />
+          <Text className="text-[16px] text-White font-semibold">
+            {i18n.t('farmers.info.addNewPlot')}
+          </Text>
+        </Pressable>
+        <Pressable
+          className="flex flex-row items-center justify-center w-full px-5 py-3 mt-4 rounded-md bg-Orange"
           onPress={navigateToPlots}
         >
+          <Map className="mr-2 text-White" />
           <Text className="text-[16px] text-White font-semibold">
             {i18n.t('farmers.info.viewAllPlots')}
           </Text>
