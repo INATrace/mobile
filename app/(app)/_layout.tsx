@@ -79,6 +79,14 @@ export default function AppLayout() {
           headerLeft: () => <LeftHeader />,
         }}
       />
+      <Stack.Screen
+        name="map-download"
+        options={{
+          presentation: 'modal',
+          title: i18n.t('plots.mapDownload'),
+          headerLeft: () => <LeftHeader />,
+        }}
+      />
     </Stack>
   );
 }

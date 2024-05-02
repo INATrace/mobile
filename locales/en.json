@@ -144,7 +144,9 @@
     "plots": "plot/s",
     "refreshGeoId": "Refresh Geo-ID",
     "refreshGeoIdSuccess": "Geo-ID successfully refreshed",
-    "refreshGeoIdError": "There was an error refreshing the Geo-ID, try again later",
+    "refreshGeoIdSuccessMessage": "The Geo-ID has been successfully refreshed",
+    "refreshGeoIdError": "Error refreshing Geo-ID",
+    "refreshGeoIdErrorMessage": "There was an error refreshing the Geo-ID, try again later",
     "refreshGeoIdErrorAGSTACK": "There was an AgStack error while refreshing the Geo-ID, try again later",
     "offlineMapsScreen": {
       "downloadedMaps": "Downloaded maps",
@@ -158,7 +160,8 @@
       "expires": "Expires %{date}",
       "delete": "Delete",
       "deleteAlert": "Are you sure you want to delete this map?",
-      "locationPermissionDeniedAlert": "Permission to access location was denied",
+      "locationPermissionDeniedAlert": "Access denied",
+      "locationPermissionDeniedAlertMessage": "Permission to access location was denied",
       "noAreaSelected": "No area selected",
       "noAreaSelectedMessage": "Please select an area to download",
       "errorTitle": "Error",
@@ -193,7 +196,9 @@
       "savePlot": "Save plot",
       "discardChangesTitle": "Unsaved changes",
       "discardChangesMessage": "Are you sure you want to leave the mapping mode? The points registered will be lost.",
-      "discardChangesButton": "Confirm"
+      "discardChangesButton": "Confirm",
+      "error": "Error",
+      "errorMessage": "There was an error saving the plot"
     },
     "totalArea": "total area",
     "summaryTitle": "Summary",

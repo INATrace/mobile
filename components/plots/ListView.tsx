@@ -267,7 +267,10 @@ export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
       const geoId = response.data.data.geoId;
 
       if (!geoId) {
-        Alert.alert(i18n.t('plots.refreshGeoIdErrorAGSTACK'));
+        Alert.alert(
+          i18n.t('plots.refreshGeoIdError'),
+          i18n.t('plots.refreshGeoIdErrorAGSTACK')
+        );
         return;
       }
 
@@ -283,10 +286,16 @@ export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
           return plot;
         }),
       } as Farmer);
-      Alert.alert(i18n.t('plots.refreshGeoIdSuccess'));
+      Alert.alert(
+        i18n.t('plots.refreshGeoIdSuccess'),
+        i18n.t('plots.refreshGeoIdSuccessMessage')
+      );
     } catch (e) {
       console.error('Failed to refresh geoId:', e);
-      Alert.alert(i18n.t('plots.refreshGeoIdError'));
+      Alert.alert(
+        i18n.t('plots.refreshGeoIdError'),
+        i18n.t('plots.refreshGeoIdErrorMessage')
+      );
     } finally {
       setLoadingGeoId(-1);
     }

@@ -144,7 +144,9 @@
     "plots": "Parzelle/n",
     "refreshGeoId": "Geo-ID aktualisieren",
     "refreshGeoIdSuccess": "Geo-ID erfolgreich aktualisiert",
-    "refreshGeoIdError": "Es gab einen Fehler beim Aktualisieren der Geo-ID, bitte versuchen Sie es später erneut",
+    "refreshGeoIdSuccessMessage": "Die Geo-ID wurde erfolgreich aktualisiert",
+    "refreshGeoIdError": "Fehler beim Aktualisieren der Geo-ID",
+    "refreshGeoIdErrorMessage": "Es gab einen Fehler beim Aktualisieren der Geo-ID, bitte versuchen Sie es später erneut",
     "refreshGeoIdErrorAGSTACK": "Es gab einen AgStack-Fehler beim Aktualisieren der Geo-ID, bitte versuchen Sie es später erneut",
     "offlineMapsScreen": {
       "downloadedMaps": "Heruntergeladene Karten",
@@ -158,7 +160,8 @@
       "expires": "Läuft ab am %{date}",
       "delete": "Löschen",
       "deleteAlert": "Sind Sie sicher, dass Sie diese Karte löschen möchten?",
-      "locationPermissionDeniedAlert": "Zugriff auf Standort wurde verweigert",
+      "locationPermissionDeniedAlert": "Zugriff verweigert",
+      "locationPermissionDeniedAlertMessage": "Berechtigung zum Zugriff auf den Standort wurde verweigert",
       "noAreaSelected": "Kein Bereich ausgewählt",
       "noAreaSelectedMessage": "Bitte wählen Sie einen Bereich zum Herunterladen",
       "errorTitle": "Fehler",
@@ -193,7 +196,9 @@
       "savePlot": "Parzelle speichern",
       "discardChangesTitle": "Nicht gespeicherte Änderungen",
       "discardChangesMessage": "Sind Sie sicher, dass Sie den Zuordnungsmodus verlassen möchten? Die registrierten Punkte gehen verloren.",
-      "discardChangesButton": "Bestätigen"
+      "discardChangesButton": "Bestätigen",
+      "error": "Fehler",
+      "errorMessage": "Beim Speichern des Diagramms ist ein Fehler aufgetreten"
     },
     "totalArea": "Gesamtfläche",
     "summaryTitle": "Zusammenfassung",

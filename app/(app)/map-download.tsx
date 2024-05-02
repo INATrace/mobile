@@ -18,6 +18,7 @@ import {
   Text,
   View,
   StyleSheet,
+  Platform,
 } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import i18n from '@/locales/i18n';
@@ -116,7 +117,8 @@ export default function MapDownload() {
 
     if (status !== 'granted') {
       Alert.alert(
-        i18n.t('plots.offlineMapsScreen.locationPermissionDeniedAlert')
+        i18n.t('plots.offlineMapsScreen.locationPermissionDeniedAlert'),
+        i18n.t('plots.offlineMapsScreen.locationPermissionDeniedAlertMessage')
       );
       return;
     }
@@ -384,7 +386,24 @@ export default function MapDownload() {
                 {i18n.t('plots.offlineMapsScreen.downloadedMaps')}
               </Text>
               {offlinePacks.map((pack: any, index: number) => {
-                const date = pack?.expires?.split(' ');
+                let formattedDate = '';
+                if (pack?.expires && pack?.percentage === 100) {
+                  if (Platform.OS === 'android') {
+                    const date = pack.expires.split(' ');
+                    formattedDate = date[2] + ' ' + date[1] + ' ' + date[5];
+                  } else {
+                    const date = new Date(pack.expires);
+                    formattedDate =
+                      date.getDate() +
+                      ' ' +
+                      date.toLocaleString('default', { month: 'short' }) +
+                      ' ' +
+                      date.getFullYear();
+                  }
+                } else {
+                  formattedDate = '-';
+                }
+
                 return (
                   <View
                     key={index}
@@ -413,10 +432,7 @@ export default function MapDownload() {
                           <View className="w-[4] h-[4] rounded-full bg-black mx-2" />
                           <Text>
                             {i18n.t('plots.offlineMapsScreen.expires', {
-                              date:
-                                date[0] === 'unknown'
-                                  ? '-'
-                                  : date[2] + ' ' + date[1] + ' ' + date[5],
+                              date: formattedDate,
                             })}
                           </Text>
                         </View>

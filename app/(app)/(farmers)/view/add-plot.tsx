@@ -214,7 +214,10 @@ export default function AddPlot() {
         });
 
         if (response.data.status !== 'OK') {
-          Alert.alert('Error', 'Error saving plot');
+          Alert.alert(
+            i18n.t('plots.addPlot.error'),
+            i18n.t('plots.addPlot.errorMessage')
+          );
           return;
         }
       } else {

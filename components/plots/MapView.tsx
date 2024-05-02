@@ -425,6 +425,7 @@ export default function MapView({
           name: i18n.t('plots.addPlot.geoId'),
           value: plot.geoId,
           editable: false,
+          share: true,
         },
         {
           type: 'view',
