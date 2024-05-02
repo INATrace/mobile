@@ -20,7 +20,11 @@ type SummaryData = {
   totalArea: number;
 };
 
-export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
+export default function ListView({
+  viewType,
+  setViewType,
+  setSeePlot,
+}: ViewSwitcherProps) {
   const [data, setData] = useState<CardProps[]>([]);
   const [summary, setSummary] = useState<CardProps>({} as CardProps);
   const [loading, setLoading] = useState<boolean>(true);
@@ -54,6 +58,13 @@ export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
       loadPlotsAndSummary();
     }
   }, [selectedFarmer]);
+
+  const handleSeePlot = (plotId: string) => {
+    if (setSeePlot) {
+      setViewType('map');
+      setSeePlot(plotId);
+    }
+  };
 
   const loadPlotsAndSummary = async () => {
     setLoading(true);
@@ -148,6 +159,7 @@ export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
             ],
             title: plotData.plotName,
             synced: false,
+            switchView: () => handleSeePlot(plotData.id.toString()),
           } as CardProps;
         }) ?? [];
 
@@ -224,6 +236,7 @@ export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
                 editable: false,
               },
             ],
+            switchView: () => handleSeePlot(plot.id.toString()),
           } as CardProps;
         }) ?? [];
 
@@ -303,7 +316,12 @@ export default function ListView({ viewType, setViewType }: ViewSwitcherProps) {
 
   return (
     <View className="h-full">
-      <ViewSwitcher viewType={viewType} setViewType={setViewType} padding />
+      <ViewSwitcher
+        viewType={viewType}
+        setViewType={setViewType}
+        padding
+        setSeePlot={setSeePlot}
+      />
       {summary?.items?.length > 0 && (
         <View>
           <Text className="text-[18px] font-medium mx-5">

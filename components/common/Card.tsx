@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  Pressable,
-  Platform,
-  TextInput,
-  Share,
-} from 'react-native';
+import { View, Text, Pressable, Platform, TextInput } from 'react-native';
 import {
   AlertCircle,
   Check,
@@ -14,6 +7,8 @@ import {
   Search,
   Share2,
   X,
+  Text as LucideText,
+  QrCode,
 } from 'lucide-react-native';
 import { router } from 'expo-router';
 import cn from '@/utils/cn';
@@ -30,6 +25,9 @@ import {
 import Selector from './Selector';
 import Colors from '@/constants/Colors';
 import i18n from '@/locales/i18n';
+import QRCode from 'react-native-qrcode-svg';
+import { captureRef } from 'react-native-view-shot';
+import Share from 'react-native-share';
 
 export type CardProps = {
   id?: number;
@@ -43,6 +41,7 @@ export type CardProps = {
   synced?: boolean;
   canClose?: boolean;
   onClose?: () => void;
+  switchView?: () => void;
 };
 
 export type ItemProps = {
@@ -70,6 +69,7 @@ export default function Card({
   synced,
   canClose,
   onClose,
+  switchView,
 }: CardProps) {
   const { selectFarmer } = useContext(AuthContext);
 
@@ -98,7 +98,14 @@ export default function Card({
       {title && (
         <Pressable
           className="flex flex-row items-center justify-between p-4 bg-Green rounded-t-md"
-          onPress={() => (navigationPath ? navigateToDetails() : null)}
+          onPress={() =>
+            navigationPath
+              ? navigateToDetails()
+              : switchView
+                ? switchView()
+                : null
+          }
+          disabled={!navigationPath && !switchView}
         >
           <Text className="text-White text-[18px] font-semibold">{title}</Text>
           {navigationPath && (
@@ -171,13 +178,30 @@ export default function Card({
 }
 
 const ItemView = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
+  const [qrView, setQrView] = useState<boolean>(false);
+  const qrRef = useRef();
+
   const onShare = async (value: string) => {
     try {
-      await Share.share({
+      await Share.open({
         message: value,
       });
     } catch (error: any) {
-      console.error(error.message);
+      console.log(error.message);
+    }
+  };
+
+  const onShareQR = async () => {
+    try {
+      const uri = await captureRef(qrRef, {
+        format: 'png',
+        quality: 0.7,
+      });
+      await Share.open({
+        url: uri,
+      });
+    } catch (error: any) {
+      console.log(error.message);
     }
   };
 
@@ -190,21 +214,46 @@ const ItemView = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
     >
       <Text className="text-[16px] max-w-[45%]">{item.name}</Text>
       <View className="max-w-[50%] flex flex-row items-center">
-        <Text
-          className={cn(
-            'text-DarkGray text-[16px]',
-            item.share && item?.value && 'mr-10'
-          )}
-        >
-          {item.value}
-        </Text>
-        {item.share && item?.value && (
+        {qrView ? (
           <Pressable
-            className="flex flex-row items-center justify-center w-8 h-8 border rounded-md border-LightGray right-8"
-            onPress={() => onShare(item.value ?? '')}
+            className="mr-4"
+            onLongPress={onShareQR}
+            ref={qrRef as any}
           >
-            <Share2 className="text-black" size={18} />
+            <QRCode value={item.value ?? ''} size={70} />
           </Pressable>
+        ) : (
+          <Pressable onLongPress={() => onShare(item.value ?? '')}>
+            <Text
+              className={cn(
+                'text-DarkGray text-[16px]',
+                item.share && item?.value && 'mr-10'
+              )}
+            >
+              {item.value}
+            </Text>
+          </Pressable>
+        )}
+
+        {item.share && item?.value && (
+          <View className={cn('flex flex-col', !qrView && 'right-8')}>
+            <Pressable
+              className="flex flex-row items-center justify-center w-8 h-8 mb-2 border rounded-md border-LightGray"
+              onPress={() => (qrView ? onShareQR() : onShare(item.value ?? ''))}
+            >
+              <Share2 className="text-black" size={18} />
+            </Pressable>
+            <Pressable
+              className="flex flex-row items-center justify-center w-8 h-8 border rounded-md border-LightGray"
+              onPress={() => setQrView(!qrView)}
+            >
+              {!qrView ? (
+                <QrCode className="text-black" size={18} />
+              ) : (
+                <LucideText className="text-black" size={18} />
+              )}
+            </Pressable>
+          </View>
         )}
       </View>
     </View>

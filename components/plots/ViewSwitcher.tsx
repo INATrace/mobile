@@ -8,13 +8,20 @@ export type ViewSwitcherProps = {
   setViewType: (viewType: 'list' | 'map') => void;
   type?: string | string[];
   padding?: boolean;
+  seePlot?: string;
+  setSeePlot?: (seePlot: string) => void;
 };
 
 export default function ViewSwitcher({
   viewType,
   setViewType,
+  setSeePlot,
   padding,
 }: ViewSwitcherProps) {
+  const handleViewType = (viewType: 'list' | 'map') => {
+    setViewType(viewType);
+    if (setSeePlot) setSeePlot('');
+  };
   return (
     <View
       className={cn(
@@ -23,7 +30,7 @@ export default function ViewSwitcher({
       )}
     >
       <Pressable
-        onPress={() => setViewType('list')}
+        onPress={() => handleViewType('list')}
         className={cn(
           viewType === 'list'
             ? 'bg-Orange border-Orange'
@@ -57,7 +64,7 @@ export default function ViewSwitcher({
         </Text>
       </Pressable>
       <Pressable
-        onPress={() => setViewType('map')}
+        onPress={() => handleViewType('map')}
         className={cn(
           viewType === 'map'
             ? 'bg-Orange border-Orange'

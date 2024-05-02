@@ -43,6 +43,8 @@ export default function MapView({
   viewType,
   setViewType,
   type,
+  seePlot,
+  setSeePlot,
 }: ViewSwitcherProps) {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
@@ -89,8 +91,25 @@ export default function MapView({
   useEffect(() => {
     if (type === 'new') {
       setAddingNewPlot(true);
+    } else if (
+      seePlot &&
+      !addingNewPlot &&
+      centroidCollection?.features &&
+      centroidCollection?.features?.length > 0 &&
+      !isMapLoading
+    ) {
+      const centroid = centroidCollection.features.find(
+        (c: any) => c.properties.id.toString() === seePlot
+      ) as any;
+      if (centroid) {
+        focusOnLocation(
+          centroid.geometry.coordinates[1],
+          centroid.geometry.coordinates[0]
+        );
+        handleSettingCardInfo(seePlot);
+      }
     }
-  }, [type]);
+  }, [type, seePlot, centroidCollection, isMapLoading]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -369,10 +388,13 @@ export default function MapView({
     router.push('/(app)/(farmers)/view/add-plot');
   };
 
-  const focusOnCurrentLocation = () => {
+  const focusOnLocation = (lat?: number, lon?: number) => {
     if (location && cameraRef.current) {
       cameraRef.current.setCamera({
-        centerCoordinate: [location.coords.longitude, location.coords.latitude],
+        centerCoordinate: [
+          lon ? lon : location.coords.longitude,
+          lat ? lat : location.coords.latitude,
+        ],
         zoomLevel: 16,
         animationDuration: 500,
       });
@@ -681,7 +703,7 @@ export default function MapView({
               {/* Location button */}
               <Pressable
                 className="flex flex-row items-center self-end justify-center w-16 h-16 mb-5 border-2 border-blue-500 rounded-full bg-White"
-                onPress={focusOnCurrentLocation}
+                onPress={() => focusOnLocation()}
                 style={style.shadowMedium}
               >
                 <Navigation className="text-blue-500" size={30} />
@@ -736,14 +758,18 @@ export default function MapView({
           {type === 'new' ? (
             <View />
           ) : (
-            <ViewSwitcher viewType={viewType} setViewType={setViewType} />
+            <ViewSwitcher
+              viewType={viewType}
+              setViewType={setViewType}
+              setSeePlot={setSeePlot}
+            />
           )}
           <View className="flex flex-col">
             {cardInfo && <Card {...cardInfo} />}
             {/* Location button */}
             <Pressable
               className="flex flex-row items-center self-end justify-center w-16 h-16 mb-5 border-2 border-blue-500 rounded-full bg-White"
-              onPress={focusOnCurrentLocation}
+              onPress={() => focusOnLocation()}
               style={style.shadowMedium}
             >
               <Navigation className="text-blue-500" size={30} />
