@@ -13,13 +13,14 @@ import {
 } from '@gorhom/bottom-sheet';
 import { useNavigation } from 'expo-router';
 import { ChevronLeft, PlusCircle, X, XCircle } from 'lucide-react-native';
-import { useContext, useEffect, useRef, useState } from 'react';
-import { View, Text, Pressable, Alert } from 'react-native';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { View, Text, Pressable, Alert, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { uuid } from 'expo-modules-core';
 import realm from '@/realm/useRealm';
 import { FarmerSchema } from '@/realm/schemas';
 import { RequestParams } from '@/types/auth';
+import { FullWindowOverlay } from 'react-native-screens';
 
 type NewFarmerErrors = {
   lastName: boolean;
@@ -90,6 +91,11 @@ export default function NewFarmer() {
       value: 'N_A',
     },
   ];
+
+  const containerComponent = useCallback(
+    (props: any) => <FullWindowOverlay>{props.children}</FullWindowOverlay>,
+    []
+  );
 
   useEffect(() => {
     if (
@@ -744,6 +750,9 @@ export default function NewFarmer() {
             />
           )}
           enableDismissOnClose={true}
+          containerComponent={
+            Platform.OS === 'ios' ? containerComponent : undefined
+          }
         >
           <BottomSheetScrollView className="rounded-t-md">
             <SelectorMultiple
