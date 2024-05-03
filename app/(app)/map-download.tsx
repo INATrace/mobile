@@ -290,7 +290,7 @@ export default function MapDownload() {
       </Modal>
       {selectingMap ? (
         <View className="flex-1 h-full">
-          <View className="flex-row items-center justify-center w-full p-5 bg-White flew">
+          <View className="flex flex-row items-center justify-center w-full p-5 bg-White">
             <Text className="text-[20px]">
               {i18n.t('plots.offlineMapsScreen.downloadThisMap')}
             </Text>

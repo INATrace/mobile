@@ -541,7 +541,7 @@ export default function MapView({
   };
 
   return (
-    <View className="relative flex-1 h-full">
+    <View className="flex-1 h-full">
       <View className="flex-1 h-full">
         {isMapLoading && (
           <View className="absolute flex flex-col items-center justify-center w-full h-full bg-White">
