@@ -5,6 +5,8 @@ import {
   Text,
   Alert,
   ActivityIndicator,
+  Dimensions,
+  Platform,
 } from 'react-native';
 import ViewSwitcher, { ViewSwitcherProps } from './ViewSwitcher';
 import Mapbox from '@rnmapbox/maps';
@@ -13,6 +15,7 @@ import * as Location from 'expo-location';
 import * as Haptics from 'expo-haptics';
 import {
   LocateFixed,
+  Map,
   MapPin,
   Navigation,
   Plus,
@@ -116,6 +119,7 @@ export default function MapView({
       title: addingNewPlot
         ? i18n.t('plots.addPlot.newPlot')
         : i18n.t('plots.title'),
+      gestureEnabled: !addingNewPlot,
     });
 
     const handleBeforeRemove = (e: any) => {
@@ -509,9 +513,36 @@ export default function MapView({
     });
   };
 
+  const fitCameraToCentroids = () => {
+    if (!centroidCollection || centroidCollection.features.length === 0) {
+      return;
+    }
+
+    const coordinates = centroidCollection.features.map(
+      (feature: any) => feature.geometry.coordinates
+    );
+
+    const longitudeCoordinates = coordinates.map((coord) => coord[0]);
+    const latitudeCoordinates = coordinates.map((coord) => coord[1]);
+
+    const minLongitude = Math.min(...longitudeCoordinates);
+    const maxLongitude = Math.max(...longitudeCoordinates);
+    const minLatitude = Math.min(...latitudeCoordinates);
+    const maxLatitude = Math.max(...latitudeCoordinates);
+
+    if (cameraRef.current) {
+      cameraRef.current.fitBounds(
+        [minLongitude, minLatitude],
+        [maxLongitude, maxLatitude],
+        [20, 20],
+        1000
+      );
+    }
+  };
+
   return (
-    <View className="relative flex-1">
-      <View style={{ ...StyleSheet.absoluteFillObject }}>
+    <View className="relative flex-1 h-full">
+      <View className="flex-1 h-full">
         {isMapLoading && (
           <View className="absolute flex flex-col items-center justify-center w-full h-full bg-White">
             <ActivityIndicator size="large" animating={isMapLoading} />
@@ -520,9 +551,11 @@ export default function MapView({
         )}
         {location && (
           <Mapbox.MapView
-            className="flex-1"
             onDidFinishLoadingMap={() => setIsMapLoading(false)}
             styleURL={Mapbox.StyleURL.SatelliteStreet}
+            style={{
+              height: Dimensions.get('window').height,
+            }}
           >
             <Mapbox.Camera
               defaultSettings={{
@@ -704,13 +737,22 @@ export default function MapView({
                 </Pressable>
               </View>
               {/* Location button */}
-              <Pressable
-                className="flex flex-row items-center self-end justify-center w-16 h-16 mb-5 border-2 border-blue-500 rounded-full bg-White"
-                onPress={() => focusOnLocation()}
-                style={style.shadowMedium}
-              >
-                <Navigation className="text-blue-500" size={30} />
-              </Pressable>
+              <View className="flex flex-row items-center self-end">
+                <Pressable
+                  className="flex flex-row items-center justify-center w-16 h-16 mb-5 mr-3 border-2 border-blue-500 rounded-full bg-White"
+                  onPress={() => fitCameraToCentroids()}
+                  style={style.shadowMedium}
+                >
+                  <Map className="text-blue-500" size={30} />
+                </Pressable>
+                <Pressable
+                  className="flex flex-row items-center justify-center w-16 h-16 mb-5 border-2 border-blue-500 rounded-full bg-White"
+                  onPress={() => focusOnLocation()}
+                  style={style.shadowMedium}
+                >
+                  <Navigation className="text-blue-500" size={30} />
+                </Pressable>
+              </View>
             </View>
             <View className="w-full p-5 bg-White rounded-t-md">
               {/* Add location button */}
@@ -770,13 +812,23 @@ export default function MapView({
           <View className="flex flex-col">
             {cardInfo && <Card {...cardInfo} />}
             {/* Location button */}
-            <Pressable
-              className="flex flex-row items-center self-end justify-center w-16 h-16 mb-5 border-2 border-blue-500 rounded-full bg-White"
-              onPress={() => focusOnLocation()}
-              style={style.shadowMedium}
-            >
-              <Navigation className="text-blue-500" size={30} />
-            </Pressable>
+            <View className="flex flex-row items-center self-end">
+              <Pressable
+                className="flex flex-row items-center justify-center w-16 h-16 mb-5 mr-3 border-2 border-blue-500 rounded-full bg-White"
+                onPress={() => fitCameraToCentroids()}
+                style={style.shadowMedium}
+              >
+                <Map className="text-blue-500" size={30} />
+              </Pressable>
+              <Pressable
+                className="flex flex-row items-center justify-center w-16 h-16 mb-5 border-2 border-blue-500 rounded-full bg-White"
+                onPress={() => focusOnLocation()}
+                style={style.shadowMedium}
+              >
+                <Navigation className="text-blue-500" size={30} />
+              </Pressable>
+            </View>
+
             {/* New plot button */}
             <Pressable
               onPress={() => {
