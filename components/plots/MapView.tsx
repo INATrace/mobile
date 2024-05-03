@@ -185,6 +185,10 @@ export default function MapView({
 
   const loadExistingPlots = async () => {
     try {
+      if ((segments as string[]).includes('add-plot')) {
+        return;
+      }
+
       const offlinePlots = await realm.realmRead(
         PlotSchema,
         undefined,
@@ -408,7 +412,6 @@ export default function MapView({
 
   const handleSettingCardInfo = (cardInfoId: string) => {
     const plot = cardInfoCollection.find((c) => c.id.toString() === cardInfoId);
-
     if (!plot) {
       return;
     }
