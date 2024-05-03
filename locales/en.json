@@ -3,6 +3,7 @@
   "no": "No",
   "ok": "OK",
   "loading": "Loading...",
+  "changeInstance": "Change instance",
   "input": {
     "type": "Type...",
     "select": "Select"

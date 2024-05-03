@@ -3,13 +3,14 @@
   "no": "Nein",
   "ok": "OK",
   "loading": "Lädt...",
+  "changeInstance": "Instanz ändern",
   "input": {
     "type": "Eingeben...",
     "select": "Auswählen"
   },
   "login": {
     "welcomeBack": "Willkommen zurück!",
-    "welcomeBackSubtitle": "Loggen Sie sich ein, um fortzufahren",
+    "welcomeBackSubtitle": "Zum Fortfahren einloggen",
     "username": "Benutzername",
     "usernamePlaceholder": "Geben Sie Ihren Benutzernamen ein",
     "password": "Passwort",

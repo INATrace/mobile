@@ -13,12 +13,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import Modal from 'react-native-modalbox';
+import LanguageSwitcher from '@/components/settings/LanguageSwitcher';
+import { Globe, X } from 'lucide-react-native';
+
 import i18n from '@/locales/i18n';
 import { Input, InputPassword } from '@/components/common/Input';
 import { useState, useContext } from 'react';
 
 import { AuthContext } from '@/context/AuthContext';
 import { router } from 'expo-router';
+import cn from '@/utils/cn';
 
 export default function Login() {
   const [username, setUsername] = useState<string>('');
@@ -26,11 +31,18 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [askLanguage, setAskLanguage] = useState<boolean>(false);
+  const [instanceChange, setInstanceChange] = useState<boolean>(false);
 
-  const { logIn } = useContext(AuthContext);
+  const instances = [
+    process.env.EXPO_PUBLIC_API_URI,
+    process.env.EXPO_PUBLIC_API_TEST_URI,
+  ];
+
+  const { logIn, instance, setInstance } = useContext(AuthContext);
 
   const resetPassword = async () => {
-    const url = process.env.EXPO_PUBLIC_API_URI + '/en/reset-password';
+    const url = instance + '/en/reset-password';
     const canOpen = await Linking.canOpenURL(url);
 
     if (canOpen) {
@@ -69,18 +81,126 @@ export default function Login() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View className="flex flex-col justify-between h-full">
+        {askLanguage && (
+          <Modal
+            isOpen={askLanguage}
+            onClosed={() => setAskLanguage(false)}
+            position={'center'}
+            backdropPressToClose={true}
+            style={{
+              height: 336,
+              width: '90%',
+              marginRight: 250,
+              borderRadius: 8,
+              padding: 20,
+              justifyContent: 'space-between',
+            }}
+          >
+            <View>
+              <View className="flex flex-row items-center justify-between mb-2">
+                <Text className="text-[18px] font-medium">
+                  {i18n.t('userSettings.language')}
+                </Text>
+                <Pressable onPress={() => setAskLanguage(false)} className="">
+                  <X size={20} className="text-black" />
+                </Pressable>
+              </View>
+
+              <LanguageSwitcher />
+              <Pressable
+                onPress={() => setAskLanguage(false)}
+                className="py-2 mt-4 rounded-md bg-Orange"
+              >
+                <Text className="text-center text-white">{i18n.t('ok')}</Text>
+              </Pressable>
+            </View>
+          </Modal>
+        )}
+        {instanceChange && (
+          <Modal
+            isOpen={instanceChange}
+            onClosed={() => setInstanceChange(false)}
+            position={'center'}
+            backdropPressToClose={true}
+            style={{
+              height: 236,
+              width: '90%',
+              marginRight: 250,
+              borderRadius: 8,
+              padding: 20,
+              justifyContent: 'space-between',
+            }}
+          >
+            <View>
+              <View className="flex flex-row items-center justify-between mb-2">
+                <Text className="text-[18px] font-medium">
+                  {i18n.t('changeInstance')}
+                </Text>
+                <Pressable
+                  onPress={() => setInstanceChange(false)}
+                  className=""
+                >
+                  <X size={20} className="text-black" />
+                </Pressable>
+              </View>
+
+              <View className="pl-3 border rounded-md border-LightGray">
+                {instances.map((ins, index) => (
+                  <Pressable
+                    key={index}
+                    className={cn(
+                      'flex flex-row justify-between pb-4 pr-3 mt-4 border-b border-b-LightGray',
+                      index === instances.length - 1 && 'border-b-0'
+                    )}
+                    onPress={() => setInstance(ins ?? '')}
+                  >
+                    <Text className={cn(instance !== ins && 'text-DarkGray')}>
+                      {ins}
+                    </Text>
+                    {instance === ins ? (
+                      <View className="flex flex-row items-center justify-center w-5 h-5 rounded-full bg-[#333333]">
+                        <View className="flex flex-row items-center justify-center w-4 h-4 rounded-full bg-White">
+                          <View className="flex flex-row items-center justify-center w-2.5 h-2.5 rounded-full bg-[#333333]" />
+                        </View>
+                      </View>
+                    ) : (
+                      <View className="flex flex-row items-center justify-center w-5 h-5 rounded-full bg-DarkGray">
+                        <View className="flex flex-row items-center justify-center w-4 h-4 rounded-full bg-White" />
+                      </View>
+                    )}
+                  </Pressable>
+                ))}
+              </View>
+
+              <Pressable
+                onPress={() => setInstanceChange(false)}
+                className="py-2 mt-4 rounded-md bg-Orange"
+              >
+                <Text className="text-center text-white">{i18n.t('ok')}</Text>
+              </Pressable>
+            </View>
+          </Modal>
+        )}
         <LoginUpperBlobSvg />
         <SafeAreaView className="px-5">
           <KeyboardAvoidingView
             behavior="position"
             keyboardVerticalOffset={300}
           >
-            <Text className="text-[24px] font-semibold">
-              {i18n.t('login.welcomeBack')}
-            </Text>
-            <Text className="text-[20px]">
-              {i18n.t('login.welcomeBackSubtitle')}
-            </Text>
+            <View className="flex flex-row items-center justify-between">
+              <View>
+                <Text className="text-[24px] font-semibold">
+                  {i18n.t('login.welcomeBack')}
+                </Text>
+                <Text className="text-[20px]">
+                  {i18n.t('login.welcomeBackSubtitle')}
+                </Text>
+              </View>
+              <Pressable onPress={() => setAskLanguage(true)}>
+                <Globe size={20} className="text-black" />
+              </Pressable>
+            </View>
+
             <View className="mt-5">
               <Text>{i18n.t('login.username')}</Text>
               <Input
@@ -104,6 +224,12 @@ export default function Login() {
                 <Text className="underline text-Green">
                   {i18n.t('login.forgotPassword')}
                 </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setInstanceChange(true)}
+                className="mt-2"
+              >
+                <Text className="text-black">{i18n.t('changeInstance')}</Text>
               </Pressable>
             </View>
             {loginError && (

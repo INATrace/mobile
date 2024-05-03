@@ -15,7 +15,6 @@ import { decode } from 'base-64';
 import realm from '@/realm/useRealm';
 import { FarmerSchema } from '@/realm/schemas';
 
-const apiUri = process.env.EXPO_PUBLIC_API_URI;
 let creatingImageCacheDir: any = null;
 
 export const AuthContext = createContext<{
@@ -25,7 +24,8 @@ export const AuthContext = createContext<{
   selectFarmer: (farmer: Farmer) => void;
   selectCompany: (company: number | string | null) => void;
   setNewPlot: (plot: Plot) => void;
-  setAskLanguage: (askLanguage: boolean) => void;
+  setInstance: (instance: string) => void;
+  instance: string;
   makeRequest: ({ url, method, body, headers }: RequestParams) => Promise<any>;
   accessToken: string | null;
   user: User | null;
@@ -37,7 +37,6 @@ export const AuthContext = createContext<{
   isConnected: boolean;
   selectedFarmer: Farmer | string | null;
   newPlot: Plot | null;
-  askLanguage: boolean | string;
 }>({
   logIn: async () => ({ success: false, errorStatus: '' }),
   logOut: () => null,
@@ -46,7 +45,8 @@ export const AuthContext = createContext<{
   selectFarmer: () => null,
   selectCompany: () => null,
   setNewPlot: () => null,
-  setAskLanguage: () => null,
+  setInstance: () => null,
+  instance: process.env.EXPO_PUBLIC_API_URI ?? '',
   accessToken: null,
   user: null,
   companies: null,
@@ -57,7 +57,6 @@ export const AuthContext = createContext<{
   isConnected: false,
   selectedFarmer: null,
   newPlot: null,
-  askLanguage: false,
 });
 
 const isTokenExpired = (token: string): boolean => {
@@ -96,11 +95,15 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     null,
     'asyncStorage'
   );
-  const [askLanguage, setAskLanguage] = useStorageState<boolean>(
-    'ask_language',
-    false,
-    'asyncStorage'
+
+  const [instance, setInstance] = useStorageState<string>(
+    'instance',
+    process.env.EXPO_PUBLIC_API_URI ?? ''
   );
+
+  useEffect(() => {
+    if (instance === 'none') setInstance(process.env.EXPO_PUBLIC_API_URI ?? '');
+  }, [instance]);
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [newPlot, setNewPlot] = useState<Plot | null>(null);
@@ -122,7 +125,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     password: string
   ): Promise<LogInResponse> => {
     try {
-      const responseLogin = await axios.post(`${apiUri}/api/user/login`, {
+      const responseLogin = await axios.post(`${instance}/api/user/login`, {
         username,
         password,
       });
@@ -137,7 +140,9 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
 
         setAccessToken(accessToken);
 
-        const responseUserData = await axios.get(`${apiUri}/api/user/profile`);
+        const responseUserData = await axios.get(
+          `${instance}/api/user/profile`
+        );
 
         if (responseUserData.data.status === 'OK') {
           const user = responseUserData.data.data as User;
@@ -147,7 +152,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           await fetchAndStoreData(user);
 
           const companyDetailsPromises = user.companyIds.map((companyId) =>
-            axios.get(`${apiUri}/api/company/profile/${companyId}`)
+            axios.get(`${instance}/api/company/profile/${companyId}`)
           );
 
           const companyDetailsResponses = await Promise.all(
@@ -157,7 +162,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
             async (response) => {
               if (response.data.status === 'OK') {
                 const logoFilePath = await downloadImageToFileSystem(
-                  `${apiUri}/api/common/image/${response.data.data.logo.storageKey}/SMALL`,
+                  `${instance}/api/common/image/${response.data.data.logo.storageKey}/SMALL`,
                   accessToken
                 );
 
@@ -197,7 +202,6 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     setProductTypes(null);
     setCountries(null);
     setNewPlot(null);
-    setAskLanguage(false);
 
     await realm.realmDeleteAll(FarmerSchema, 'synced == true');
 
@@ -211,7 +215,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     }
 
     return await axios.request({
-      url: apiUri + url,
+      url: instance + url,
       method,
       headers: {
         'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
@@ -229,7 +233,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     const productTypesPromises = user.companyIds.map((companyId) =>
       axios
         .get(
-          `${apiUri}/api/company/${companyId}/product-types?limit=1000&offset=0`
+          `${instance}/api/company/${companyId}/product-types?limit=1000&offset=0`
         )
         .then((response) => ({ response, companyId }))
     );
@@ -250,7 +254,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
 
     //countries
     const countriesResponse = await axios.get(
-      `${apiUri}/api/common/countries?requestType=FETCH&limit=500&sort=ASC`
+      `${instance}/api/common/countries?requestType=FETCH&limit=500&sort=ASC`
     );
     const countriesResp = countriesResponse.data.data.items as Country[];
     setCountries(countriesResp);
@@ -260,7 +264,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     const farmersPromises = user.companyIds.map((companyId) =>
       axios
         .get(
-          `${apiUri}/api/company/userCustomers/${companyId}/FARMER?limit=5000`
+          `${instance}/api/company/userCustomers/${companyId}/FARMER?limit=5000`
         )
         .then((response) => ({ response, companyId }))
     );
@@ -330,8 +334,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         selectedFarmer,
         newPlot,
         setNewPlot,
-        askLanguage,
-        setAskLanguage,
+        instance,
+        setInstance,
       }}
     >
       {props.children}

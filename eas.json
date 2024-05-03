@@ -12,7 +12,8 @@
     },
     "production": {
       "env": {
-        "EXPO_PUBLIC_API_URI": "https://test.inatrace.org",
+        "EXPO_PUBLIC_API_URI": "https://inatrace.org",
+        "EXPO_PUBLIC_API_TEST_URI": "https://test.inatrace.org",
         "EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN": "pk.eyJ1IjoicGlub2tva29sIiwiYSI6ImNsdTVzdmdmaDFvbXoyaXFzZjVtb2xrbHUifQ.loX_4cGYQz1H9Op_HzslFQ"
       },
       "android": {

@@ -40,6 +40,7 @@ export default function UserSettings() {
     companies,
     isConnected,
     selectCompany,
+    instance,
   } = useContext(AuthContext);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -85,7 +86,7 @@ export default function UserSettings() {
   };
 
   const resetPassword = async () => {
-    const url = process.env.EXPO_PUBLIC_API_URI + '/en/reset-password';
+    const url = instance + '/en/reset-password';
     const canOpen = await Linking.canOpenURL(url);
 
     if (canOpen) {
