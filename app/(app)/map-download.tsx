@@ -298,7 +298,11 @@ export default function MapDownload() {
           {location ? (
             <Mapbox.MapView
               className="border-[5px] border-blue-500"
-              style={{ height: Dimensions.get('window').height - 254 }}
+              style={{
+                height:
+                  Dimensions.get('window').height -
+                  (Platform.OS === 'android' ? 254 : 304),
+              }}
               ref={mapRef}
               onMapIdle={onRegionDidChange}
               styleURL={Mapbox.StyleURL.SatelliteStreet}

@@ -275,12 +275,19 @@ export default function DataSync() {
       <Pressable
         className="bg-White"
         onPress={syncData}
-        disabled={!isConnected}
+        disabled={
+          !isConnected ||
+          (farmersToSync.length === 0 && plotsToSync.length === 0)
+        }
       >
         {({ pressed }) => (
           <View
             className={cn(
-              pressed || !isConnected ? 'bg-Orange/80' : 'bg-Orange',
+              pressed ||
+                !isConnected ||
+                (farmersToSync.length === 0 && plotsToSync.length === 0)
+                ? 'bg-Orange/80'
+                : 'bg-Orange',
               'flex flex-row m-5 p-3 items-center justify-center rounded-md h-[48px]'
             )}
           >

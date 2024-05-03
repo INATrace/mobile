@@ -99,7 +99,7 @@ export default function Login() {
                 setIsPasswordVisible={setIsPasswordVisible}
               />
             </View>
-            <View className="mt-3">
+            <View className="self-start mt-3">
               <Pressable onPress={() => resetPassword()}>
                 <Text className="underline text-Green">
                   {i18n.t('login.forgotPassword')}
