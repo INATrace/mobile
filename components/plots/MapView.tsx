@@ -6,7 +6,6 @@ import {
   Alert,
   ActivityIndicator,
   Dimensions,
-  Platform,
 } from 'react-native';
 import ViewSwitcher, { ViewSwitcherProps } from './ViewSwitcher';
 import Mapbox from '@rnmapbox/maps';
@@ -284,7 +283,7 @@ export default function MapView({
     }
   };
 
-  const addLocationToLocations = () => {
+  const addLocationToLocations = async () => {
     if (location) {
       if (!location?.coords?.accuracy || location?.coords?.accuracy > 10) {
         Alert.alert(
@@ -295,7 +294,7 @@ export default function MapView({
         return;
       }
 
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
       setLocationsForFeatureCache([]);
       setLocationsForFeature([
@@ -428,6 +427,7 @@ export default function MapView({
     );
 
     setCardInfo({
+      limitScreen: true,
       canClose: true,
       onClose: () => setCardInfo(null),
       items: [
@@ -544,7 +544,12 @@ export default function MapView({
     <View className="flex-1 h-full">
       <View className="flex-1 h-full">
         {isMapLoading && (
-          <View className="absolute flex flex-col items-center justify-center w-full h-full bg-White">
+          <View
+            style={{
+              height: Dimensions.get('window').height - 200,
+            }}
+            className="absolute flex flex-col items-center justify-center w-full"
+          >
             <ActivityIndicator size="large" animating={isMapLoading} />
             <Text className="mt-2">{i18n.t('plots.mapLoading')}</Text>
           </View>
@@ -642,7 +647,10 @@ export default function MapView({
       </View>
 
       {addingNewPlot ? (
-        <View className="flex flex-col justify-between h-full">
+        <View
+          className="flex flex-col justify-between h-full"
+          pointerEvents="box-none"
+        >
           {location?.coords.accuracy && (
             <View
               className="flex flex-row self-start px-3 py-2 mx-5 mt-5 rounded-md bg-White"
@@ -739,7 +747,7 @@ export default function MapView({
               {/* Location button */}
               <View className="flex flex-row items-center self-end">
                 <Pressable
-                  className="flex flex-row items-center justify-center w-16 h-16 mb-5 mr-3 border-2 border-blue-500 rounded-full bg-White"
+                  className="flex flex-row items-center justify-center w-16 h-16 mb-5 mr-2 border-2 border-blue-500 rounded-full bg-White"
                   onPress={() => fitCameraToCentroids()}
                   style={style.shadowMedium}
                 >
@@ -799,7 +807,10 @@ export default function MapView({
           </View>
         </View>
       ) : (
-        <View className="flex flex-col justify-between h-full p-5">
+        <View
+          className="flex flex-col justify-between h-full p-5"
+          pointerEvents="box-none"
+        >
           {type === 'new' ? (
             <View />
           ) : (
@@ -814,7 +825,7 @@ export default function MapView({
             {/* Location button */}
             <View className="flex flex-row items-center self-end">
               <Pressable
-                className="flex flex-row items-center justify-center w-16 h-16 mb-5 mr-3 border-2 border-blue-500 rounded-full bg-White"
+                className="flex flex-row items-center justify-center w-16 h-16 mb-5 mr-2 border-2 border-blue-500 rounded-full bg-White"
                 onPress={() => fitCameraToCentroids()}
                 style={style.shadowMedium}
               >

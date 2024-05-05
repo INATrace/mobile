@@ -1,4 +1,11 @@
-import { View, Text, Pressable, Platform, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  Platform,
+  TextInput,
+  ScrollView,
+} from 'react-native';
 import {
   AlertCircle,
   Check,
@@ -17,6 +24,7 @@ import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { Farmer } from '@/types/farmer';
 import { InputCard, InputCardDate } from './Input';
 import { FullWindowOverlay } from 'react-native-screens';
+import * as Haptics from 'expo-haptics';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -40,6 +48,7 @@ export type CardProps = {
   };
   synced?: boolean;
   canClose?: boolean;
+  limitScreen?: boolean;
   onClose?: () => void;
   switchView?: () => void;
 };
@@ -70,6 +79,7 @@ export default function Card({
   canClose,
   onClose,
   switchView,
+  limitScreen,
 }: CardProps) {
   const { selectFarmer } = useContext(AuthContext);
 
@@ -86,7 +96,7 @@ export default function Card({
   };
 
   return (
-    <View className="flex flex-col m-5">
+    <ScrollView className={cn('flex flex-col m-5', limitScreen && 'h-[50%]')}>
       {synced === false && (
         <View className="flex flex-row items-center justify-start mb-1">
           <AlertCircle className="mr-1 text-purple-300" size={14} />
@@ -173,7 +183,7 @@ export default function Card({
           }
         })}
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -183,6 +193,7 @@ const ItemView = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
 
   const onShare = async (value: string) => {
     try {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       await Share.open({
         message: value,
       });
@@ -193,6 +204,7 @@ const ItemView = ({ item, isLast }: { item: ItemProps; isLast: boolean }) => {
 
   const onShareQR = async () => {
     try {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       const uri = await captureRef(qrRef, {
         format: 'png',
         quality: 0.7,
