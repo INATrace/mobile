@@ -4,6 +4,7 @@
   "ok": "OK",
   "loading": "Lädt...",
   "changeInstance": "Instanz ändern",
+  "privacyPolicy": "Datenschutzrichtlinie",
   "input": {
     "type": "Eingeben...",
     "select": "Auswählen"

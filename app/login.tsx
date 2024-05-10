@@ -94,6 +94,17 @@ export default function Login() {
     setIsLoading(false);
   };
 
+  const clickPrivacyPolicy = async () => {
+    const url = instance + '/en/s/cookies';
+    const canOpen = await Linking.canOpenURL(url);
+
+    if (canOpen) {
+      Linking.openURL(url);
+    } else {
+      console.error('Cannot open URL:', url);
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View className="flex flex-col justify-between h-full">
@@ -253,33 +264,43 @@ export default function Login() {
                 <Text className="text-red-500">{loginError}</Text>
               </View>
             )}
-            <View className="flex flex-row items-center self-end">
+            <View className="flex flex-row items-center justify-between">
               <Pressable
-                onPress={() => handleLogInGuest()}
-                className="px-5 py-3 mr-2 rounded-md bg-Green"
-                disabled={isLoading}
+                onPress={() => clickPrivacyPolicy()}
+                className="self-end"
               >
-                {isLoading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text className="text-White font-semibold text-[16px]">
-                    {i18n.t('login.guest')}
-                  </Text>
-                )}
+                <Text className="underline text-Green">
+                  {i18n.t('privacyPolicy')}
+                </Text>
               </Pressable>
-              <Pressable
-                onPress={() => handleLogIn()}
-                className="px-5 py-3 rounded-md bg-Orange"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text className="text-White font-semibold text-[16px]">
-                    {i18n.t('login.login')}
-                  </Text>
-                )}
-              </Pressable>
+              <View className="flex flex-row items-center">
+                <Pressable
+                  onPress={() => handleLogInGuest()}
+                  className="px-5 py-3 mr-2 rounded-md bg-Green"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text className="text-White font-semibold text-[16px]">
+                      {i18n.t('login.guest')}
+                    </Text>
+                  )}
+                </Pressable>
+                <Pressable
+                  onPress={() => handleLogIn()}
+                  className="px-5 py-3 rounded-md bg-Orange"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text className="text-White font-semibold text-[16px]">
+                      {i18n.t('login.login')}
+                    </Text>
+                  )}
+                </Pressable>
+              </View>
             </View>
           </KeyboardAvoidingView>
         </SafeAreaView>
