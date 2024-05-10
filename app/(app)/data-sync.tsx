@@ -265,9 +265,14 @@ export default function DataSync() {
       {guestAccess ? (
         <View className="p-5">
           <Text className="text-lg">{i18n.t('synced.guestWarning')}</Text>
-          <Pressable onPress={() => openLink()}>
-            <Text className="text-lg underline text-Orange">
-              {instance.includes('pro') ? 'https://inatrace.pro' : instance}
+          <Pressable
+            onPress={() => openLink()}
+            className="self-start px-3 py-2 mx-auto my-5 rounded-md bg-Orange"
+          >
+            <Text className="text-lg text-White">
+              {instance.includes('pro')
+                ? 'inatrace.pro'
+                : instance.split('//')[1]}
             </Text>
           </Pressable>
         </View>

@@ -41,6 +41,7 @@ export default function UserSettings() {
     isConnected,
     selectCompany,
     instance,
+    guestAccess,
   } = useContext(AuthContext);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -101,101 +102,113 @@ export default function UserSettings() {
       <Text className="text-[18px] font-medium">
         {i18n.t('userSettings.userInformation')}
       </Text>
-      <View className="flex flex-row items-center mx-1.5 mt-5 justify-evenly">
-        <View className="w-1/2">
-          <Text>{i18n.t('userSettings.name')}</Text>
-          <Input
-            value={user?.name || ''}
-            onChangeText={() => {}}
-            editable={false}
-          />
+      {guestAccess ? (
+        <View>
+          <Text>{i18n.t('userSettings.loggedInGuest')}</Text>
         </View>
-        <View className="mx-2.5" />
-        <View className="w-1/2">
-          <Text>{i18n.t('userSettings.surname')}</Text>
-          <Input
-            value={user?.surname || ''}
-            onChangeText={() => {}}
-            editable={false}
-          />
-        </View>
-      </View>
-      <View className="mt-3">
-        <Text>{i18n.t('userSettings.username')}</Text>
-        <Input
-          value={user?.email || ''}
-          onChangeText={() => {}}
-          editable={false}
-        />
-      </View>
-      <Text className="text-[18px] font-medium mt-5">
-        {i18n.t('userSettings.companyInformation')}
-      </Text>
-      <View className="flex flex-row items-center justify-between w-full mt-3">
-        <View className="flex flex-row items-center justify-center w-20 h-20 border rounded-full border-LightGray">
-          {company?.logo && (
-            <Image
-              source={{
-                uri: company?.logo,
-              }}
-              className="w-[76px] h-[76px] rounded-full"
+      ) : (
+        <View>
+          <View className="flex flex-row items-center mx-1.5 mt-5 justify-evenly">
+            <View className="w-1/2">
+              <Text>{i18n.t('userSettings.name')}</Text>
+              <Input
+                value={user?.name || ''}
+                onChangeText={() => {}}
+                editable={false}
+              />
+            </View>
+            <View className="mx-2.5" />
+            <View className="w-1/2">
+              <Text>{i18n.t('userSettings.surname')}</Text>
+              <Input
+                value={user?.surname || ''}
+                onChangeText={() => {}}
+                editable={false}
+              />
+            </View>
+          </View>
+          <View className="mt-3">
+            <Text>{i18n.t('userSettings.username')}</Text>
+            <Input
+              value={user?.email || ''}
+              onChangeText={() => {}}
+              editable={false}
             />
-          )}
+          </View>
+          <Text className="text-[18px] font-medium mt-5">
+            {i18n.t('userSettings.companyInformation')}
+          </Text>
+          <View className="flex flex-row items-center justify-between w-full mt-3">
+            <View className="flex flex-row items-center justify-center w-20 h-20 border rounded-full border-LightGray">
+              {company?.logo && (
+                <Image
+                  source={{
+                    uri: company?.logo,
+                  }}
+                  className="w-[76px] h-[76px] rounded-full"
+                />
+              )}
+            </View>
+            <View className="flex flex-col items-start w-full ml-4">
+              <Text className="text-[16px]">
+                {i18n.t('userSettings.company')}
+              </Text>
+              {isConnected ? (
+                <>
+                  <Pressable
+                    className="flex flex-row items-center justify-between min-h-[48px] px-2 mt-2 border rounded-md border-LightGray"
+                    style={{ width: Dimensions.get('window').width - 136 }}
+                    onPress={handlePresentModalPress}
+                  >
+                    <Text className="text-[16px] w-[85%]">{company?.name}</Text>
+                    <ChevronDown className="text-black" />
+                  </Pressable>
+                  <BottomSheetModal
+                    ref={bottomSheetRef}
+                    index={0}
+                    snapPoints={snapPoints}
+                    backdropComponent={(props) => (
+                      <BottomSheetBackdrop
+                        {...props}
+                        onPress={() => bottomSheetRef.current?.close()}
+                        disappearsOnIndex={-1}
+                      />
+                    )}
+                    enableDismissOnClose={true}
+                    containerComponent={
+                      Platform.OS === 'ios' ? containerComponent : undefined
+                    }
+                  >
+                    <BottomSheetScrollView className="rounded-t-md">
+                      {typeof companies !== 'string' && (
+                        <Selector
+                          items={
+                            companies?.map((company) => ({
+                              label: company?.name ?? '',
+                              value: company?.id ?? 0,
+                            })) ?? []
+                          }
+                          selected={company?.id ?? 0}
+                          setSelected={selectCompany}
+                        />
+                      )}
+                    </BottomSheetScrollView>
+                  </BottomSheetModal>
+                </>
+              ) : (
+                <Pressable
+                  className="flex flex-row items-center justify-between h-12 px-2 mt-2 border rounded-md border-LightGray"
+                  style={{ width: Dimensions.get('window').width - 136 }}
+                >
+                  <Text className="text-[16px] text-DarkGray">
+                    {company?.name}
+                  </Text>
+                </Pressable>
+              )}
+            </View>
+          </View>
         </View>
-        <View className="flex flex-col items-start w-full ml-4">
-          <Text className="text-[16px]">{i18n.t('userSettings.company')}</Text>
-          {isConnected ? (
-            <>
-              <Pressable
-                className="flex flex-row items-center justify-between min-h-[48px] px-2 mt-2 border rounded-md border-LightGray"
-                style={{ width: Dimensions.get('window').width - 136 }}
-                onPress={handlePresentModalPress}
-              >
-                <Text className="text-[16px] w-[85%]">{company?.name}</Text>
-                <ChevronDown className="text-black" />
-              </Pressable>
-              <BottomSheetModal
-                ref={bottomSheetRef}
-                index={0}
-                snapPoints={snapPoints}
-                backdropComponent={(props) => (
-                  <BottomSheetBackdrop
-                    {...props}
-                    onPress={() => bottomSheetRef.current?.close()}
-                    disappearsOnIndex={-1}
-                  />
-                )}
-                enableDismissOnClose={true}
-                containerComponent={
-                  Platform.OS === 'ios' ? containerComponent : undefined
-                }
-              >
-                <BottomSheetScrollView className="rounded-t-md">
-                  {typeof companies !== 'string' && (
-                    <Selector
-                      items={
-                        companies?.map((company) => ({
-                          label: company?.name ?? '',
-                          value: company?.id ?? 0,
-                        })) ?? []
-                      }
-                      selected={company?.id ?? 0}
-                      setSelected={selectCompany}
-                    />
-                  )}
-                </BottomSheetScrollView>
-              </BottomSheetModal>
-            </>
-          ) : (
-            <Pressable
-              className="flex flex-row items-center justify-between h-12 px-2 mt-2 border rounded-md border-LightGray"
-              style={{ width: Dimensions.get('window').width - 136 }}
-            >
-              <Text className="text-[16px] text-DarkGray">{company?.name}</Text>
-            </Pressable>
-          )}
-        </View>
-      </View>
+      )}
       <Text className="text-[18px] font-medium mt-5 mb-3">
         {i18n.t('userSettings.offlineMaps')}
       </Text>

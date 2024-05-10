@@ -22,6 +22,7 @@
     "guest": "Invitado"
   },
   "userSettings": {
+    "loggedInGuest": "Estás conectado como invitado",
     "title": "Configuración de usuario",
     "userInformation": "Información del usuario",
     "name": "Nombre",
@@ -214,6 +215,6 @@
     "title": "Título",
     "syncedTitle": "Sincronizado",
     "syncedMessage": "Datos sincronizados con éxito",
-    "guestWarning": "Para sincronizar datos, necesita tener una cuenta, visite este sitio web para comenzar -"
+    "guestWarning": "Necesitas tener una cuenta para sincronizar datos, haz clic en el botón de abajo para comenzar"
   }
 }

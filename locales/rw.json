@@ -22,6 +22,7 @@
     "guest": "Umushyitsi"
   },
   "userSettings": {
+    "loggedInGuest": "Uwinjiye nk'umushyitsi",
     "title": "Igenamiterere ry'umukoresha",
     "userInformation": "Amakuru y'umukoresha",
     "name": "Izina",
@@ -214,6 +215,6 @@
     "title": "Umutwe",
     "syncedTitle": "Byahuje",
     "syncedMessage": "Imyirondoro yahuje neza",
-    "guestWarning": "Kugira ngo uhuzeho amakuru, ugomba kuba ufite konti, gana uru rubuga ngo utangire -"
+    "guestWarning": "Ugomba kugira konti kugira ngo ushobore guhuza amakuru, kanda ku buto buri hasi kugira ngo utangire"
   }
 }

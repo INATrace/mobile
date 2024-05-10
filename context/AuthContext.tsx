@@ -228,6 +228,10 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
 
   const logInGuest = async () => {
     setGuestAccess(true);
+    setUser(null);
+    setSelectedCompany(null);
+    setCompanies(null);
+    setSelectedFarmer(null);
     setCountries(guestCountries as Country[]);
     setProductTypes(guestProductTypes as any);
   };
