@@ -18,7 +18,8 @@
     "forgotPassword": "Forgot password?",
     "login": "Log in",
     "genericError": "Something went wrong, please try again later",
-    "authError": "Wrong username or password"
+    "authError": "Wrong username or password",
+    "guest": "Guest"
   },
   "userSettings": {
     "title": "User settings",
@@ -212,6 +213,7 @@
     "name": "Name",
     "title": "Title",
     "syncedTitle": "Synced",
-    "syncedMessage": "Data successfully synced"
+    "syncedMessage": "Data successfully synced",
+    "guestWarning": "To sync data, you need to have an account, visit this website to get started -"
   }
 }

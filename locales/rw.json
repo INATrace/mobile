@@ -18,7 +18,8 @@
     "forgotPassword": "Wibagiwe ijambo ry'ibanga?",
     "login": "Injira",
     "genericError": "Habayeho ikibazo, ongera ugerageze nyuma",
-    "authError": "Izina ry'umukoresha cyangwa ijambo ry'ibanga ntibikwiye"
+    "authError": "Izina ry'umukoresha cyangwa ijambo ry'ibanga ntibikwiye",
+    "guest": "Umushyitsi"
   },
   "userSettings": {
     "title": "Igenamiterere ry'umukoresha",
@@ -212,6 +213,7 @@
     "name": "Izina",
     "title": "Umutwe",
     "syncedTitle": "Byahuje",
-    "syncedMessage": "Imyirondoro yahuje neza"
+    "syncedMessage": "Imyirondoro yahuje neza",
+    "guestWarning": "Kugira ngo uhuzeho amakuru, ugomba kuba ufite konti, gana uru rubuga ngo utangire -"
   }
 }

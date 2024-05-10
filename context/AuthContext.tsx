@@ -13,13 +13,17 @@ import { uuid } from 'expo-modules-core';
 import { Plot } from '@/types/plot';
 import { decode } from 'base-64';
 import realm from '@/realm/useRealm';
-import { FarmerSchema } from '@/realm/schemas';
+import { FarmerSchema, PlotSchema } from '@/realm/schemas';
+
+import guestCountries from '@/context/guestCountries.json';
+import guestProductTypes from '@/context/guestProductTypes.json';
 
 let creatingImageCacheDir: any = null;
 
 export const AuthContext = createContext<{
   logIn: (username: string, password: string) => Promise<LogInResponse>;
   logOut: () => void;
+  logInGuest: () => void;
   checkAuth: () => Promise<boolean>;
   selectFarmer: (farmer: Farmer) => void;
   selectCompany: (company: number | string | null) => void;
@@ -34,12 +38,14 @@ export const AuthContext = createContext<{
   productTypes: ProductTypeWithCompanyId[] | string | null;
   countries: Country[] | string | null;
   getConnection: Promise<NetInfoState>;
+  guestAccess: boolean;
   isConnected: boolean;
   selectedFarmer: Farmer | string | null;
   newPlot: Plot | null;
 }>({
   logIn: async () => ({ success: false, errorStatus: '' }),
   logOut: () => null,
+  logInGuest: () => null,
   checkAuth: async () => false,
   makeRequest: async () => null,
   selectFarmer: () => null,
@@ -54,6 +60,7 @@ export const AuthContext = createContext<{
   productTypes: null,
   countries: null,
   getConnection: Promise.resolve({ isConnected: false } as NetInfoState),
+  guestAccess: false,
   isConnected: false,
   selectedFarmer: null,
   newPlot: null,
@@ -101,6 +108,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     process.env.EXPO_PUBLIC_API_URI ?? ''
   );
 
+  const [guestAccess, setGuestAccess] = useState<boolean>(false);
+
   useEffect(() => {
     if (instance === 'none') setInstance(process.env.EXPO_PUBLIC_API_URI ?? '');
   }, [instance]);
@@ -145,11 +154,14 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         );
 
         if (responseUserData.data.status === 'OK') {
+          setGuestAccess(false);
           const user = responseUserData.data.data as User;
           setUser(user);
           setSelectedCompany(user.companyIds[0]);
 
-          await fetchAndStoreData(user);
+          await fetchProductTypes(user);
+          await fetchCountries();
+          await fetchFarmers(user);
 
           const companyDetailsPromises = user.companyIds.map((companyId) =>
             axios.get(`${instance}/api/company/profile/${companyId}`)
@@ -194,6 +206,11 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   };
 
   const logOut = async () => {
+    if (guestAccess) {
+      await realm.realmDeleteAll(FarmerSchema, '');
+      await realm.realmDeleteAll(PlotSchema, '');
+    }
+
     setAccessToken(null);
     setUser(null);
     setSelectedCompany(null);
@@ -202,10 +219,17 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     setProductTypes(null);
     setCountries(null);
     setNewPlot(null);
+    setGuestAccess(false);
 
     await realm.realmDeleteAll(FarmerSchema, 'synced == true');
 
     clearImageCache();
+  };
+
+  const logInGuest = async () => {
+    setGuestAccess(true);
+    setCountries(guestCountries as Country[]);
+    setProductTypes(guestProductTypes as any);
   };
 
   const makeRequest = async ({ url, method, body, headers }: RequestParams) => {
@@ -221,15 +245,12 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
         Pragma: 'no-cache',
         Expires: '0',
-        /* Cookie: `; inatrace-accessToken=${accessToken}`, */
       },
       data: body,
     });
   };
 
-  const fetchAndStoreData = async (user: User): Promise<void> => {
-    //product types
-
+  const fetchProductTypes = async (user: User) => {
     const productTypesPromises = user.companyIds.map((companyId) =>
       axios
         .get(
@@ -251,15 +272,17 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     const productTypesResp = await Promise.all(productTypes);
 
     setProductTypes(productTypesResp as any);
+  };
 
-    //countries
+  const fetchCountries = async () => {
     const countriesResponse = await axios.get(
       `${instance}/api/common/countries?requestType=FETCH&limit=500&sort=ASC`
     );
     const countriesResp = countriesResponse.data.data.items as Country[];
     setCountries(countriesResp);
+  };
 
-    //farmers
+  const fetchFarmers = async (user: User) => {
     await realm.realmDeleteAll(FarmerSchema, 'synced == true');
     const farmersPromises = user.companyIds.map((companyId) =>
       axios
@@ -319,6 +342,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
       value={{
         logIn,
         logOut,
+        logInGuest,
+        guestAccess,
         checkAuth,
         selectFarmer: setSelectedFarmer,
         selectCompany: setSelectedCompany,

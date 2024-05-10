@@ -18,7 +18,8 @@
     "forgotPassword": "Passwort vergessen?",
     "login": "Einloggen",
     "genericError": "Etwas ist schief gelaufen, bitte versuchen Sie es später noch einmal",
-    "authError": "Falscher Benutzername oder Passwort"
+    "authError": "Falscher Benutzername oder Passwort",
+    "guest": "Gast"
   },
   "userSettings": {
     "title": "Benutzereinstellungen",
@@ -212,6 +213,7 @@
     "name": "Name",
     "title": "Titel",
     "syncedTitle": "Synchronisiert",
-    "syncedMessage": "Daten erfolgreich synchronisiert"
+    "syncedMessage": "Daten erfolgreich synchronisiert",
+    "guestWarning": "Um Daten zu synchronisieren, müssen Sie ein Konto haben, besuchen Sie diese Website, um zu beginnen -"
   }
 }

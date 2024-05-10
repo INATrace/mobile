@@ -46,6 +46,7 @@ export default function NewFarmer() {
     productTypes,
     selectedCompany,
     isConnected,
+    guestAccess,
     makeRequest,
     user,
   } = useContext(AuthContext) as {
@@ -53,6 +54,7 @@ export default function NewFarmer() {
     productTypes: ProductTypeWithCompanyId[];
     selectedCompany: number;
     isConnected: boolean;
+    guestAccess: boolean;
     makeRequest: ({
       url,
       method,
@@ -98,6 +100,11 @@ export default function NewFarmer() {
   );
 
   useEffect(() => {
+    if (guestAccess && productTypes && typeof productTypes !== 'string') {
+      setProductTypesSelect(productTypes as any);
+      return;
+    }
+
     if (
       selectedCompany &&
       typeof selectedCompany !== 'string' &&
@@ -357,7 +364,7 @@ export default function NewFarmer() {
     } as any;
 
     try {
-      if (isConnected) {
+      if (isConnected && !guestAccess) {
         const response = await makeRequest({
           url: `/api/company/userCustomers/add/${selectedCompany}`,
           method: 'POST',
@@ -386,8 +393,8 @@ export default function NewFarmer() {
         farmerBody.id = farmerId;
         const farmerRealm = {
           id: farmerId,
-          userId: user.id ? user.id.toString() : '',
-          companyId: selectedCompany.toString(),
+          userId: user?.id ? user.id.toString() : guestAccess ? '0' : '',
+          companyId: guestAccess ? '0' : selectedCompany.toString(),
           data: JSON.stringify(farmerBody),
           name: farmerBody.name ? farmerBody.name : '',
           surname: farmerBody.surname ? farmerBody.surname : '',

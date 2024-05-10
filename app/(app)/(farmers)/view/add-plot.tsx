@@ -65,6 +65,7 @@ export default function AddPlot() {
     selectFarmer,
     user,
     isConnected,
+    guestAccess,
     makeRequest,
   } = useContext(AuthContext) as {
     newPlot: Plot;
@@ -74,6 +75,7 @@ export default function AddPlot() {
     selectFarmer: (farmer: Farmer) => void;
     user: User;
     isConnected: boolean;
+    guestAccess: boolean;
     makeRequest: ({
       url,
       method,
@@ -127,6 +129,20 @@ export default function AddPlot() {
   };
 
   useEffect(() => {
+    if (guestAccess && productTypes && typeof productTypes !== 'string') {
+      setCrops(
+        productTypes.map((product: any) => ({
+          label: product.name,
+          value: product.id.toString(),
+        }))
+      );
+      setPlotInfo((currentInfo) => ({
+        ...currentInfo,
+        crop: (productTypes[0] as any).id.toString(),
+      }));
+      return;
+    }
+
     if (
       productTypes &&
       typeof productTypes !== 'string' &&
@@ -187,7 +203,11 @@ export default function AddPlot() {
     setLoading(true);
 
     try {
-      if (isConnected && !isUUIDV4(selectedFarmer.id.toString())) {
+      if (
+        isConnected &&
+        !isUUIDV4(selectedFarmer.id.toString()) &&
+        !guestAccess
+      ) {
         const response = await makeRequest({
           url: `/api/company/userCustomers/${selectedFarmer.id}/plots/add`,
           method: 'POST',
@@ -241,7 +261,7 @@ export default function AddPlot() {
         const plotRealm = {
           id: plot.id,
           farmerId: selectedFarmer?.id?.toString(),
-          userId: user.id.toString(),
+          userId: guestAccess ? '0' : user.id.toString(),
           data: JSON.stringify(plot),
           synced: false,
         };

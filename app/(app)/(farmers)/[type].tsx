@@ -42,7 +42,7 @@ export default function Farmers() {
   const [offset, setOffset] = useState<number>(0);
   const limit = 10;
 
-  const { isConnected, makeRequest, selectedCompany, user } =
+  const { isConnected, makeRequest, selectedCompany, user, guestAccess } =
     useContext(AuthContext);
 
   const segments = useSegments();
@@ -103,7 +103,7 @@ export default function Farmers() {
     offsetHF: number,
     resetData: boolean
   ) => {
-    if (isConnected) {
+    if (isConnected && !guestAccess) {
       await fetchFarmers(limitHF, offsetHF, resetData);
     } else {
       await loadFarmers(limitHF, offsetHF, resetData);
@@ -224,7 +224,7 @@ export default function Farmers() {
     setIsLoading(true);
     try {
       const sort = selectedSort.split('_');
-      const searchString = `companyId == '${selectedCompany}' AND userId == '${user?.id}' AND (${selectedFilter === 'BY_NAME' ? 'name' : 'surname'} CONTAINS[c] '${search}')`;
+      const searchString = `companyId == '${guestAccess ? '0' : selectedCompany}' AND userId == '${guestAccess ? '0' : user?.id}' AND (${selectedFilter === 'BY_NAME' ? 'name' : 'surname'} CONTAINS[c] '${search}')`;
 
       const farmersRealm = await realm.realmRead(
         FarmerSchema,

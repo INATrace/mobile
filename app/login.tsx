@@ -39,7 +39,7 @@ export default function Login() {
     process.env.EXPO_PUBLIC_API_TEST_URI,
   ];
 
-  const { logIn, instance, setInstance } = useContext(AuthContext);
+  const { logIn, instance, setInstance, logInGuest } = useContext(AuthContext);
 
   const resetPassword = async () => {
     const url = instance + '/en/reset-password';
@@ -74,6 +74,22 @@ export default function Login() {
           break;
       }
     }
+
+    setIsLoading(false);
+  };
+
+  const handleLogInGuest = async () => {
+    setIsLoading(true);
+
+    Keyboard.dismiss();
+
+    try {
+      logInGuest();
+    } catch (error) {
+      console.error('Error logging in as guest:', error);
+    }
+
+    router.replace('/(app)/');
 
     setIsLoading(false);
   };
@@ -237,10 +253,24 @@ export default function Login() {
                 <Text className="text-red-500">{loginError}</Text>
               </View>
             )}
-            <View className="self-end">
+            <View className="flex flex-row items-center self-end">
+              <Pressable
+                onPress={() => handleLogInGuest()}
+                className="px-5 py-3 mr-2 rounded-md bg-Green"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text className="text-White font-semibold text-[16px]">
+                    {i18n.t('login.guest')}
+                  </Text>
+                )}
+              </Pressable>
               <Pressable
                 onPress={() => handleLogIn()}
                 className="px-5 py-3 rounded-md bg-Orange"
+                disabled={isLoading}
               >
                 {isLoading ? (
                   <ActivityIndicator color="#fff" />

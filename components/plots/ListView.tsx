@@ -37,6 +37,7 @@ export default function ListView({
     productTypes,
     selectedCompany,
     isConnected,
+    guestAccess,
     makeRequest,
   } = useContext(AuthContext) as {
     selectedFarmer: Farmer;
@@ -45,6 +46,7 @@ export default function ListView({
     productTypes: ProductTypeWithCompanyId[];
     selectedCompany: number;
     isConnected: boolean;
+    guestAccess: boolean;
     makeRequest: ({
       url,
       method,
@@ -83,7 +85,7 @@ export default function ListView({
         undefined,
         undefined,
         undefined,
-        `farmerId == '${selectedFarmer?.id}' AND userId == '${user.id}'`
+        `farmerId == '${selectedFarmer?.id}' AND userId == '${guestAccess ? '0' : user.id}'`
       );
 
       const dataToDisplay =
@@ -267,7 +269,7 @@ export default function ListView({
   };
 
   const refreshGeoId = async (plotId?: number, isSynced?: boolean) => {
-    if (!isConnected || !plotId || !isSynced) return;
+    if (!isConnected || !plotId || !isSynced || guestAccess) return;
 
     setLoadingGeoId(plotId);
 
@@ -344,9 +346,9 @@ export default function ListView({
               <Pressable
                 className={cn(
                   'flex flex-row items-center self-start px-2 py-1 mt-3 ml-5 -mb-3 rounded-md',
-                  isConnected ? 'bg-Orange' : 'bg-Orange/60'
+                  isConnected && !guestAccess ? 'bg-Orange' : 'bg-Orange/60'
                 )}
-                disabled={!isConnected || !item.synced}
+                disabled={!isConnected || !item.synced || guestAccess}
                 onPress={() => refreshGeoId(item.id, item.synced)}
               >
                 {loadingGeoId === item.id && (

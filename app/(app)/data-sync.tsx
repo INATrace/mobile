@@ -2,7 +2,14 @@ import { Farmer } from '@/types/farmer';
 import { useNavigation } from 'expo-router';
 import { ChevronLeft, RefreshCw } from 'lucide-react-native';
 import { useContext, useEffect, useState } from 'react';
-import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  ActivityIndicator,
+  Alert,
+  Linking,
+} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import realm from '@/realm/useRealm';
 import { FarmerSchema, PlotSchema } from '@/realm/schemas';
@@ -13,14 +20,21 @@ import { AuthContext } from '@/context/AuthContext';
 
 export default function DataSync() {
   const navigation = useNavigation();
-  const { isConnected, makeRequest, selectedCompany, user, selectedFarmer } =
-    useContext(AuthContext) as {
-      isConnected: boolean;
-      makeRequest: any;
-      selectedCompany: number;
-      user: any;
-      selectedFarmer: Farmer;
-    };
+  const {
+    isConnected,
+    makeRequest,
+    selectedCompany,
+    user,
+    guestAccess,
+    instance,
+  } = useContext(AuthContext) as {
+    isConnected: boolean;
+    makeRequest: any;
+    selectedCompany: number;
+    user: any;
+    guestAccess: boolean;
+    instance: string;
+  };
 
   const [farmersToSync, setFarmersToSync] = useState<ItemProps[]>([]);
   const [plotsToSync, setPlotsToSync] = useState<ItemProps[]>([]);
@@ -235,74 +249,102 @@ export default function DataSync() {
     }
   };
 
-  return (
-    <View className="h-full">
-      <ScrollView className="flex flex-col h-full pt-5 bg-White">
-        <Text className="text-[18px] font-medium mx-5">
-          {i18n.t('farmers.title')}
-        </Text>
-        {loading ? (
-          <View className="flex flex-row items-center justify-center p-5 py-10">
-            <Text className="text-[16px] font-medium">{i18n.t('loading')}</Text>
-          </View>
-        ) : farmersToSync.length > 0 ? (
-          <Card items={farmersToSync} />
-        ) : (
-          <View className="flex flex-row items-center justify-center p-5 py-10">
-            <Text className="text-[16px] font-medium">
-              {i18n.t('synced.noFarmers')}
-            </Text>
-          </View>
-        )}
+  const openLink = async () => {
+    const url = instance.includes('pro') ? 'https://inatrace.pro' : instance;
+    const canOpen = await Linking.canOpenURL(url);
 
-        <Text className="text-[18px] font-medium mx-5">
-          {i18n.t('plots.title')}
-        </Text>
-        {loading ? (
-          <View className="flex flex-row items-center justify-center p-5 py-10">
-            <Text className="text-[16px] font-medium">{i18n.t('loading')}</Text>
-          </View>
-        ) : plotsToSync.length > 0 ? (
-          <Card items={plotsToSync} />
-        ) : (
-          <View className="flex flex-row items-center justify-center p-5 py-10">
-            <Text className="text-[16px] font-medium">
-              {i18n.t('synced.noPlots')}
+    if (canOpen) {
+      Linking.openURL(url);
+    } else {
+      console.error('Cannot open URL:', url);
+    }
+  };
+
+  return (
+    <View>
+      {guestAccess ? (
+        <View className="p-5">
+          <Text className="text-lg">{i18n.t('synced.guestWarning')}</Text>
+          <Pressable onPress={() => openLink()}>
+            <Text className="text-lg underline text-Orange">
+              {instance.includes('pro') ? 'https://inatrace.pro' : instance}
             </Text>
-          </View>
-        )}
-      </ScrollView>
-      <Pressable
-        className="bg-White"
-        onPress={syncData}
-        disabled={
-          !isConnected ||
-          (farmersToSync.length === 0 && plotsToSync.length === 0)
-        }
-      >
-        {({ pressed }) => (
-          <View
-            className={cn(
-              pressed ||
-                !isConnected ||
-                (farmersToSync.length === 0 && plotsToSync.length === 0)
-                ? 'bg-Orange/80'
-                : 'bg-Orange',
-              'flex flex-row m-5 p-3 items-center justify-center rounded-md h-[48px]'
-            )}
-          >
-            {syncing ? (
-              <ActivityIndicator />
+          </Pressable>
+        </View>
+      ) : (
+        <View className="h-full">
+          <ScrollView className="flex flex-col h-full pt-5 bg-White">
+            <Text className="text-[18px] font-medium mx-5">
+              {i18n.t('farmers.title')}
+            </Text>
+            {loading ? (
+              <View className="flex flex-row items-center justify-center p-5 py-10">
+                <Text className="text-[16px] font-medium">
+                  {i18n.t('loading')}
+                </Text>
+              </View>
+            ) : farmersToSync.length > 0 ? (
+              <Card items={farmersToSync} />
             ) : (
-              <RefreshCw className="text-White" />
+              <View className="flex flex-row items-center justify-center p-5 py-10">
+                <Text className="text-[16px] font-medium">
+                  {i18n.t('synced.noFarmers')}
+                </Text>
+              </View>
             )}
-            <View className="w-2" />
-            <Text className="text-[16px] text-White font-semibold">
-              {i18n.t('home.syncData')}
+
+            <Text className="text-[18px] font-medium mx-5">
+              {i18n.t('plots.title')}
             </Text>
-          </View>
-        )}
-      </Pressable>
+            {loading ? (
+              <View className="flex flex-row items-center justify-center p-5 py-10">
+                <Text className="text-[16px] font-medium">
+                  {i18n.t('loading')}
+                </Text>
+              </View>
+            ) : plotsToSync.length > 0 ? (
+              <Card items={plotsToSync} />
+            ) : (
+              <View className="flex flex-row items-center justify-center p-5 py-10">
+                <Text className="text-[16px] font-medium">
+                  {i18n.t('synced.noPlots')}
+                </Text>
+              </View>
+            )}
+          </ScrollView>
+          <Pressable
+            className="bg-White"
+            onPress={syncData}
+            disabled={
+              !isConnected ||
+              (farmersToSync.length === 0 && plotsToSync.length === 0)
+            }
+          >
+            {({ pressed }) => (
+              <View
+                className={cn(
+                  pressed ||
+                    !isConnected ||
+                    (farmersToSync.length === 0 && plotsToSync.length === 0)
+                    ? 'bg-Orange/80'
+                    : 'bg-Orange',
+                  'flex flex-row m-5 p-3 items-center justify-center rounded-md h-[48px]'
+                )}
+              >
+                {syncing ? (
+                  <ActivityIndicator />
+                ) : (
+                  <RefreshCw className="text-White" />
+                )}
+                <View className="w-2" />
+                <Text className="text-[16px] text-White font-semibold">
+                  {i18n.t('home.syncData')}
+                </Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 }

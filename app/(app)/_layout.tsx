@@ -16,7 +16,7 @@ export const unstable_settings = {
 };
 
 export default function AppLayout() {
-  const { checkAuth, accessToken } = useContext(AuthContext);
+  const { checkAuth, accessToken, guestAccess } = useContext(AuthContext);
 
   const segments = useSegments();
 
@@ -28,6 +28,12 @@ export default function AppLayout() {
   }, [segments, accessToken]);
 
   const handleAuthCheck = async () => {
+    if (guestAccess) {
+      setIsLoading(false);
+      checkForOfflineMaps();
+      return;
+    }
+
     if (accessToken === 'none') {
       router.replace('/login');
       return;

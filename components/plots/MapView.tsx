@@ -74,6 +74,7 @@ export default function MapView({
     user,
     selectedCompany,
     productTypes,
+    guestAccess,
   } = useContext(AuthContext) as {
     newPlot: Plot | null;
     selectedCompany: number;
@@ -81,6 +82,7 @@ export default function MapView({
     selectedFarmer: Farmer;
     user: User;
     productTypes: ProductTypeWithCompanyId[];
+    guestAccess: boolean;
   };
   const [isMapLoading, setIsMapLoading] = useState<boolean>(true);
   const [cardInfoCollection, setCardInfoCollection] = useState<any[]>([]);
@@ -198,7 +200,7 @@ export default function MapView({
         undefined,
         undefined,
         undefined,
-        `farmerId == '${selectedFarmer?.id}' AND userId == '${user.id}'`
+        `farmerId == '${selectedFarmer?.id}' AND userId == '${guestAccess ? '0' : user.id}'`
       );
 
       let features: GeoJSON.Feature[] = [];
@@ -378,10 +380,12 @@ export default function MapView({
       return;
     }
 
-    featureInfo.id = uuid.v4();
+    const id = uuid.v4();
+
+    featureInfo.id = id;
 
     setNewPlot({
-      id: uuid.v4(),
+      id,
       plotName: '',
       crop: '',
       numberOfPlants: 0,
