@@ -95,7 +95,7 @@ export default function Login() {
   };
 
   const clickPrivacyPolicy = async () => {
-    const url = instance + '/en/s/cookies';
+    const url = instance + '/en/s/privacy';
     const canOpen = await Linking.canOpenURL(url);
 
     if (canOpen) {
