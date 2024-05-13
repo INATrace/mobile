@@ -306,6 +306,7 @@ export default function MapDownload() {
               ref={mapRef}
               onMapIdle={onRegionDidChange}
               styleURL={Mapbox.StyleURL.SatelliteStreet}
+              onDidFinishLoadingMap={() => focusOnCurrentLocation()}
             >
               <Mapbox.Camera
                 zoomLevel={14}

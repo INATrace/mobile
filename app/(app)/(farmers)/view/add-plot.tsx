@@ -129,22 +129,26 @@ export default function AddPlot() {
   };
 
   useEffect(() => {
-    if (guestAccess && productTypes && typeof productTypes !== 'string') {
+    if (
+      guestAccess &&
+      productTypes.length > 0 &&
+      typeof productTypes !== 'string'
+    ) {
       setCrops(
         productTypes.map((product: any) => ({
-          label: product.name,
-          value: product.id.toString(),
+          label: product?.name,
+          value: product?.id?.toString(),
         }))
       );
       setPlotInfo((currentInfo) => ({
         ...currentInfo,
-        crop: (productTypes[0] as any).id.toString(),
+        crop: (productTypes[0] as any)?.id?.toString(),
       }));
       return;
     }
 
     if (
-      productTypes &&
+      productTypes.length > 0 &&
       typeof productTypes !== 'string' &&
       selectedCompany &&
       typeof selectedCompany !== 'string'
@@ -158,15 +162,15 @@ export default function AddPlot() {
       if (products) {
         setCrops(
           products.productTypes.map((product) => ({
-            label: product.name,
-            value: product.id.toString(),
+            label: product?.name,
+            value: product?.id?.toString(),
           }))
         );
 
         const firstProduct = products.productTypes[0];
         setPlotInfo((currentInfo) => ({
           ...currentInfo,
-          crop: firstProduct.id.toString(),
+          crop: firstProduct?.id?.toString(),
         }));
       }
     }

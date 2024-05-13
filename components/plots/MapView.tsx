@@ -560,7 +560,10 @@ export default function MapView({
         )}
         {location && (
           <Mapbox.MapView
-            onDidFinishLoadingMap={() => setIsMapLoading(false)}
+            onDidFinishLoadingMap={() => {
+              setIsMapLoading(false);
+              focusOnLocation();
+            }}
             styleURL={Mapbox.StyleURL.SatelliteStreet}
             style={{
               height: Dimensions.get('window').height,
