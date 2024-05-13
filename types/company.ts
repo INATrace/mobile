@@ -80,5 +80,5 @@ export interface Company {
 export interface CompanyInfo {
   id: number;
   name: string;
-  logo: string;
+  logo: string | null;
 }

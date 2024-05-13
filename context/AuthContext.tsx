@@ -170,9 +170,10 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           const companyDetailsResponses = await Promise.all(
             companyDetailsPromises
           );
+
           const companyDetails = companyDetailsResponses.map(
             async (response) => {
-              if (response.data.status === 'OK') {
+              if (response.data.status === 'OK' && response.data.data.logo) {
                 const logoFilePath = await downloadImageToFileSystem(
                   `${instance}/api/common/image/${response.data.data.logo.storageKey}/SMALL`,
                   accessToken
@@ -182,6 +183,13 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
                   id: response.data.data.id,
                   name: response.data.data.name,
                   logo: logoFilePath,
+                } as CompanyInfo;
+                return companyInfo;
+              } else if (response.data.status === 'OK') {
+                const companyInfo = {
+                  id: response.data.data.id,
+                  name: response.data.data.name,
+                  logo: null,
                 } as CompanyInfo;
                 return companyInfo;
               }
