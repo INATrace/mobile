@@ -9,7 +9,6 @@ import {
   View,
   Linking,
   ActivityIndicator,
-  StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -307,8 +306,6 @@ export default function Login() {
         <View className="flex items-end w-full">
           <LoginLowerBlobSvg />
         </View>
-
-        <StatusBar barStyle="dark-content" />
       </View>
     </TouchableWithoutFeedback>
   );
