@@ -269,11 +269,7 @@ export default function DataSync() {
             onPress={() => openLink()}
             className="self-start px-3 py-2 mx-auto my-5 rounded-md bg-Orange"
           >
-            <Text className="text-lg text-White">
-              {instance.includes('pro')
-                ? 'inatrace.pro'
-                : instance.split('//')[1]}
-            </Text>
+            <Text className="text-lg text-White">INATrace</Text>
           </Pressable>
         </View>
       ) : (
