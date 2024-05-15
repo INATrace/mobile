@@ -167,7 +167,7 @@ export default function ListView({
 
       const farmerPlots =
         selectedFarmer?.plots?.map((plot: any) => {
-          const summarySize = parseFloat(plot.size);
+          const summarySize = parseFloat(plot.size ?? 0);
 
           if (summaryData.find((s) => s.crop === plot.crop.id.toString())) {
             const summaryIndex = summaryData.findIndex(
@@ -209,7 +209,7 @@ export default function ListView({
               {
                 type: 'view',
                 name: i18n.t('plots.addPlot.size'),
-                value: plot.size + ' ' + plot.unit,
+                value: plot.size ? plot.size + ' ' + plot.unit : '/',
                 editable: false,
               },
               {

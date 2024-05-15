@@ -14,8 +14,8 @@ import * as Location from 'expo-location';
 import * as Haptics from 'expo-haptics';
 import {
   LocateFixed,
-  Map,
   MapPin,
+  MapPinned,
   Navigation,
   Plus,
   Redo2,
@@ -236,6 +236,10 @@ export default function MapView({
 
       if (selectedFarmer.plots && selectedFarmer.plots.length > 0) {
         for (let plot of selectedFarmer.plots as any) {
+          if (!plot.coordinates || plot.coordinates.length === 0) {
+            continue;
+          }
+
           const featureInfo = {
             type: 'Feature',
             properties: {},
@@ -582,6 +586,7 @@ export default function MapView({
             <Mapbox.PointAnnotation
               coordinate={[location.coords.longitude, location.coords.latitude]}
               id="current-location"
+              key={location.timestamp.toString()}
             >
               <View className="relative flex flex-row items-center justify-center w-5 h-5 bg-white rounded-full">
                 <View className="w-4 h-4 bg-blue-500 rounded-full" />
@@ -664,7 +669,10 @@ export default function MapView({
               style={style.shadowMedium}
             >
               {location.coords.accuracy < 10 ? (
-                <View className="flex flex-row items-center self-start justify-start">
+                <View
+                  className="flex flex-row items-center self-start justify-start"
+                  key={location.coords.accuracy}
+                >
                   <LocateFixed className="mr-2 text-Green" size={20} />
                   <Text className="text-Green">
                     {i18n.t('plots.addPlot.highGPSAccuracy', {
@@ -673,7 +681,10 @@ export default function MapView({
                   </Text>
                 </View>
               ) : location.coords.accuracy < 30 ? (
-                <View className="flex flex-row items-center justify-start">
+                <View
+                  className="flex flex-row items-center justify-start"
+                  key={location.coords.accuracy}
+                >
                   <LocateFixed className="mr-2 text-Orange" size={20} />
                   <Text className="text-Orange">
                     {i18n.t('plots.addPlot.mediumGPSAccuracy', {
@@ -682,7 +693,10 @@ export default function MapView({
                   </Text>
                 </View>
               ) : (
-                <View className="flex flex-row items-center justify-start">
+                <View
+                  className="flex flex-row items-center justify-start"
+                  key={location.coords.accuracy}
+                >
                   <LocateFixed className="mr-2 text-red-500" size={20} />
                   <Text className="text-red-500">
                     {i18n.t('plots.addPlot.lowGPSAccuracy', {
@@ -758,7 +772,7 @@ export default function MapView({
                   onPress={() => fitCameraToCentroids()}
                   style={style.shadowMedium}
                 >
-                  <Map className="text-blue-500" size={30} />
+                  <MapPinned className="text-blue-500" size={30} />
                 </Pressable>
                 <Pressable
                   className="flex flex-row items-center justify-center w-16 h-16 mb-5 border-2 border-blue-500 rounded-full bg-White"
@@ -836,7 +850,7 @@ export default function MapView({
                 onPress={() => fitCameraToCentroids()}
                 style={style.shadowMedium}
               >
-                <Map className="text-blue-500" size={30} />
+                <MapPinned className="text-blue-500" size={30} />
               </Pressable>
               <Pressable
                 className="flex flex-row items-center justify-center w-16 h-16 mb-5 border-2 border-blue-500 rounded-full bg-White"
