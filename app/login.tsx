@@ -106,7 +106,7 @@ export default function Login() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View className="flex flex-col justify-between h-full">
+      <View className="flex flex-col justify-between h-full bg-White">
         {askLanguage && (
           <Modal
             isOpen={askLanguage}
