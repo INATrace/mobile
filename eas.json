@@ -18,7 +18,7 @@
         "EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN": "pk.eyJ1IjoicGlub2tva29sIiwiYSI6ImNsdTVzdmdmaDFvbXoyaXFzZjVtb2xrbHUifQ.loX_4cGYQz1H9Op_HzslFQ"
       },
       "android": {
-        "buildType": "apk"
+        "buildType": "app-bundle"
       },
       "autoIncrement": true
     }
