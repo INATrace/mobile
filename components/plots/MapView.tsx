@@ -168,7 +168,7 @@ export default function MapView({
       }
 
       let locationSubscription = await Location.watchPositionAsync(
-        { accuracy: Location.Accuracy.BestForNavigation, timeInterval: 1000 },
+        { accuracy: Location.Accuracy.BestForNavigation, distanceInterval: 1 },
         (newLocation) => {
           setLocation(newLocation);
         }
