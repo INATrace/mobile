@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "INATrace",
-    "slug": "inatrace",
+    "slug": "inatrace-mobile",
     "version": "1.4.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -68,7 +68,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "96faa844-aefa-4ebc-8c69-23acc4862544"
+        "projectId": "92b692fc-0be1-40d1-9c1d-bd10d94be7d0"
       }
     }
   }
