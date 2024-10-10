@@ -87,6 +87,9 @@ export default function MapView({
   const [isMapLoading, setIsMapLoading] = useState<boolean>(true);
   const [cardInfoCollection, setCardInfoCollection] = useState<any[]>([]);
   const [cardInfo, setCardInfo] = useState<CardProps | null>(null);
+  const [manualMode, setManualMode] = useState<boolean>(false);
+  const [draggableMarkerCoordinate, setDraggableMarkerCoordinate] =
+    useState<Position | null>(null);
 
   const navigation = useNavigation();
 
@@ -125,7 +128,11 @@ export default function MapView({
 
     const handleBeforeRemove = (e: any) => {
       e.preventDefault();
-      if ((segments as string[]).includes('add-plot')) {
+      if (
+        (segments as string[]).includes('add-plot') ||
+        (locationsForFeature.length === 0 &&
+          locationsForFeatureCache.length === 0)
+      ) {
         setAddingNewPlot(false);
         navigation.dispatch(e.data.action);
         return;
@@ -158,7 +165,7 @@ export default function MapView({
     return () => {
       navigation.removeListener('beforeRemove', handleBeforeRemove);
     };
-  }, [addingNewPlot, segments]);
+  }, [addingNewPlot, segments, locationsForFeature]);
 
   useEffect(() => {
     (async () => {
@@ -187,6 +194,25 @@ export default function MapView({
       loadExistingPlots();
     }
   }, [selectedFarmer]);
+
+  useEffect(() => {
+    if (manualMode && location) {
+      setDraggableMarkerCoordinate([
+        location.coords.longitude,
+        location.coords.latitude,
+      ]);
+    } else {
+      setDraggableMarkerCoordinate(null);
+    }
+  }, [manualMode, location]);
+
+  const handleDragEnd = (e: any) => {
+    const { geometry } = e;
+    setDraggableMarkerCoordinate([
+      geometry.coordinates[0],
+      geometry.coordinates[1],
+    ]);
+  };
 
   const loadExistingPlots = async () => {
     try {
@@ -292,11 +318,6 @@ export default function MapView({
   const addLocationToLocations = async () => {
     if (location) {
       if (!location?.coords?.accuracy || location?.coords?.accuracy > 10) {
-        Alert.alert(
-          i18n.t('plots.addPlot.GPSAccuracyTitle'),
-          i18n.t('plots.addPlot.GPSAccuracyMessage'),
-          [{ text: i18n.t('plots.addPlot.ok') }]
-        );
         return;
       }
 
@@ -307,6 +328,20 @@ export default function MapView({
         ...locationsForFeature,
         [location.coords.longitude, location.coords.latitude],
       ]);
+    }
+  };
+
+  const addManualLocation = async () => {
+    if (draggableMarkerCoordinate) {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      setLocationsForFeatureCache([]);
+      setLocationsForFeature([
+        ...locationsForFeature,
+        [draggableMarkerCoordinate[0], draggableMarkerCoordinate[1]],
+      ]);
+
+      setManualMode(false);
     }
   };
 
@@ -506,6 +541,29 @@ export default function MapView({
   };
 
   const cancelNewPlot = () => {
+    if (locationsForFeature.length > 0) {
+      Alert.alert(
+        i18n.t('plots.addPlot.discardChangesTitle'),
+        i18n.t('plots.addPlot.discardChangesMessage'),
+        [
+          {
+            text: i18n.t('plots.addPlot.cancel'),
+            style: 'cancel',
+          },
+          {
+            text: i18n.t('plots.addPlot.discardChangesButton'),
+            onPress: () => {
+              cancelNewPlotHandler();
+            },
+          },
+        ]
+      );
+    } else {
+      cancelNewPlotHandler();
+    }
+  };
+
+  const cancelNewPlotHandler = () => {
     setAddingNewPlot(false);
     setLocationsForFeature([]);
     setLocationsForFeatureCache([]);
@@ -583,15 +641,50 @@ export default function MapView({
               }}
               ref={cameraRef}
             />
-            <Mapbox.PointAnnotation
-              coordinate={[location.coords.longitude, location.coords.latitude]}
-              id="current-location"
-              key={location.timestamp.toString()}
-            >
-              <View className="relative flex flex-row items-center justify-center w-5 h-5 bg-white rounded-full">
-                <View className="w-4 h-4 bg-blue-500 rounded-full" />
-              </View>
-            </Mapbox.PointAnnotation>
+
+            {manualMode ? (
+              <>
+                <Mapbox.PointAnnotation
+                  id="draggableMarker"
+                  coordinate={draggableMarkerCoordinate ?? [0, 0]}
+                  draggable
+                  onDragEnd={handleDragEnd}
+                >
+                  <View className="relative flex flex-row items-center justify-center w-12 h-12 rounded-full bg-White/50">
+                    <LocateFixed
+                      className="rounded-full text-Orange"
+                      size={32}
+                    />
+                  </View>
+                </Mapbox.PointAnnotation>
+
+                <Mapbox.PointAnnotation
+                  coordinate={[
+                    location.coords.longitude,
+                    location.coords.latitude,
+                  ]}
+                  id="current-location"
+                  key={location.timestamp.toString()}
+                >
+                  <View className="relative flex flex-row items-center justify-center w-5 h-5 bg-white rounded-full">
+                    <View className="w-4 h-4 bg-blue-500 rounded-full" />
+                  </View>
+                </Mapbox.PointAnnotation>
+              </>
+            ) : (
+              <Mapbox.PointAnnotation
+                coordinate={[
+                  location.coords.longitude,
+                  location.coords.latitude,
+                ]}
+                id="current-location"
+                key={location.timestamp.toString()}
+              >
+                <View className="relative flex flex-row items-center justify-center w-5 h-5 bg-white rounded-full">
+                  <View className="w-4 h-4 bg-blue-500 rounded-full" />
+                </View>
+              </Mapbox.PointAnnotation>
+            )}
 
             {locationsForFeature.length > 0 &&
               locationsForFeature.map((location, index) => (
@@ -785,45 +878,92 @@ export default function MapView({
             </View>
             <View className="w-full p-5 bg-White rounded-t-md">
               {/* Add location button */}
-              <Pressable
-                onPress={addLocationToLocations}
-                className="flex flex-row items-center justify-center px-5 py-3 rounded-md bg-Green"
-              >
-                <MapPin className="mr-2 text-White" size={20} />
-                <Text className="text-White font-semibold text-[16px]">
-                  {i18n.t('plots.addPlot.addCurrentLocation')}
-                </Text>
-              </Pressable>
-              <View className="flex flex-row items-center justify-center mt-2">
-                <Pressable
-                  onPress={cancelNewPlot}
-                  className="flex flex-row items-center justify-center flex-grow px-5 py-3 mr-2 border rounded-md bg-White border-LightGray"
-                >
-                  <Text className="text-black/60 font-semibold text-[16px]">
-                    {i18n.t('plots.addPlot.cancel')}
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={savePlotShape}
-                  className={cn(
-                    'flex flex-row items-center justify-center flex-grow px-5 py-3 rounded-md bg-Orange',
-                    featureCollection.features.find(
-                      (f: GeoJSON.Feature) => f.id === 'NewFeature'
-                    ) === undefined
-                      ? 'opacity-50'
-                      : ''
-                  )}
-                  disabled={
-                    featureCollection.features.find(
-                      (f: GeoJSON.Feature) => f.id === 'NewFeature'
-                    ) === undefined
-                  }
-                >
-                  <Text className="text-White font-semibold text-[16px]">
-                    {i18n.t('plots.addPlot.savePlotShape')}
-                  </Text>
-                </Pressable>
-              </View>
+              {manualMode ? (
+                <View className="flex flex-row items-center justify-center mt-2">
+                  <Pressable
+                    onPress={() => setManualMode(!manualMode)}
+                    className="flex flex-row items-center justify-center flex-grow px-5 py-3 mr-2 border rounded-md bg-White border-LightGray"
+                  >
+                    <Text className="text-black/60 font-semibold text-[16px]">
+                      {i18n.t('plots.addPlot.cancel')}
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={addManualLocation}
+                    className="flex flex-row items-center justify-center flex-grow px-5 py-3 rounded-md bg-Orange"
+                  >
+                    <Text className="text-White font-semibold text-[16px]">
+                      {i18n.t('plots.addPlot.confirm')}
+                    </Text>
+                  </Pressable>
+                </View>
+              ) : (
+                <>
+                  <Pressable
+                    onPress={addLocationToLocations}
+                    className={cn(
+                      'flex flex-row items-center justify-center px-5 py-3 rounded-md bg-Green',
+                      !location?.coords.accuracy ||
+                        location?.coords.accuracy > 10
+                        ? 'bg-Green/70'
+                        : ''
+                    )}
+                    disabled={
+                      !location?.coords.accuracy ||
+                      location?.coords.accuracy > 10
+                    }
+                  >
+                    <MapPin className="mr-2 text-White" size={20} />
+                    <Text className="text-White font-semibold text-[16px]">
+                      {i18n.t('plots.addPlot.addCurrentLocation')}
+                    </Text>
+                  </Pressable>
+
+                  {location?.coords.accuracy &&
+                  location?.coords.accuracy > 10 ? (
+                    <Pressable
+                      onPress={() => setManualMode(!manualMode)}
+                      className="flex flex-row items-center justify-center px-5 py-3 mt-2 rounded-md bg-Orange"
+                    >
+                      <MapPin className="mr-2 text-White" size={20} />
+                      <Text className="text-White font-semibold text-[16px]">
+                        {i18n.t('plots.addPlot.toggleManual')}
+                      </Text>
+                    </Pressable>
+                  ) : null}
+
+                  <View className="flex flex-row items-center justify-center mt-2">
+                    <Pressable
+                      onPress={cancelNewPlot}
+                      className="flex flex-row items-center justify-center flex-grow px-5 py-3 mr-2 border rounded-md bg-White border-LightGray"
+                    >
+                      <Text className="text-black/60 font-semibold text-[16px]">
+                        {i18n.t('plots.addPlot.cancel')}
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={savePlotShape}
+                      className={cn(
+                        'flex flex-row items-center justify-center flex-grow px-5 py-3 rounded-md bg-Orange',
+                        featureCollection.features.find(
+                          (f: GeoJSON.Feature) => f.id === 'NewFeature'
+                        ) === undefined
+                          ? 'opacity-50'
+                          : ''
+                      )}
+                      disabled={
+                        featureCollection.features.find(
+                          (f: GeoJSON.Feature) => f.id === 'NewFeature'
+                        ) === undefined
+                      }
+                    >
+                      <Text className="text-White font-semibold text-[16px]">
+                        {i18n.t('plots.addPlot.savePlotShape')}
+                      </Text>
+                    </Pressable>
+                  </View>
+                </>
+              )}
             </View>
           </View>
         </View>

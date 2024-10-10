@@ -26,6 +26,8 @@ type NewFarmerErrors = {
   lastName: boolean;
   gender: boolean;
   country: boolean;
+  areaUnit: boolean;
+  totalCultivatedArea: boolean;
   hondurasFarm?: boolean;
   hondurasVillage?: boolean;
   hondurasMunicipality?: boolean;
@@ -260,6 +262,8 @@ export default function NewFarmer() {
       lastName: !farmer.surname,
       gender: !farmer.gender,
       country: !farmer.location?.address?.country,
+      areaUnit: !farmer.farm?.areaUnit,
+      totalCultivatedArea: !farmer.farm?.totalCultivatedArea,
       hondurasFarm:
         farmer?.location?.address?.country?.code === 'HN' &&
         !farmer.location?.address?.hondurasFarm,
@@ -831,22 +835,25 @@ export default function NewFarmer() {
         items={[
           {
             type: 'type',
-            name: i18n.t('farmers.info.farmInformation.areaUnit'),
+            name: i18n.t('farmers.info.farmInformation.areaUnit') + '*',
             placeholder: i18n.t('input.type'),
             value: farmer?.farm?.areaUnit ?? '',
             setValue: (value: string) =>
               updateState(['farm', 'areaUnit'], value),
+            error: errors.areaUnit,
           },
           {
             type: 'type',
             name:
               i18n.t('farmers.info.farmInformation.totalFarmSize') +
-              ` (${farmer?.farm?.areaUnit ?? '/'})`,
+              ` (${farmer?.farm?.areaUnit ?? '/'})` +
+              '*',
             placeholder: i18n.t('input.type'),
             value: farmer?.farm?.totalCultivatedArea?.toString() ?? '',
             setValue: (value: string) =>
               updateState(['farm', 'totalCultivatedArea'], value),
             isNumeric: true,
+            error: errors.totalCultivatedArea,
           },
           ...(farmer?.farm?.farmPlantInformationList
             ?.map((item, index) => [
