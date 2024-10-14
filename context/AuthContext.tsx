@@ -29,6 +29,7 @@ export const AuthContext = createContext<{
   selectCompany: (company: number | string | null) => void;
   setNewPlot: (plot: Plot) => void;
   setInstance: (instance: string) => void;
+  setDocumentationModal: (value: boolean) => void;
   instance: string;
   makeRequest: ({ url, method, body, headers }: RequestParams) => Promise<any>;
   accessToken: string | null;
@@ -42,6 +43,7 @@ export const AuthContext = createContext<{
   isConnected: boolean;
   selectedFarmer: Farmer | string | null;
   newPlot: Plot | null;
+  documentationModal: boolean;
 }>({
   logIn: async () => ({ success: false, errorStatus: '' }),
   logOut: () => null,
@@ -52,6 +54,7 @@ export const AuthContext = createContext<{
   selectCompany: () => null,
   setNewPlot: () => null,
   setInstance: () => null,
+  setDocumentationModal: () => null,
   instance: process.env.EXPO_PUBLIC_API_URI ?? '',
   accessToken: null,
   user: null,
@@ -64,6 +67,7 @@ export const AuthContext = createContext<{
   isConnected: false,
   selectedFarmer: null,
   newPlot: null,
+  documentationModal: false,
 });
 
 const isTokenExpired = (token: string): boolean => {
@@ -107,6 +111,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     'instance',
     process.env.EXPO_PUBLIC_API_URI ?? ''
   );
+
+  const [documentationModal, setDocumentationModal] = useState<boolean>(false);
 
   const [guestAccess, setGuestAccess] = useState<boolean>(false);
 
@@ -373,6 +379,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         setNewPlot,
         instance,
         setInstance,
+        setDocumentationModal,
+        documentationModal,
       }}
     >
       {props.children}

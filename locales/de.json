@@ -22,6 +22,11 @@
     "authError": "Falscher Benutzername oder Passwort",
     "guest": "Gast"
   },
+  "documentation": {
+    "title": "Dokumentation",
+    "description": "Hier finden Sie alle Informationen, die Sie benötigen, um mit der App zu beginnen",
+    "documentation": "Dokumentation"
+  },
   "userSettings": {
     "loggedInGuest": "Sie sind als Gast eingeloggt",
     "title": "Benutzereinstellungen",

@@ -22,6 +22,11 @@
     "authError": "Usuario o contraseña incorrectos",
     "guest": "Invitado"
   },
+  "documentation": {
+    "title": "Documentación",
+    "description": "Aquí puedes encontrar toda la información que necesitas para empezar a usar la aplicación",
+    "documentation": "Documentación"
+  },
   "userSettings": {
     "loggedInGuest": "Estás conectado como invitado",
     "title": "Configuración de usuario",

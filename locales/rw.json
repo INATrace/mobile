@@ -22,6 +22,11 @@
     "authError": "Izina ry'umukoresha cyangwa ijambo ry'ibanga ntibikwiye",
     "guest": "Umushyitsi"
   },
+  "documentation": {
+    "title": "Ibisobanuro",
+    "description": "Hano ushobora kubona amakuru yose ukeneye kugira ngo utangire gukoresha porogaramu",
+    "documentation": "Ibisobanuro"
+  },
   "userSettings": {
     "loggedInGuest": "Uwinjiye nk'umushyitsi",
     "title": "Igenamiterere ry'umukoresha",
