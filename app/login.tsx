@@ -89,6 +89,7 @@ export default function Login() {
     }
 
     router.replace('/(app)/');
+    router.push('/(app)/(farmers)/info/0');
 
     setIsLoading(false);
   };

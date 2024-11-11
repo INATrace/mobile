@@ -23,7 +23,7 @@ let creatingImageCacheDir: any = null;
 export const AuthContext = createContext<{
   logIn: (username: string, password: string) => Promise<LogInResponse>;
   logOut: () => void;
-  logInGuest: () => void;
+  logInGuest: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
   selectFarmer: (farmer: Farmer) => void;
   selectCompany: (company: number | string | null) => void;
@@ -38,7 +38,6 @@ export const AuthContext = createContext<{
   companies: (CompanyInfo | undefined)[] | string | null;
   productTypes: ProductTypeWithCompanyId[] | string | null;
   countries: Country[] | string | null;
-  getConnection: Promise<NetInfoState>;
   guestAccess: boolean;
   isConnected: boolean;
   selectedFarmer: Farmer | string | null;
@@ -47,7 +46,7 @@ export const AuthContext = createContext<{
 }>({
   logIn: async () => ({ success: false, errorStatus: '' }),
   logOut: () => null,
-  logInGuest: () => null,
+  logInGuest: async () => void 0,
   checkAuth: async () => false,
   makeRequest: async () => null,
   selectFarmer: () => null,
@@ -62,7 +61,6 @@ export const AuthContext = createContext<{
   selectedCompany: null,
   productTypes: null,
   countries: null,
-  getConnection: Promise.resolve({ isConnected: false } as NetInfoState),
   guestAccess: false,
   isConnected: false,
   selectedFarmer: null,
@@ -248,6 +246,88 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     setSelectedFarmer(null);
     setCountries(guestCountries as Country[]);
     setProductTypes(guestProductTypes as any);
+
+    const defaultFarmer = (await realm.realmRead(
+      FarmerSchema,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'id == "0"'
+    )) as any;
+
+    if (defaultFarmer.length === 0) {
+      const farmerId = uuid.v4();
+
+      const farmerBody = {
+        id: farmerId,
+        companyId: 0,
+        farmerCompanyInternalId: '0',
+        type: 'FARMER',
+        name: 'Guest',
+        surname: 'Farmer',
+        phone: '',
+        email: '',
+        hasSmartphone: false,
+        gender: '',
+        location: {
+          address: {
+            cell: '',
+            sector: '',
+            village: '',
+            address: '',
+            city: '',
+            state: '',
+            zip: '',
+            hondurasFarm: '',
+            hondurasVillage: '',
+            hondurasMunicipality: '',
+            hondurasDepartment: '',
+            country: {
+              id: 0,
+              code: '',
+              name: '',
+            },
+            otherAddress: '',
+          },
+        },
+        bank: {
+          accountHolderName: '',
+          accountNumber: '',
+          bankName: '',
+          additionalInformation: '',
+        },
+        farm: {
+          areaUnit: '',
+          totalCultivatedArea: 0,
+          farmPlantInformationList: [],
+          organic: false,
+          areaOrganicCertified: 0,
+          startTransitionToOrganic: '',
+        },
+        associations: [],
+        cooperatives: [],
+        certifications: [],
+        productTypes: [],
+        plots: [],
+      };
+
+      const farmerRealm = {
+        id: farmerId,
+        userId: '0',
+        companyId: '0',
+        data: JSON.stringify(farmerBody),
+        name: 'Guest',
+        surname: 'Farmer',
+        synced: false,
+      };
+
+      await realm.realmWrite(FarmerSchema, farmerRealm);
+
+      setSelectedFarmer(farmerBody);
+    } else {
+      setSelectedFarmer(JSON.parse(defaultFarmer[0].data));
+    }
   };
 
   const makeRequest = async ({ url, method, body, headers }: RequestParams) => {
@@ -342,10 +422,6 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     await realm.realmWriteMultiple(FarmerSchema, farmersRealm);
   };
 
-  const getConnection = async () => {
-    return await NetInfo.fetch();
-  };
-
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
       setIsConnected(state?.isConnected ?? false);
@@ -372,7 +448,6 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         companies,
         productTypes,
         countries,
-        getConnection: getConnection(),
         isConnected,
         selectedFarmer,
         newPlot,

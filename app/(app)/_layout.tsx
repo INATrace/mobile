@@ -1,6 +1,6 @@
 import { Stack, router, useSegments } from 'expo-router';
 import { Pressable, Text } from 'react-native';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { AuthContext } from '@/context/AuthContext';
 import i18n from '@/locales/i18n';
@@ -16,36 +16,52 @@ export const unstable_settings = {
 };
 
 export default function AppLayout() {
-  const { checkAuth, accessToken, guestAccess } = useContext(AuthContext);
+  const { checkAuth, accessToken, guestAccess, logInGuest } =
+    useContext(AuthContext);
 
   const segments = useSegments();
 
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const hasNavigatedToMapDownload = useRef<boolean>(false);
+  const hasNavigatedToMapDownload = useRef(false);
+  const hasNavigatedToDefaultFarmer = useRef(false);
+
+  const prevAccessToken = useRef(accessToken);
+  const prevSegments = useRef(segments);
 
   useEffect(() => {
-    handleAuthCheck();
+    if (
+      prevAccessToken.current !== accessToken ||
+      JSON.stringify(prevSegments.current) !== JSON.stringify(segments)
+    ) {
+      handleAuthCheck();
+      prevAccessToken.current = accessToken;
+      prevSegments.current = segments;
+    }
   }, [segments, accessToken]);
 
-  const handleAuthCheck = async () => {
+  const handleAuthCheck = useCallback(async () => {
     if (guestAccess) {
-      setIsLoading(false);
-      checkForOfflineMaps();
+      await checkForOfflineMaps();
       return;
     }
 
     if (accessToken === 'none') {
-      router.replace('/login');
-      return;
+      await handleLoginGuest();
     } else if (accessToken) {
       const isAuth = await checkAuth();
 
       if (!isAuth) {
-        router.replace('/login');
+        await handleLoginGuest();
       } else {
-        setIsLoading(false);
-        checkForOfflineMaps();
+        await checkForOfflineMaps();
       }
+    }
+  }, [accessToken, segments]);
+
+  const handleLoginGuest = async () => {
+    await logInGuest();
+    if (!hasNavigatedToDefaultFarmer.current) {
+      hasNavigatedToDefaultFarmer.current = true;
+      router.push('/(app)/(farmers)/info/0');
     }
   };
 
@@ -60,10 +76,6 @@ export default function AppLayout() {
       console.error('Error fetching offline packs:', error);
     }
   };
-
-  if (isLoading) {
-    return null;
-  }
 
   return (
     <Stack>

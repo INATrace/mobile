@@ -21,7 +21,13 @@ import { router, useNavigation } from 'expo-router';
 import i18n from '@/locales/i18n';
 import { Input } from '@/components/common/Input';
 import LanguageSwitcher from '@/components/settings/LanguageSwitcher';
-import { ChevronDown, ChevronLeft, LogOut, Map } from 'lucide-react-native';
+import {
+  ChevronDown,
+  ChevronLeft,
+  LogIn,
+  LogOut,
+  Map,
+} from 'lucide-react-native';
 import { CompanyInfo } from '@/types/company';
 import {
   BottomSheetBackdrop,
@@ -30,6 +36,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import Selector from '@/components/common/Selector';
 import { FullWindowOverlay } from 'react-native-screens';
+import cn from '@/utils/cn';
 
 export default function UserSettings() {
   const [company, setCompany] = useState<CompanyInfo | undefined>(undefined);
@@ -105,6 +112,15 @@ export default function UserSettings() {
       {guestAccess ? (
         <View>
           <Text>{i18n.t('userSettings.loggedInGuest')}</Text>
+          <Pressable
+            onPress={() => handleLogOut()}
+            className="flex flex-row items-center justify-center w-[50%] mt-5 px-5 py-3 rounded-md bg-Orange"
+          >
+            <LogIn className="mr-2 text-White" size={20} />
+            <Text className="text-White font-semibold text-[16px]">
+              {i18n.t('login.login')}
+            </Text>
+          </Pressable>
         </View>
       ) : (
         <View>
@@ -230,21 +246,26 @@ export default function UserSettings() {
       <View className="flex flex-row items-center justify-between mt-5 mb-10">
         <Pressable
           onPress={() => resetPassword()}
-          className="w-[55%] px-5 py-3 rounded-md bg-Green flex flex-row items-center justify-center"
+          className={cn(
+            guestAccess ? 'w-full' : 'w-[55%]',
+            'px-5 py-3 rounded-md bg-Green flex flex-row items-center justify-center'
+          )}
         >
           <Text className="text-White font-semibold text-[16px]">
             {i18n.t('userSettings.resetPassword')}
           </Text>
         </Pressable>
-        <Pressable
-          onPress={() => handleLogOut()}
-          className="flex flex-row items-center justify-center w-[40%] px-5 py-3 rounded-md bg-Orange"
-        >
-          <LogOut className="mr-2 text-White" size={20} />
-          <Text className="text-White font-semibold text-[16px]">
-            {i18n.t('userSettings.logOut')}
-          </Text>
-        </Pressable>
+        {!guestAccess && (
+          <Pressable
+            onPress={() => handleLogOut()}
+            className="flex flex-row items-center justify-center w-[40%] px-5 py-3 rounded-md bg-Orange"
+          >
+            <LogOut className="mr-2 text-White" size={20} />
+            <Text className="text-White font-semibold text-[16px]">
+              {i18n.t('userSettings.logOut')}
+            </Text>
+          </Pressable>
+        )}
       </View>
     </ScrollView>
   );

@@ -1,7 +1,7 @@
 import { Plot } from './plot';
 
 export interface Farmer {
-  id: number;
+  id: number | string;
   companyId: number;
   farmerCompanyInternalId: string;
   type: string;
