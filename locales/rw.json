@@ -69,6 +69,7 @@
       "name": "Izina rya mbere",
       "surname": "Izina ry'umuryango"
     },
+    "edit": "Hindura",
     "errorFetch": "Ikosa mu gushaka abahinzi",
     "card": {
       "villageAndCell": "Umudugudu & Akagari",
@@ -77,6 +78,7 @@
     "info": {
       "addNewPlot": "Ongeraho ikibanza gishya",
       "viewAllPlots": "Reba ibibanza byose",
+      "farmerInfo": "Amakuru y'umuhinzi",
       "basicInformation": {
         "title": "Amakuru y'ibanze",
         "firstName": "Izina rya mbere",
@@ -210,7 +212,11 @@
     },
     "totalArea": "ubuso bwose",
     "summaryTitle": "Isummari",
-    "plotsTitle": "Ibibanza"
+    "plotsTitle": "Ibibanza",
+    "export": "Eksporta",
+    "exportTitle": "Ohereza ibishushanyo",
+    "exportMessage": "Urashaka kohereza ibishushanyo?",
+    "cancel": "Hagarika"
   },
   "synced": {
     "itemNotSynced": "Igikoresho kitahuje",

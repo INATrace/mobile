@@ -1,4 +1,6 @@
 import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
+import Share from 'react-native-share';
+import RNFS from 'react-native-fs';
 import ViewSwitcher, { ViewSwitcherProps } from './ViewSwitcher';
 import { useContext, useEffect, useState } from 'react';
 import { Plot } from '@/types/plot';
@@ -13,6 +15,7 @@ import { Farmer, ProductTypeWithCompanyId } from '@/types/farmer';
 import { User } from '@/types/user';
 import { RequestParams } from '@/types/auth';
 import cn from '@/utils/cn';
+import { FileUp } from 'lucide-react-native';
 
 type SummaryData = {
   crop: string;
@@ -73,11 +76,14 @@ export default function ListView({
     try {
       let summaryData: SummaryData[] = [];
 
-      const products = productTypes?.find(
-        (product: ProductTypeWithCompanyId) => {
-          return product.companyId === selectedCompany;
-        }
-      );
+      const product = guestAccess
+        ? {
+            companyId: 0,
+            productTypes: [productTypes?.find((p: any) => p.id === 1) as any],
+          }
+        : productTypes?.find((p: ProductTypeWithCompanyId) => {
+            return p.companyId === selectedCompany;
+          });
 
       const offlinePlots = await realm.realmRead(
         PlotSchema,
@@ -107,8 +113,8 @@ export default function ListView({
             });
           }
 
-          const crop = products?.productTypes.find(
-            (product) => product.id.toString() === plotData.crop
+          const crop = product?.productTypes.find(
+            (p) => p.id.toString() === plotData.crop
           );
 
           return {
@@ -183,9 +189,7 @@ export default function ListView({
             });
           }
 
-          const crop = products?.productTypes.find(
-            (product) => product.id === plot.crop.id
-          );
+          const crop = product?.productTypes.find((p) => p.id === plot.crop.id);
 
           return {
             id: plot.id,
@@ -244,9 +248,10 @@ export default function ListView({
 
       if (summaryData.length !== 0) {
         const summaryItems = summaryData.map((s: any) => {
-          const crop = products?.productTypes.find(
-            (product) => product.id.toString() === s.crop
+          const crop = product?.productTypes.find(
+            (p) => p.id.toString() === s.crop
           );
+
           return {
             type: 'view',
             name: crop?.name,
@@ -316,6 +321,52 @@ export default function ListView({
     }
   };
 
+  const exportPlots = async () => {
+    Alert.alert(i18n.t('plots.exportTitle'), i18n.t('plots.exportMessage'), [
+      {
+        text: i18n.t('plots.cancel'),
+        style: 'cancel',
+      },
+      {
+        text: i18n.t('plots.export'),
+        onPress: async () => {
+          try {
+            // Step 1: Prepare plots data
+            const plots = data.map((plot) => {
+              const plotData = plot.items.reduce((acc, item) => {
+                acc[item.name] = item.value;
+                return acc;
+              }, {} as any);
+              return plotData;
+            });
+
+            const plotsJson = JSON.stringify(plots, null, 2);
+
+            // Step 2: Define the file path
+            const filePath = `${RNFS.DocumentDirectoryPath}/plots.json`;
+
+            // Step 3: Write JSON data to the file
+            await RNFS.writeFile(filePath, plotsJson, 'utf8');
+            console.log(`File saved to: ${filePath}`);
+
+            // Step 4: Share the file using react-native-share
+            const shareOptions = {
+              title: i18n.t('plots.exportTitle'),
+              url: `file://${filePath}`,
+              type: 'application/json',
+              filename: 'plots.json', // Optional
+              subject: i18n.t('plots.exportSubject'),
+            };
+
+            await Share.open(shareOptions);
+          } catch (error) {
+            console.error('Failed to export plots:', error);
+          }
+        },
+      },
+    ]);
+  };
+
   return (
     <View className="h-full">
       <ViewSwitcher
@@ -333,9 +384,20 @@ export default function ListView({
         </View>
       )}
       {data.length > 0 && (
-        <Text className="text-[18px] font-medium my-2 mx-5">
-          {i18n.t('plots.plotsTitle')}
-        </Text>
+        <View className="flex flex-row items-center justify-between mx-5">
+          <Text className="text-[18px] font-medium my-2">
+            {i18n.t('plots.plotsTitle')}
+          </Text>
+          <Pressable
+            onPress={exportPlots}
+            className="flex flex-row items-center justify-center px-5 py-2 rounded-md bg-Orange"
+          >
+            <FileUp className="mr-2 text-White" />
+            <Text className="text-[16px] text-White font-semibold">
+              {i18n.t('plots.export')}
+            </Text>
+          </Pressable>
+        </View>
       )}
       <View style={{ flex: 1 }}>
         <FlashList

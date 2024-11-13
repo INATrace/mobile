@@ -69,6 +69,7 @@
       "name": "First name",
       "surname": "Last name"
     },
+    "edit": "Edit",
     "errorFetch": "Error fetching farmers",
     "card": {
       "villageAndCell": "Village & Cell",
@@ -77,6 +78,7 @@
     "info": {
       "addNewPlot": "Add new plot",
       "viewAllPlots": "View all plots",
+      "farmerInfo": "Farmer information",
       "basicInformation": {
         "title": "Basic information",
         "firstName": "First name",
@@ -210,7 +212,11 @@
     },
     "totalArea": "total area",
     "summaryTitle": "Summary",
-    "plotsTitle": "Plots"
+    "plotsTitle": "Plots",
+    "export": "Export",
+    "exportTitle": "Export plots",
+    "exportMessage": "Do you want to export the plots?",
+    "cancel": "Cancel"
   },
   "synced": {
     "itemNotSynced": "Item not synced",

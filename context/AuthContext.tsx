@@ -257,10 +257,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     )) as any;
 
     if (defaultFarmer.length === 0) {
-      const farmerId = uuid.v4();
-
       const farmerBody = {
-        id: farmerId,
+        id: 0,
         companyId: 0,
         farmerCompanyInternalId: '0',
         type: 'FARMER',
@@ -313,7 +311,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
       };
 
       const farmerRealm = {
-        id: farmerId,
+        id: '0',
         userId: '0',
         companyId: '0',
         data: JSON.stringify(farmerBody),

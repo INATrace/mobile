@@ -1,11 +1,8 @@
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import { Text, Pressable } from 'react-native';
 import { router, useNavigation } from 'expo-router';
 import { useContext, useEffect } from 'react';
 import { AuthContext } from '@/context/AuthContext';
-import QRCode from 'react-native-qrcode-svg';
-import i18n from '@/locales/i18n';
-import Card, { ItemProps } from '@/components/common/Card';
-import { ChevronLeft, Map, Plus } from 'lucide-react-native';
+import { ChevronLeft } from 'lucide-react-native';
 import { Farmer } from '@/types/farmer';
 import FarmerInformationGuest from '@/components/farmers/info/FarmerInformationGuest';
 import FarmerInformation from '@/components/farmers/info/FarmerInformation';
@@ -18,6 +15,7 @@ export default function FarmersInfo() {
   const navigation = useNavigation();
 
   useEffect(() => {
+    console.log(selectedFarmer);
     navigation.setOptions({
       title: `${selectedFarmer?.name ?? ''} ${selectedFarmer?.surname}`,
       headerLeft: () => (
@@ -41,13 +39,7 @@ export default function FarmersInfo() {
   };
 
   if (guestAccess) {
-    return (
-      <FarmerInformationGuest
-        selectedFarmer={selectedFarmer}
-        navigateToPlots={navigateToPlots}
-        navigateToPlotsMapping={navigateToPlotsMapping}
-      />
-    );
+    return <FarmerInformationGuest />;
   }
 
   return (

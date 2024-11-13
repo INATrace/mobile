@@ -22,6 +22,7 @@ export default function ViewSwitcher({
     setViewType(viewType);
     if (setSeePlot) setSeePlot('');
   };
+
   return (
     <View
       className={cn(

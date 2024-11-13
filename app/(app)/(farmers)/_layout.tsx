@@ -17,6 +17,10 @@ export default function FarmersLayout() {
       />
       <Stack.Screen name="info/[id]" options={{ presentation: 'modal' }} />
       <Stack.Screen
+        name="info/edit-guest"
+        options={{ presentation: 'modal' }}
+      />
+      <Stack.Screen
         name="view/[type]"
         options={{
           presentation: 'modal',

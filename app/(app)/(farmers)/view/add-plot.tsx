@@ -274,6 +274,10 @@ export default function AddPlot() {
       }
 
       router.back();
+      console.log(
+        'selectedFarmer?.id?.toString()',
+        selectedFarmer?.id?.toString()
+      );
       router.replace(`view/${selectedFarmer?.id?.toString()}` as any);
     } catch (error) {
       console.error('Error saving plot', error);

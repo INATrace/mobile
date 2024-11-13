@@ -69,6 +69,7 @@
       "name": "Vorname",
       "surname": "Nachname"
     },
+    "edit": "Bearbeiten",
     "errorFetch": "Fehler beim Abrufen der Bauern",
     "card": {
       "villageAndCell": "Dorf & Zelle",
@@ -77,6 +78,7 @@
     "info": {
       "addNewPlot": "Neue Parzelle hinzufügen",
       "viewAllPlots": "Alle Parzellen ansehen",
+      "farmerInfo": "Bauerninformationen",
       "basicInformation": {
         "title": "Grundinformation",
         "firstName": "Vorname",
@@ -210,7 +212,11 @@
     },
     "totalArea": "Gesamtfläche",
     "summaryTitle": "Zusammenfassung",
-    "plotsTitle": "Parzellen"
+    "plotsTitle": "Parzellen",
+    "export": "Exportieren",
+    "exportTitle": "Diagramme exportieren",
+    "exportMessage": "Möchten Sie die Diagramme exportieren?",
+    "cancel": "Abbrechen"
   },
   "synced": {
     "itemNotSynced": "Element nicht synchronisiert",

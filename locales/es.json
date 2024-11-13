@@ -69,6 +69,7 @@
       "name": "Nombre",
       "surname": "Apellido"
     },
+    "edit": "Editar",
     "errorFetch": "Error al obtener agricultores",
     "card": {
       "villageAndCell": "Pueblo & Celda",
@@ -77,6 +78,7 @@
     "info": {
       "addNewPlot": "Agregar nueva parcela",
       "viewAllPlots": "Ver todas las parcelas",
+      "farmerInfo": "Información del agricultor",
       "basicInformation": {
         "title": "Información básica",
         "firstName": "Nombre",
@@ -210,7 +212,11 @@
     },
     "totalArea": "área total",
     "summaryTitle": "Resumen",
-    "plotsTitle": "Parcelas"
+    "plotsTitle": "Parcelas",
+    "export": "Exportar",
+    "exportTitle": "Exportar gráficos",
+    "exportMessage": "¿Desea exportar los gráficos?",
+    "cancel": "Cancelar"
   },
   "synced": {
     "itemNotSynced": "Elemento no sincronizado",
