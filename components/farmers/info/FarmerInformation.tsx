@@ -4,17 +4,14 @@ import i18n from '@/locales/i18n';
 import Card, { ItemProps } from '@/components/common/Card';
 import { Map, Plus } from 'lucide-react-native';
 import { Farmer } from '@/types/farmer';
+import { router } from 'expo-router';
 
 interface FarmerInformationProps {
-  selectedFarmer: Farmer;
-  navigateToPlots: () => void;
-  navigateToPlotsMapping: () => void;
+  selectedFarmer: Farmer | null;
 }
 
 export default function FarmerInformation({
   selectedFarmer,
-  navigateToPlots,
-  navigateToPlotsMapping,
 }: FarmerInformationProps) {
   return (
     <ScrollView className="h-full border-t bg-White border-t-LightGray">
@@ -23,7 +20,7 @@ export default function FarmerInformation({
         <Text className="mt-3 mb-5">{selectedFarmer?.id}</Text>
         <Pressable
           className="flex flex-row items-center justify-center w-full px-5 py-3 rounded-md bg-Orange"
-          onPress={navigateToPlotsMapping}
+          onPress={() => router.push('view/new' as any)}
         >
           <Plus className="mr-2 text-White" />
           <Text className="text-[16px] text-White font-semibold">
@@ -32,7 +29,9 @@ export default function FarmerInformation({
         </Pressable>
         <Pressable
           className="flex flex-row items-center justify-center w-full px-5 py-3 mt-4 rounded-md bg-Orange"
-          onPress={navigateToPlots}
+          onPress={() =>
+            router.push(`view/${selectedFarmer?.id?.toString()}` as any)
+          }
         >
           <Map className="mr-2 text-White" />
           <Text className="text-[16px] text-White font-semibold">

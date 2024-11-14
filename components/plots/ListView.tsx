@@ -24,6 +24,7 @@ import { User } from '@/types/user';
 import { RequestParams } from '@/types/auth';
 import cn from '@/utils/cn';
 import { FileUp } from 'lucide-react-native';
+import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
 
 type SummaryData = {
   crop: string;
@@ -46,9 +47,9 @@ export default function ListView({
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingGeoId, setLoadingGeoId] = useState<number>(-1);
 
+  const { selectedFarmer, setSelectedFarmer } = useSelectedFarmerState();
+
   const {
-    selectedFarmer,
-    selectFarmer,
     user,
     productTypes,
     selectedCompany,
@@ -56,8 +57,6 @@ export default function ListView({
     guestAccess,
     makeRequest,
   } = useContext(AuthContext) as {
-    selectedFarmer: Farmer;
-    selectFarmer: (farmer: Farmer) => void;
     user: User;
     productTypes: ProductTypeWithCompanyId[];
     selectedCompany: number;
@@ -311,7 +310,8 @@ export default function ListView({
   };
 
   const refreshGeoId = async (plotId?: number, isSynced?: boolean) => {
-    if (!isConnected || !plotId || !isSynced || guestAccess) return;
+    if (!isConnected || !plotId || !isSynced || guestAccess || !selectedFarmer)
+      return;
 
     setLoadingGeoId(plotId);
 
@@ -331,7 +331,7 @@ export default function ListView({
         return;
       }
 
-      selectFarmer({
+      setSelectedFarmer({
         ...selectedFarmer,
         plots: selectedFarmer.plots?.map((plot) => {
           if (parseInt(plot.id) === plotId) {
@@ -359,6 +359,8 @@ export default function ListView({
   };
 
   const exportPlots = async () => {
+    if (!selectedFarmer) return;
+
     const filePath = `${RNFS.DocumentDirectoryPath}/${selectedFarmer.id}_plots.json`;
 
     try {
@@ -461,7 +463,7 @@ export default function ListView({
               <Pressable
                 className={cn(
                   'flex flex-row items-center self-start px-2 py-1 mt-3 ml-5 -mb-3 rounded-md',
-                  isConnected && !guestAccess ? 'bg-Orange' : 'bg-Orange/60'
+                  isConnected && !guestAccess ? 'bg-Orange' : 'bg-LightOrange'
                 )}
                 disabled={!isConnected || !item.synced || guestAccess}
                 onPress={() => refreshGeoId(item.id, item.synced)}

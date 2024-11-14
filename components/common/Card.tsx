@@ -19,8 +19,7 @@ import {
 } from 'lucide-react-native';
 import { router } from 'expo-router';
 import cn from '@/utils/cn';
-import { AuthContext } from '@/context/AuthContext';
-import { useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Farmer } from '@/types/farmer';
 import { InputCard, InputCardDate } from './Input';
 import { FullWindowOverlay } from 'react-native-screens';
@@ -36,6 +35,7 @@ import i18n from '@/locales/i18n';
 import QRCode from 'react-native-qrcode-svg';
 import { captureRef } from 'react-native-view-shot';
 import Share from 'react-native-share';
+import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
 
 export type CardProps = {
   id?: number;
@@ -81,12 +81,12 @@ export default function Card({
   switchView,
   limitScreen,
 }: CardProps) {
-  const { selectFarmer } = useContext(AuthContext);
+  const { setSelectedFarmer } = useSelectedFarmerState();
 
   const navigateToDetails = () => {
     switch (navigationParams?.type) {
       case 'farmer':
-        selectFarmer(navigationParams.data);
+        setSelectedFarmer(navigationParams.data);
         break;
       default:
         break;

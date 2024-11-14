@@ -1,21 +1,21 @@
-import { Text, Pressable } from 'react-native';
-import { router, useNavigation } from 'expo-router';
+import { Text, Pressable, View } from 'react-native';
+import { Link, useNavigation } from 'expo-router';
 import { useContext, useEffect } from 'react';
 import { AuthContext } from '@/context/AuthContext';
-import { ChevronLeft } from 'lucide-react-native';
-import { Farmer } from '@/types/farmer';
+import { ChevronLeft, User2 } from 'lucide-react-native';
 import FarmerInformationGuest from '@/components/farmers/info/FarmerInformationGuest';
 import FarmerInformation from '@/components/farmers/info/FarmerInformation';
+import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
+import cn from '@/utils/cn';
 
 export default function FarmersInfo() {
-  const { selectedFarmer, guestAccess } = useContext(AuthContext) as {
-    selectedFarmer: Farmer;
+  const { guestAccess } = useContext(AuthContext) as {
     guestAccess: boolean;
   };
+  const { selectedFarmer } = useSelectedFarmerState();
   const navigation = useNavigation();
 
   useEffect(() => {
-    console.log(selectedFarmer);
     navigation.setOptions({
       title: `${selectedFarmer?.name ?? ''} ${selectedFarmer?.surname}`,
       headerLeft: () => (
@@ -27,26 +27,28 @@ export default function FarmersInfo() {
           <Text className="font-medium text-Orange text-[18px]">Back</Text>
         </Pressable>
       ),
+      headerRight: () => (
+        <Link href="/user-settings" asChild>
+          <Pressable>
+            {({ pressed }) => (
+              <View
+                className={cn(
+                  pressed ? 'bg-LightOrange' : 'bg-Orange',
+                  'rounded-full p-[6px]'
+                )}
+              >
+                <User2 size={14} className="text-White" />
+              </View>
+            )}
+          </Pressable>
+        </Link>
+      ),
     });
   }, [selectedFarmer]);
-
-  const navigateToPlots = () => {
-    router.push(`view/${selectedFarmer?.id?.toString()}` as any);
-  };
-
-  const navigateToPlotsMapping = () => {
-    router.push('view/new' as any);
-  };
 
   if (guestAccess) {
     return <FarmerInformationGuest />;
   }
 
-  return (
-    <FarmerInformation
-      selectedFarmer={selectedFarmer}
-      navigateToPlots={navigateToPlots}
-      navigateToPlotsMapping={navigateToPlotsMapping}
-    />
-  );
+  return <FarmerInformation selectedFarmer={selectedFarmer} />;
 }

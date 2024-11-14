@@ -4,6 +4,7 @@ import { Link } from 'expo-router';
 import { ChevronLeft, Info, User2 } from 'lucide-react-native';
 import { useContext } from 'react';
 import { View, Text, Pressable } from 'react-native';
+import i18n from '@/locales/i18n';
 
 export type TopbarProps = {
   title: string;
@@ -11,10 +12,10 @@ export type TopbarProps = {
 };
 
 export default function Topbar(props: TopbarProps) {
-  const { setDocumentationModal } = useContext(AuthContext);
+  const { setDocumentationModal, guestAccess } = useContext(AuthContext);
 
   return (
-    <>
+    <View>
       <View className="flex flex-row items-center justify-between p-5">
         <View className="flex flex-row items-center">
           {props.goBack && (
@@ -45,7 +46,7 @@ export default function Topbar(props: TopbarProps) {
               {({ pressed }) => (
                 <View
                   className={cn(
-                    pressed ? 'bg-Orange/80' : 'bg-Orange',
+                    pressed ? 'bg-LightOrange' : 'bg-Orange',
                     'rounded-full p-[6px]'
                   )}
                 >
@@ -56,6 +57,11 @@ export default function Topbar(props: TopbarProps) {
           </Link>
         </View>
       </View>
-    </>
+      {guestAccess && (
+        <View className="flex flex-row items-center justify-center w-full h-5 -mt-2 bg-purple-300">
+          <Text>{i18n.t('guestAccess')}</Text>
+        </View>
+      )}
+    </View>
   );
 }

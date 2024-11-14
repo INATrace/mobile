@@ -5,6 +5,7 @@
   "loading": "Lädt...",
   "changeInstance": "Instanz ändern",
   "privacyPolicy": "Datenschutzrichtlinie",
+  "guestAccess": "Gastzugang",
   "input": {
     "type": "Eingeben...",
     "select": "Auswählen"

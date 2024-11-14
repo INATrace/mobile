@@ -38,6 +38,7 @@ import { User } from '@/types/user';
 import Card, { CardProps } from '../common/Card';
 import * as turf from '@turf/turf';
 import MarkerPlotSvg from '../svg/MarkerPlotSvg';
+import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '');
 
@@ -70,7 +71,6 @@ export default function MapView({
   const {
     newPlot,
     setNewPlot,
-    selectedFarmer,
     user,
     selectedCompany,
     productTypes,
@@ -79,11 +79,13 @@ export default function MapView({
     newPlot: Plot | null;
     selectedCompany: number;
     setNewPlot: (plot: Plot) => void;
-    selectedFarmer: Farmer;
     user: User;
     productTypes: ProductTypeWithCompanyId[];
     guestAccess: boolean;
   };
+
+  const { selectedFarmer } = useSelectedFarmerState();
+
   const [isMapLoading, setIsMapLoading] = useState<boolean>(true);
   const [cardInfoCollection, setCardInfoCollection] = useState<any[]>([]);
   const [cardInfo, setCardInfo] = useState<CardProps | null>(null);
@@ -260,7 +262,7 @@ export default function MapView({
         }
       }
 
-      if (selectedFarmer.plots && selectedFarmer.plots.length > 0) {
+      if (selectedFarmer?.plots && selectedFarmer.plots.length > 0) {
         for (let plot of selectedFarmer.plots as any) {
           if (!plot.coordinates || plot.coordinates.length === 0) {
             continue;

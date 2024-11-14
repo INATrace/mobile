@@ -2,7 +2,7 @@ import Card from '@/components/common/Card';
 import { ShadowButtonStyle } from '@/constants/Shadow';
 import { AuthContext } from '@/context/AuthContext';
 import i18n from '@/locales/i18n';
-import { Farmer, ProductTypeWithCompanyId } from '@/types/farmer';
+import { ProductTypeWithCompanyId } from '@/types/farmer';
 import { router, useNavigation } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useContext, useEffect, useState } from 'react';
@@ -14,6 +14,7 @@ import { Plot } from '@/types/plot';
 import { User } from '@/types/user';
 import { RequestParams } from '@/types/auth';
 import cn from '@/utils/cn';
+import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
 
 type PlotInto = {
   plotName: string;
@@ -61,8 +62,6 @@ export default function AddPlot() {
     newPlot,
     productTypes,
     selectedCompany,
-    selectedFarmer,
-    selectFarmer,
     user,
     isConnected,
     guestAccess,
@@ -71,8 +70,6 @@ export default function AddPlot() {
     newPlot: Plot;
     productTypes: ProductTypeWithCompanyId[];
     selectedCompany: number;
-    selectedFarmer: Farmer;
-    selectFarmer: (farmer: Farmer) => void;
     user: User;
     isConnected: boolean;
     guestAccess: boolean;
@@ -83,6 +80,8 @@ export default function AddPlot() {
       headers,
     }: RequestParams) => Promise<any>;
   };
+
+  const { selectedFarmer, setSelectedFarmer } = useSelectedFarmerState();
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -203,6 +202,7 @@ export default function AddPlot() {
 
   const savePlot = async () => {
     if (!validateFields()) return;
+    if (!selectedFarmer) return;
 
     setLoading(true);
 
@@ -232,7 +232,7 @@ export default function AddPlot() {
           },
         });
 
-        selectFarmer({
+        setSelectedFarmer({
           ...selectedFarmer,
           plots: [...selectedFarmer.plots, response.data.data],
         });
@@ -358,7 +358,7 @@ export default function AddPlot() {
       <Pressable
         className={cn(
           'flex flex-row items-center justify-center h-12 mx-5 mt-5 mb-10 rounded-md',
-          loading ? 'bg-Orange/80' : 'bg-Orange'
+          loading ? 'bg-LightOrange' : 'bg-Orange'
         )}
         style={ShadowButtonStyle}
         onPress={savePlot}

@@ -375,7 +375,7 @@ export default function MapDownload() {
           <Pressable
             onPress={() => (isConnected ? setSelectingMap(true) : null)}
             className={cn(
-              isConnected ? 'bg-Orange' : 'bg-Orange/50',
+              isConnected ? 'bg-Orange' : 'bg-LightOrange',
               'flex flex-row items-center justify-center h-12 px-2 rounded-md'
             )}
             disabled={!isConnected}

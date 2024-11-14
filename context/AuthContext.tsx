@@ -17,6 +17,7 @@ import { FarmerSchema, PlotSchema } from '@/realm/schemas';
 
 import guestCountries from '@/context/guestCountries.json';
 import guestProductTypes from '@/context/guestProductTypes.json';
+import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
 
 let creatingImageCacheDir: any = null;
 
@@ -25,7 +26,6 @@ export const AuthContext = createContext<{
   logOut: () => void;
   logInGuest: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
-  selectFarmer: (farmer: Farmer) => void;
   selectCompany: (company: number | string | null) => void;
   setNewPlot: (plot: Plot) => void;
   setInstance: (instance: string) => void;
@@ -40,7 +40,6 @@ export const AuthContext = createContext<{
   countries: Country[] | string | null;
   guestAccess: boolean;
   isConnected: boolean;
-  selectedFarmer: Farmer | string | null;
   newPlot: Plot | null;
   documentationModal: boolean;
 }>({
@@ -49,7 +48,6 @@ export const AuthContext = createContext<{
   logInGuest: async () => void 0,
   checkAuth: async () => false,
   makeRequest: async () => null,
-  selectFarmer: () => null,
   selectCompany: () => null,
   setNewPlot: () => null,
   setInstance: () => null,
@@ -63,7 +61,6 @@ export const AuthContext = createContext<{
   countries: null,
   guestAccess: false,
   isConnected: false,
-  selectedFarmer: null,
   newPlot: null,
   documentationModal: false,
 });
@@ -93,9 +90,6 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   const [companies, setCompanies] = useStorageState<
     (CompanyInfo | undefined)[] | string | null
   >('companies', null, 'asyncStorage');
-  const [selectedFarmer, setSelectedFarmer] = useStorageState<
-    Farmer | string | null
-  >('selected_farmer', null, 'asyncStorage');
   const [productTypes, setProductTypes] = useStorageState<
     ProductTypeWithCompanyId[] | string | null
   >('product_type', null, 'asyncStorage');
@@ -109,6 +103,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     'instance',
     process.env.EXPO_PUBLIC_API_URI ?? ''
   );
+
+  const { setSelectedFarmer } = useSelectedFarmerState();
 
   const [documentationModal, setDocumentationModal] = useState<boolean>(false);
 
@@ -437,7 +433,6 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         logInGuest,
         guestAccess,
         checkAuth,
-        selectFarmer: setSelectedFarmer,
         selectCompany: setSelectedCompany,
         makeRequest,
         accessToken,
@@ -447,7 +442,6 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         productTypes,
         countries,
         isConnected,
-        selectedFarmer,
         newPlot,
         setNewPlot,
         instance,

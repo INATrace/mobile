@@ -5,6 +5,7 @@
   "loading": "Loading...",
   "changeInstance": "Change instance",
   "privacyPolicy": "Privacy policy",
+  "guestAccess": "Guest access",
   "input": {
     "type": "Type...",
     "select": "Select"

@@ -5,6 +5,7 @@
   "loading": "Cargando...",
   "changeInstance": "Cambiar instancia",
   "privacyPolicy": "Política de privacidad",
+  "guestAccess": "Acceso de invitado",
   "input": {
     "type": "Escriba...",
     "select": "Seleccione"

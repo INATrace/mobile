@@ -327,7 +327,7 @@ export default function DataSync() {
                   pressed ||
                     !isConnected ||
                     (farmersToSync.length === 0 && plotsToSync.length === 0)
-                    ? 'bg-Orange/80'
+                    ? 'bg-LightOrange'
                     : 'bg-Orange',
                   'flex flex-row m-5 p-3 items-center justify-center rounded-md h-[48px]'
                 )}

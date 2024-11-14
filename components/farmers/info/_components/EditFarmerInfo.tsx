@@ -1,15 +1,11 @@
 import { View, Text, Pressable } from 'react-native';
-import { Farmer } from '@/types/farmer';
 import i18n from '@/locales/i18n';
 import { Pen } from 'lucide-react-native';
 import { router } from 'expo-router';
-import { useContext } from 'react';
-import { AuthContext } from '@/context/AuthContext';
+import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
 
 export default function EditFarmerInfo() {
-  const { selectedFarmer } = useContext(AuthContext) as {
-    selectedFarmer: Farmer;
-  };
+  const { selectedFarmer } = useSelectedFarmerState();
 
   return (
     <>

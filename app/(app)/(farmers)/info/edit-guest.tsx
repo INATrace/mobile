@@ -10,8 +10,8 @@ import {
   BottomSheetModal,
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
-import { useNavigation } from 'expo-router';
-import { ChevronLeft, PlusCircle, XCircle } from 'lucide-react-native';
+import { Link, useNavigation } from 'expo-router';
+import { ChevronLeft, PlusCircle, User2, XCircle } from 'lucide-react-native';
 import {
   useCallback,
   useContext,
@@ -25,6 +25,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import realm from '@/realm/useRealm';
 import { FarmerSchema } from '@/realm/schemas';
 import { FullWindowOverlay } from 'react-native-screens';
+import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
+import cn from '@/utils/cn';
 
 type NewFarmerErrors = {
   lastName: boolean;
@@ -47,18 +49,20 @@ type NewFarmerErrors = {
 };
 
 export default function EditGuestFarmer() {
-  const { countries, productTypes, selectedFarmer } = useContext(
-    AuthContext
-  ) as {
+  const { countries, productTypes } = useContext(AuthContext) as {
     countries: Country[];
     productTypes: ProductTypeWithCompanyId[];
-    selectedFarmer: Farmer;
   };
+
+  const { selectedFarmer, setSelectedFarmer } = useSelectedFarmerState();
+
   const [searchedCountries, setSearchedCountries] =
     useState<Country[]>(countries);
   const navigation = useNavigation();
-  const [oldFarmer, _] = useState<Farmer>(selectedFarmer);
-  const [farmer, setFarmer] = useState<Farmer>(selectedFarmer);
+  const [oldFarmer, _] = useState<Farmer>(selectedFarmer ?? ({} as Farmer));
+  const [farmer, setFarmer] = useState<Farmer>(
+    selectedFarmer ?? ({} as Farmer)
+  );
   const [productTypesSelect, setProductTypesSelect] = useState<ProductType[]>(
     []
   );
@@ -106,6 +110,22 @@ export default function EditGuestFarmer() {
           <ChevronLeft className="text-Orange" />
           <Text className="font-medium text-Orange text-[18px]">Back</Text>
         </Pressable>
+      ),
+      headerRight: () => (
+        <Link href="/user-settings" asChild>
+          <Pressable>
+            {({ pressed }) => (
+              <View
+                className={cn(
+                  pressed ? 'bg-LightOrange' : 'bg-Orange',
+                  'rounded-full p-[6px]'
+                )}
+              >
+                <User2 size={14} className="text-White" />
+              </View>
+            )}
+          </Pressable>
+        </Link>
       ),
     });
   }, [selectedFarmer]);
@@ -340,8 +360,6 @@ export default function EditGuestFarmer() {
         ) ?? [],
     } as any;
 
-    console.log(farmerBody);
-
     try {
       await realm.realmUpdate(
         FarmerSchema,
@@ -349,6 +367,8 @@ export default function EditGuestFarmer() {
         'data',
         JSON.stringify(farmerBody)
       );
+
+      setSelectedFarmer(farmerBody);
 
       Alert.alert(
         i18n.t('farmers.newFarmerCreation.success'),
@@ -429,318 +449,278 @@ export default function EditGuestFarmer() {
   }, [farmer, oldFarmer]);
 
   return (
-    <KeyboardAwareScrollView
-      extraScrollHeight={52}
-      className="h-full border-t bg-White border-t-LightGray"
-    >
-      <Text className="text-[18px] font-medium mt-5 mx-5">
-        {i18n.t('farmers.info.basicInformation.title')}
-      </Text>
-      <Card
-        items={[
-          {
-            type: 'type',
-            name: i18n.t('farmers.info.basicInformation.firstName'),
-            placeholder: i18n.t('input.type'),
-            value: farmer?.name ?? '',
-            setValue: (value: string) => updateState(['name'], value),
-          },
-          {
-            type: 'type',
-            name: i18n.t('farmers.info.basicInformation.lastName') + '*',
-            placeholder: i18n.t('input.type'),
-            value: farmer?.surname ?? '',
-            setValue: (value: string) => updateState(['surname'], value),
-            error: errors.lastName,
-          },
-          {
-            type: 'select',
-            name: i18n.t('farmers.info.basicInformation.gender') + '*',
-            placeholder: i18n.t('input.select'),
-            value: farmer?.gender ?? '',
-            setValue: (value: string) => updateState(['gender'], value),
-            selectItems: genderItems,
-            error: errors.gender,
-          },
-          {
-            type: 'type',
-            name: i18n.t(
-              'farmers.info.basicInformation.companyInternalFarmerId'
-            ),
-            placeholder: i18n.t('input.type'),
-            value: farmer?.farmerCompanyInternalId ?? '',
-            setValue: (value: string) =>
-              updateState(['farmerCompanyInternalId'], value),
-          },
-        ]}
-      />
-
-      <Text className="text-[18px] font-medium mt-5 mx-5">
-        {i18n.t('farmers.info.address.title')}
-      </Text>
-      <Card
-        items={[
-          {
-            type: 'select',
-            name: i18n.t('farmers.info.address.country') + '*',
-            placeholder: i18n.t('input.select'),
-            value: farmer?.location?.address?.country?.name ?? '',
-            setValue: (value: string) =>
-              updateState(
-                ['location', 'address', 'country'],
-                searchedCountries?.find((country) => country.name === value) ??
-                  {}
+    <>
+      <View className="flex flex-row items-center justify-center w-full h-5 bg-purple-300">
+        <Text>{i18n.t('guestAccess')}</Text>
+      </View>
+      <KeyboardAwareScrollView
+        extraScrollHeight={52}
+        className="h-full border-t bg-White border-t-LightGray"
+      >
+        <Text className="text-[18px] font-medium mt-5 mx-5">
+          {i18n.t('farmers.info.basicInformation.title')}
+        </Text>
+        <Card
+          items={[
+            {
+              type: 'type',
+              name: i18n.t('farmers.info.basicInformation.firstName'),
+              placeholder: i18n.t('input.type'),
+              value: farmer?.name ?? '',
+              setValue: (value: string) => updateState(['name'], value),
+            },
+            {
+              type: 'type',
+              name: i18n.t('farmers.info.basicInformation.lastName') + '*',
+              placeholder: i18n.t('input.type'),
+              value: farmer?.surname ?? '',
+              setValue: (value: string) => updateState(['surname'], value),
+              error: errors.lastName,
+            },
+            {
+              type: 'select',
+              name: i18n.t('farmers.info.basicInformation.gender') + '*',
+              placeholder: i18n.t('input.select'),
+              value: farmer?.gender ?? '',
+              setValue: (value: string) => updateState(['gender'], value),
+              selectItems: genderItems,
+              error: errors.gender,
+            },
+            {
+              type: 'type',
+              name: i18n.t(
+                'farmers.info.basicInformation.companyInternalFarmerId'
               ),
-            selectItems: searchedCountries?.map((country: Country) => ({
-              label: country.name,
-              value: country.name,
-            })),
-            selectWithSearch: true,
-            updateSearch: updateSearchCountries,
-            error: errors.country,
-          },
-          ...((farmer?.location?.address?.country?.code === 'HN'
-            ? [
-                {
-                  type: 'type',
-                  name: i18n.t('farmers.info.address.hondurasFarm') + '*',
-                  placeholder: i18n.t('input.type'),
-                  value: farmer?.location?.address?.hondurasFarm ?? '',
-                  setValue: (value: string) =>
-                    updateState(['location', 'address', 'hondurasFarm'], value),
-                  error: errors.hondurasFarm,
-                },
-                {
-                  type: 'type',
-                  name: i18n.t('farmers.info.address.hondurasVillage') + '*',
-                  placeholder: i18n.t('input.type'),
-                  value: farmer?.location?.address?.hondurasVillage ?? '',
-                  setValue: (value: string) =>
-                    updateState(
-                      ['location', 'address', 'hondurasVillage'],
-                      value
-                    ),
-                  error: errors.hondurasVillage,
-                },
-                {
-                  type: 'type',
-                  name:
-                    i18n.t('farmers.info.address.hondurasMunicipality') + '*',
-                  placeholder: i18n.t('input.type'),
-                  value: farmer?.location?.address?.hondurasMunicipality ?? '',
-                  setValue: (value: string) =>
-                    updateState(
-                      ['location', 'address', 'hondurasMunicipality'],
-                      value
-                    ),
-                  error: errors.hondurasMunicipality,
-                },
-                {
-                  type: 'type',
-                  name: i18n.t('farmers.info.address.hondurasDepartment') + '*',
-                  placeholder: i18n.t('input.type'),
-                  value: farmer?.location?.address?.hondurasDepartment ?? '',
-                  setValue: (value: string) =>
-                    updateState(
-                      ['location', 'address', 'hondurasDepartment'],
-                      value
-                    ),
-                  error: errors.hondurasDepartment,
-                },
-              ]
-            : farmer?.location?.address?.country?.code === 'RW'
+              placeholder: i18n.t('input.type'),
+              value: farmer?.farmerCompanyInternalId ?? '',
+              setValue: (value: string) =>
+                updateState(['farmerCompanyInternalId'], value),
+            },
+          ]}
+        />
+
+        <Text className="text-[18px] font-medium mt-5 mx-5">
+          {i18n.t('farmers.info.address.title')}
+        </Text>
+        <Card
+          items={[
+            {
+              type: 'select',
+              name: i18n.t('farmers.info.address.country') + '*',
+              placeholder: i18n.t('input.select'),
+              value: farmer?.location?.address?.country?.name ?? '',
+              setValue: (value: string) =>
+                updateState(
+                  ['location', 'address', 'country'],
+                  searchedCountries?.find(
+                    (country) => country.name === value
+                  ) ?? {}
+                ),
+              selectItems: searchedCountries?.map((country: Country) => ({
+                label: country.name,
+                value: country.name,
+              })),
+              selectWithSearch: true,
+              updateSearch: updateSearchCountries,
+              error: errors.country,
+            },
+            ...((farmer?.location?.address?.country?.code === 'HN'
               ? [
                   {
                     type: 'type',
-                    name: i18n.t('farmers.info.address.village') + '*',
+                    name: i18n.t('farmers.info.address.hondurasFarm') + '*',
                     placeholder: i18n.t('input.type'),
-                    value: farmer?.location?.address?.village ?? '',
+                    value: farmer?.location?.address?.hondurasFarm ?? '',
                     setValue: (value: string) =>
-                      updateState(['location', 'address', 'village'], value),
-                    error: errors.village,
+                      updateState(
+                        ['location', 'address', 'hondurasFarm'],
+                        value
+                      ),
+                    error: errors.hondurasFarm,
                   },
                   {
                     type: 'type',
-                    name: i18n.t('farmers.info.address.cell') + '*',
+                    name: i18n.t('farmers.info.address.hondurasVillage') + '*',
                     placeholder: i18n.t('input.type'),
-                    value: farmer?.location?.address?.cell ?? '',
+                    value: farmer?.location?.address?.hondurasVillage ?? '',
                     setValue: (value: string) =>
-                      updateState(['location', 'address', 'cell'], value),
-                    error: errors.cell,
+                      updateState(
+                        ['location', 'address', 'hondurasVillage'],
+                        value
+                      ),
+                    error: errors.hondurasVillage,
                   },
                   {
                     type: 'type',
-                    name: i18n.t('farmers.info.address.sector') + '*',
+                    name:
+                      i18n.t('farmers.info.address.hondurasMunicipality') + '*',
                     placeholder: i18n.t('input.type'),
-                    value: farmer?.location?.address?.sector ?? '',
+                    value:
+                      farmer?.location?.address?.hondurasMunicipality ?? '',
                     setValue: (value: string) =>
-                      updateState(['location', 'address', 'sector'], value),
-                    error: errors.sector,
+                      updateState(
+                        ['location', 'address', 'hondurasMunicipality'],
+                        value
+                      ),
+                    error: errors.hondurasMunicipality,
+                  },
+                  {
+                    type: 'type',
+                    name:
+                      i18n.t('farmers.info.address.hondurasDepartment') + '*',
+                    placeholder: i18n.t('input.type'),
+                    value: farmer?.location?.address?.hondurasDepartment ?? '',
+                    setValue: (value: string) =>
+                      updateState(
+                        ['location', 'address', 'hondurasDepartment'],
+                        value
+                      ),
+                    error: errors.hondurasDepartment,
                   },
                 ]
-              : customAddress === 'Yes'
+              : farmer?.location?.address?.country?.code === 'RW'
                 ? [
                     {
                       type: 'type',
-                      name: i18n.t('farmers.info.address.customAddress') + '*',
+                      name: i18n.t('farmers.info.address.village') + '*',
                       placeholder: i18n.t('input.type'),
-                      value: farmer?.location?.address?.otherAddress ?? '',
+                      value: farmer?.location?.address?.village ?? '',
                       setValue: (value: string) =>
-                        updateState(
-                          ['location', 'address', 'otherAddress'],
-                          value
-                        ),
-                      error: errors.otherAddress,
+                        updateState(['location', 'address', 'village'], value),
+                      error: errors.village,
                     },
                     {
-                      type: 'checkbox',
-                      name: i18n.t('farmers.info.address.customAddressEnabled'),
-                      value: customAddress,
-                      setValue: (value: string) => updateCustomAddress(value),
+                      type: 'type',
+                      name: i18n.t('farmers.info.address.cell') + '*',
+                      placeholder: i18n.t('input.type'),
+                      value: farmer?.location?.address?.cell ?? '',
+                      setValue: (value: string) =>
+                        updateState(['location', 'address', 'cell'], value),
+                      error: errors.cell,
+                    },
+                    {
+                      type: 'type',
+                      name: i18n.t('farmers.info.address.sector') + '*',
+                      placeholder: i18n.t('input.type'),
+                      value: farmer?.location?.address?.sector ?? '',
+                      setValue: (value: string) =>
+                        updateState(['location', 'address', 'sector'], value),
+                      error: errors.sector,
                     },
                   ]
-                : [
-                    {
-                      type: 'type',
-                      name: i18n.t('farmers.info.address.address') + '*',
-                      placeholder: i18n.t('input.type'),
-                      value: farmer?.location?.address?.address ?? '',
-                      setValue: (value: string) =>
-                        updateState(['location', 'address', 'address'], value),
-                      error: errors.address,
-                    },
-                    {
-                      type: 'type',
-                      name: i18n.t('farmers.info.address.city') + '*',
-                      placeholder: i18n.t('input.type'),
-                      value: farmer?.location?.address?.city ?? '',
-                      setValue: (value: string) =>
-                        updateState(['location', 'address', 'city'], value),
-                      error: errors.city,
-                    },
-                    {
-                      type: 'type',
-                      name: i18n.t('farmers.info.address.state') + '*',
-                      placeholder: i18n.t('input.type'),
-                      value: farmer?.location?.address?.state ?? '',
-                      setValue: (value: string) =>
-                        updateState(['location', 'address', 'state'], value),
-                      error: errors.state,
-                    },
-                    {
-                      type: 'type',
-                      name: i18n.t('farmers.info.address.zip') + '*',
-                      placeholder: i18n.t('input.type'),
-                      value: farmer?.location?.address?.zip ?? '',
-                      setValue: (value: string) =>
-                        updateState(['location', 'address', 'zip'], value),
-                      error: errors.zip,
-                    },
-                    {
-                      type: 'checkbox',
-                      name: i18n.t('farmers.info.address.customAddressEnabled'),
-                      value: customAddress,
-                      setValue: (value: string) => updateCustomAddress(value),
-                    },
-                  ]) as ItemProps[]),
-        ]}
-      />
-
-      <Text className="text-[18px] font-medium mt-5 mx-5">
-        {i18n.t('farmers.info.contact.title')}
-      </Text>
-      <Card
-        items={[
-          {
-            type: 'type',
-            name: i18n.t('farmers.info.contact.phoneNumber'),
-            placeholder: i18n.t('input.type'),
-            value: farmer?.phone ?? '',
-            setValue: (value: string) => updateState(['phone'], value),
-          },
-          {
-            type: 'type',
-            name: i18n.t('farmers.info.contact.email'),
-            placeholder: i18n.t('input.type'),
-            value: farmer?.email ?? '',
-            setValue: (value: string) => updateState(['email'], value),
-          },
-        ]}
-      />
-      <Text className="text-[18px] font-medium mt-5 mx-5">
-        {i18n.t('farmers.info.productTypes.title')}
-      </Text>
-      <View className="flex items-center w-full">
-        <View className="flex flex-row flex-wrap justify-start w-full px-5 mt-2 mb-4">
-          {farmer?.farm?.farmPlantInformationList?.map((item, index) => (
-            <View
-              key={index}
-              className="flex flex-row items-center justify-between px-2 py-1 mt-2 mr-2 border rounded-md border-DarkGray"
-            >
-              <Text className="text-[16px] text-black mr-2">
-                {item.productType.name.trim()}
-              </Text>
-              <Pressable
-                className="flex items-center justify-center"
-                onPress={() => {
-                  setFarmer((currentFarmer: Farmer) => {
-                    return {
-                      ...currentFarmer,
-                      farm: {
-                        ...currentFarmer.farm,
-                        farmPlantInformationList:
-                          currentFarmer.farm?.farmPlantInformationList?.filter(
-                            (f) => f.productType.id !== item.productType.id
+                : customAddress === 'Yes'
+                  ? [
+                      {
+                        type: 'type',
+                        name:
+                          i18n.t('farmers.info.address.customAddress') + '*',
+                        placeholder: i18n.t('input.type'),
+                        value: farmer?.location?.address?.otherAddress ?? '',
+                        setValue: (value: string) =>
+                          updateState(
+                            ['location', 'address', 'otherAddress'],
+                            value
                           ),
+                        error: errors.otherAddress,
                       },
-                    };
-                  });
-                }}
+                      {
+                        type: 'checkbox',
+                        name: i18n.t(
+                          'farmers.info.address.customAddressEnabled'
+                        ),
+                        value: customAddress,
+                        setValue: (value: string) => updateCustomAddress(value),
+                      },
+                    ]
+                  : [
+                      {
+                        type: 'type',
+                        name: i18n.t('farmers.info.address.address') + '*',
+                        placeholder: i18n.t('input.type'),
+                        value: farmer?.location?.address?.address ?? '',
+                        setValue: (value: string) =>
+                          updateState(
+                            ['location', 'address', 'address'],
+                            value
+                          ),
+                        error: errors.address,
+                      },
+                      {
+                        type: 'type',
+                        name: i18n.t('farmers.info.address.city') + '*',
+                        placeholder: i18n.t('input.type'),
+                        value: farmer?.location?.address?.city ?? '',
+                        setValue: (value: string) =>
+                          updateState(['location', 'address', 'city'], value),
+                        error: errors.city,
+                      },
+                      {
+                        type: 'type',
+                        name: i18n.t('farmers.info.address.state') + '*',
+                        placeholder: i18n.t('input.type'),
+                        value: farmer?.location?.address?.state ?? '',
+                        setValue: (value: string) =>
+                          updateState(['location', 'address', 'state'], value),
+                        error: errors.state,
+                      },
+                      {
+                        type: 'type',
+                        name: i18n.t('farmers.info.address.zip') + '*',
+                        placeholder: i18n.t('input.type'),
+                        value: farmer?.location?.address?.zip ?? '',
+                        setValue: (value: string) =>
+                          updateState(['location', 'address', 'zip'], value),
+                        error: errors.zip,
+                      },
+                      {
+                        type: 'checkbox',
+                        name: i18n.t(
+                          'farmers.info.address.customAddressEnabled'
+                        ),
+                        value: customAddress,
+                        setValue: (value: string) => updateCustomAddress(value),
+                      },
+                    ]) as ItemProps[]),
+          ]}
+        />
+
+        <Text className="text-[18px] font-medium mt-5 mx-5">
+          {i18n.t('farmers.info.contact.title')}
+        </Text>
+        <Card
+          items={[
+            {
+              type: 'type',
+              name: i18n.t('farmers.info.contact.phoneNumber'),
+              placeholder: i18n.t('input.type'),
+              value: farmer?.phone ?? '',
+              setValue: (value: string) => updateState(['phone'], value),
+            },
+            {
+              type: 'type',
+              name: i18n.t('farmers.info.contact.email'),
+              placeholder: i18n.t('input.type'),
+              value: farmer?.email ?? '',
+              setValue: (value: string) => updateState(['email'], value),
+            },
+          ]}
+        />
+        <Text className="text-[18px] font-medium mt-5 mx-5">
+          {i18n.t('farmers.info.productTypes.title')}
+        </Text>
+        <View className="flex items-center w-full">
+          <View className="flex flex-row flex-wrap justify-start w-full px-5 mt-2 mb-4">
+            {farmer?.farm?.farmPlantInformationList?.map((item, index) => (
+              <View
+                key={index}
+                className="flex flex-row items-center justify-between px-2 py-1 mt-2 mr-2 border rounded-md border-DarkGray"
               >
-                <XCircle className="text-black" size={16} />
-              </Pressable>
-            </View>
-          ))}
-        </View>
-        <BottomSheetModal
-          ref={bottomSheetRef}
-          index={0}
-          snapPoints={['50%']}
-          backdropComponent={(props) => (
-            <BottomSheetBackdrop
-              {...props}
-              onPress={() => bottomSheetRef.current?.close()}
-              disappearsOnIndex={-1}
-            />
-          )}
-          enableDismissOnClose={true}
-          containerComponent={
-            Platform.OS === 'ios' ? containerComponent : undefined
-          }
-        >
-          <BottomSheetScrollView className="rounded-t-md">
-            <SelectorMultiple
-              items={productTypesSelect.map((productType: ProductType) => ({
-                label: productType.name,
-                value: productType.id,
-              }))}
-              selected={
-                farmer?.farm?.farmPlantInformationList?.length > 0
-                  ? farmer?.farm?.farmPlantInformationList?.map(
-                      (item) => item.productType.id
-                    )
-                  : []
-              }
-              setSelected={(selected: string | number) => {
-                const productType = productTypesSelect.find(
-                  (productType) => productType.id === selected
-                );
-                if (productType) {
-                  if (
-                    farmer?.farm?.farmPlantInformationList?.find(
-                      (item) => item.productType.id === selected
-                    )
-                  ) {
+                <Text className="text-[16px] text-black mr-2">
+                  {item.productType.name.trim()}
+                </Text>
+                <Pressable
+                  className="flex items-center justify-center"
+                  onPress={() => {
                     setFarmer((currentFarmer: Farmer) => {
                       return {
                         ...currentFarmer,
@@ -748,201 +728,263 @@ export default function EditGuestFarmer() {
                           ...currentFarmer.farm,
                           farmPlantInformationList:
                             currentFarmer.farm?.farmPlantInformationList?.filter(
-                              (item) => item.productType.id !== selected
+                              (f) => f.productType.id !== item.productType.id
                             ),
                         },
                       };
                     });
-                  } else {
+                  }}
+                >
+                  <XCircle className="text-black" size={16} />
+                </Pressable>
+              </View>
+            ))}
+          </View>
+          <BottomSheetModal
+            ref={bottomSheetRef}
+            index={0}
+            snapPoints={['50%']}
+            backdropComponent={(props) => (
+              <BottomSheetBackdrop
+                {...props}
+                onPress={() => bottomSheetRef.current?.close()}
+                disappearsOnIndex={-1}
+              />
+            )}
+            enableDismissOnClose={true}
+            containerComponent={
+              Platform.OS === 'ios' ? containerComponent : undefined
+            }
+          >
+            <BottomSheetScrollView className="rounded-t-md">
+              <SelectorMultiple
+                items={productTypesSelect.map((productType: ProductType) => ({
+                  label: productType.name,
+                  value: productType.id,
+                }))}
+                selected={
+                  farmer?.farm?.farmPlantInformationList?.length > 0
+                    ? farmer?.farm?.farmPlantInformationList?.map(
+                        (item) => item.productType.id
+                      )
+                    : []
+                }
+                setSelected={(selected: string | number) => {
+                  const productType = productTypesSelect.find(
+                    (productType) => productType.id === selected
+                  );
+                  if (productType) {
+                    if (
+                      farmer?.farm?.farmPlantInformationList?.find(
+                        (item) => item.productType.id === selected
+                      )
+                    ) {
+                      setFarmer((currentFarmer: Farmer) => {
+                        return {
+                          ...currentFarmer,
+                          farm: {
+                            ...currentFarmer.farm,
+                            farmPlantInformationList:
+                              currentFarmer.farm?.farmPlantInformationList?.filter(
+                                (item) => item.productType.id !== selected
+                              ),
+                          },
+                        };
+                      });
+                    } else {
+                      setFarmer((currentFarmer: Farmer) => {
+                        return {
+                          ...currentFarmer,
+                          farm: {
+                            ...currentFarmer.farm,
+                            farmPlantInformationList: [
+                              ...(currentFarmer.farm
+                                ?.farmPlantInformationList ?? []),
+                              {
+                                productType,
+                                plantCultivatedArea: 0,
+                                numberOfPlants: 0,
+                              },
+                            ],
+                          },
+                        };
+                      });
+                    }
+                  }
+                }}
+              />
+            </BottomSheetScrollView>
+          </BottomSheetModal>
+          <Pressable onPress={() => bottomSheetRef.current?.present()}>
+            <PlusCircle className="text-black" />
+          </Pressable>
+        </View>
+        <Text className="text-[18px] font-medium mt-5 mx-5">
+          {i18n.t('farmers.info.farmInformation.title')}
+        </Text>
+        <Card
+          items={[
+            {
+              type: 'type',
+              name: i18n.t('farmers.info.farmInformation.areaUnit') + '*',
+              placeholder: i18n.t('input.type'),
+              value: farmer?.farm?.areaUnit ?? '',
+              setValue: (value: string) =>
+                updateState(['farm', 'areaUnit'], value),
+              error: errors.areaUnit,
+            },
+            {
+              type: 'type',
+              name:
+                i18n.t('farmers.info.farmInformation.totalFarmSize') +
+                ` (${farmer?.farm?.areaUnit ?? '/'})` +
+                '*',
+              placeholder: i18n.t('input.type'),
+              value: farmer?.farm?.totalCultivatedArea?.toString() ?? '',
+              setValue: (value: string) =>
+                updateState(['farm', 'totalCultivatedArea'], value),
+              isNumeric: true,
+              error: errors.totalCultivatedArea,
+            },
+            ...(farmer?.farm?.farmPlantInformationList
+              ?.map((item, index) => [
+                {
+                  type: 'view',
+                  name:
+                    i18n.t('farmers.info.farmInformation.productType') +
+                    ` ${index + 1}`,
+                  value: item.productType.name,
+                } as ItemProps,
+                {
+                  type: 'type',
+                  name:
+                    i18n.t('farmers.info.farmInformation.area') +
+                    ` (${farmer?.farm?.areaUnit ?? '/'})`,
+                  value: item?.plantCultivatedArea?.toString(),
+                  placeholder: i18n.t('input.type'),
+                  setValue: (value: string) => {
                     setFarmer((currentFarmer: Farmer) => {
                       return {
                         ...currentFarmer,
                         farm: {
                           ...currentFarmer.farm,
-                          farmPlantInformationList: [
-                            ...(currentFarmer.farm?.farmPlantInformationList ??
-                              []),
-                            {
-                              productType,
-                              plantCultivatedArea: 0,
-                              numberOfPlants: 0,
-                            },
-                          ],
+                          farmPlantInformationList:
+                            currentFarmer.farm?.farmPlantInformationList?.map(
+                              (f, i) => {
+                                if (i === index) {
+                                  return {
+                                    ...f,
+                                    plantCultivatedArea: parseFloat(value) || 0,
+                                  };
+                                }
+                                return f;
+                              }
+                            ),
                         },
                       };
                     });
-                  }
-                }
-              }}
-            />
-          </BottomSheetScrollView>
-        </BottomSheetModal>
-        <Pressable onPress={() => bottomSheetRef.current?.present()}>
-          <PlusCircle className="text-black" />
-        </Pressable>
-      </View>
-      <Text className="text-[18px] font-medium mt-5 mx-5">
-        {i18n.t('farmers.info.farmInformation.title')}
-      </Text>
-      <Card
-        items={[
-          {
-            type: 'type',
-            name: i18n.t('farmers.info.farmInformation.areaUnit') + '*',
-            placeholder: i18n.t('input.type'),
-            value: farmer?.farm?.areaUnit ?? '',
-            setValue: (value: string) =>
-              updateState(['farm', 'areaUnit'], value),
-            error: errors.areaUnit,
-          },
-          {
-            type: 'type',
-            name:
-              i18n.t('farmers.info.farmInformation.totalFarmSize') +
-              ` (${farmer?.farm?.areaUnit ?? '/'})` +
-              '*',
-            placeholder: i18n.t('input.type'),
-            value: farmer?.farm?.totalCultivatedArea?.toString() ?? '',
-            setValue: (value: string) =>
-              updateState(['farm', 'totalCultivatedArea'], value),
-            isNumeric: true,
-            error: errors.totalCultivatedArea,
-          },
-          ...(farmer?.farm?.farmPlantInformationList
-            ?.map((item, index) => [
-              {
-                type: 'view',
-                name:
-                  i18n.t('farmers.info.farmInformation.productType') +
-                  ` ${index + 1}`,
-                value: item.productType.name,
-              } as ItemProps,
-              {
-                type: 'type',
-                name:
-                  i18n.t('farmers.info.farmInformation.area') +
-                  ` (${farmer?.farm?.areaUnit ?? '/'})`,
-                value: item?.plantCultivatedArea?.toString(),
-                placeholder: i18n.t('input.type'),
-                setValue: (value: string) => {
-                  setFarmer((currentFarmer: Farmer) => {
-                    return {
-                      ...currentFarmer,
-                      farm: {
-                        ...currentFarmer.farm,
-                        farmPlantInformationList:
-                          currentFarmer.farm?.farmPlantInformationList?.map(
-                            (f, i) => {
-                              if (i === index) {
-                                return {
-                                  ...f,
-                                  plantCultivatedArea: parseFloat(value) || 0,
-                                };
+                  },
+                  isNumeric: true,
+                } as ItemProps,
+                {
+                  type: 'type',
+                  name: i18n.t('farmers.info.farmInformation.plants'),
+                  value: item?.numberOfPlants?.toString(),
+                  placeholder: i18n.t('input.type'),
+                  setValue: (value: string) => {
+                    setFarmer((currentFarmer: Farmer) => {
+                      return {
+                        ...currentFarmer,
+                        farm: {
+                          ...currentFarmer.farm,
+                          farmPlantInformationList:
+                            currentFarmer.farm?.farmPlantInformationList?.map(
+                              (f, i) => {
+                                if (i === index) {
+                                  return {
+                                    ...f,
+                                    numberOfPlants: parseFloat(value) || 0,
+                                  };
+                                }
+                                return f;
                               }
-                              return f;
-                            }
-                          ),
-                      },
-                    };
-                  });
-                },
-                isNumeric: true,
-              } as ItemProps,
-              {
-                type: 'type',
-                name: i18n.t('farmers.info.farmInformation.plants'),
-                value: item?.numberOfPlants?.toString(),
-                placeholder: i18n.t('input.type'),
-                setValue: (value: string) => {
-                  setFarmer((currentFarmer: Farmer) => {
-                    return {
-                      ...currentFarmer,
-                      farm: {
-                        ...currentFarmer.farm,
-                        farmPlantInformationList:
-                          currentFarmer.farm?.farmPlantInformationList?.map(
-                            (f, i) => {
-                              if (i === index) {
-                                return {
-                                  ...f,
-                                  numberOfPlants: parseFloat(value) || 0,
-                                };
-                              }
-                              return f;
-                            }
-                          ),
-                      },
-                    };
-                  });
-                },
-                isNumeric: true,
-              } as ItemProps,
-            ])
-            .flat() || []),
-          {
-            type: 'checkbox',
-            name: i18n.t('farmers.info.farmInformation.organicFarm'),
-            value: farmer?.farm?.organic ? i18n.t('yes') : i18n.t('no'),
-            setValue: (value: string) =>
-              updateState(
-                ['farm', 'organic'],
-                value === i18n.t('yes') ? true : false
+                            ),
+                        },
+                      };
+                    });
+                  },
+                  isNumeric: true,
+                } as ItemProps,
+              ])
+              .flat() || []),
+            {
+              type: 'checkbox',
+              name: i18n.t('farmers.info.farmInformation.organicFarm'),
+              value: farmer?.farm?.organic ? i18n.t('yes') : i18n.t('no'),
+              setValue: (value: string) =>
+                updateState(
+                  ['farm', 'organic'],
+                  value === i18n.t('yes') ? true : false
+                ),
+            },
+            {
+              type: 'date',
+              name: i18n.t(
+                'farmers.info.farmInformation.startedTransitionToOrganic'
               ),
-          },
-          {
-            type: 'date',
-            name: i18n.t(
-              'farmers.info.farmInformation.startedTransitionToOrganic'
-            ),
-            placeholder: i18n.t('input.select'),
-            value: farmer?.farm?.startTransitionToOrganic ?? '',
-            setValue: (value: string) =>
-              updateState(['farm', 'startTransitionToOrganic'], value),
-          },
-        ]}
-      />
-      <Text className="text-[18px] font-medium mt-5 mx-5">
-        {i18n.t('farmers.info.bankInformation.title')}
-      </Text>
-      <Card
-        items={[
-          {
-            type: 'type',
-            name: i18n.t('farmers.info.bankInformation.bankAccountHolder'),
-            placeholder: i18n.t('input.type'),
-            value: farmer?.bank?.accountHolderName ?? '',
-            setValue: (value: string) =>
-              updateState(['bank', 'accountHolderName'], value),
-          },
-          {
-            type: 'type',
-            name: i18n.t('farmers.info.bankInformation.bankAccountNumber'),
-            placeholder: i18n.t('input.type'),
-            value: farmer?.bank?.accountNumber ?? '',
-            setValue: (value: string) =>
-              updateState(['bank', 'accountNumber'], value),
-          },
-          {
-            type: 'type',
-            name: i18n.t('farmers.info.bankInformation.bankName'),
-            placeholder: i18n.t('input.type'),
-            value: farmer?.bank?.bankName ?? '',
-            setValue: (value: string) =>
-              updateState(['bank', 'bankName'], value),
-          },
-        ]}
-      />
-
-      <Pressable
-        onPress={saveFarmer}
-        className="flex flex-row items-center justify-center h-12 mx-5 mt-5 mb-10 rounded-md bg-Orange"
-        style={ShadowButtonStyle}
-        disabled={isDisabled}
-      >
-        <Text className="text-White text-[18px] font-medium">
-          {i18n.t('farmers.newFarmerCreation.saveFarmer')}
+              placeholder: i18n.t('input.select'),
+              value: farmer?.farm?.startTransitionToOrganic ?? '',
+              setValue: (value: string) =>
+                updateState(['farm', 'startTransitionToOrganic'], value),
+            },
+          ]}
+        />
+        <Text className="text-[18px] font-medium mt-5 mx-5">
+          {i18n.t('farmers.info.bankInformation.title')}
         </Text>
-      </Pressable>
-    </KeyboardAwareScrollView>
+        <Card
+          items={[
+            {
+              type: 'type',
+              name: i18n.t('farmers.info.bankInformation.bankAccountHolder'),
+              placeholder: i18n.t('input.type'),
+              value: farmer?.bank?.accountHolderName ?? '',
+              setValue: (value: string) =>
+                updateState(['bank', 'accountHolderName'], value),
+            },
+            {
+              type: 'type',
+              name: i18n.t('farmers.info.bankInformation.bankAccountNumber'),
+              placeholder: i18n.t('input.type'),
+              value: farmer?.bank?.accountNumber ?? '',
+              setValue: (value: string) =>
+                updateState(['bank', 'accountNumber'], value),
+            },
+            {
+              type: 'type',
+              name: i18n.t('farmers.info.bankInformation.bankName'),
+              placeholder: i18n.t('input.type'),
+              value: farmer?.bank?.bankName ?? '',
+              setValue: (value: string) =>
+                updateState(['bank', 'bankName'], value),
+            },
+          ]}
+        />
+
+        <Pressable
+          onPress={saveFarmer}
+          className={cn(
+            'flex flex-row items-center justify-center h-12 mx-5 mt-5 mb-10 rounded-md',
+            isDisabled ? 'bg-LightOrange' : 'bg-Orange'
+          )}
+          style={ShadowButtonStyle}
+          disabled={isDisabled}
+        >
+          <Text className="text-White text-[18px] font-medium">
+            {i18n.t('farmers.newFarmerCreation.saveFarmer')}
+          </Text>
+        </Pressable>
+      </KeyboardAwareScrollView>
+    </>
   );
 }
