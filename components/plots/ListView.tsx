@@ -1,4 +1,12 @@
-import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  Text,
+  View,
+  Linking,
+} from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 import Share from 'react-native-share';
 import RNFS from 'react-native-fs';
 import ViewSwitcher, { ViewSwitcherProps } from './ViewSwitcher';
@@ -28,6 +36,11 @@ export default function ListView({
   setViewType,
   setSeePlot,
 }: ViewSwitcherProps) {
+  const [featureCollection, setFeatureCollection] =
+    useState<GeoJSON.FeatureCollection>({
+      type: 'FeatureCollection',
+      features: [],
+    });
   const [data, setData] = useState<CardProps[]>([]);
   const [summary, setSummary] = useState<CardProps>({} as CardProps);
   const [loading, setLoading] = useState<boolean>(true);
@@ -76,6 +89,8 @@ export default function ListView({
     try {
       let summaryData: SummaryData[] = [];
 
+      if ((productTypes as any) === 'none') return;
+
       const product = guestAccess
         ? {
             companyId: 0,
@@ -94,10 +109,14 @@ export default function ListView({
         `farmerId == '${selectedFarmer?.id}' AND userId == '${guestAccess ? '0' : user.id}'`
       );
 
+      let features: GeoJSON.Feature[] = [];
+
       const dataToDisplay =
         offlinePlots?.map((plot: any) => {
           const plotData = JSON.parse(plot.data) as Plot;
           const summarySize = parseFloat(plotData.size.split(' ')[0]);
+
+          features.push(plotData.featureInfo);
 
           if (summaryData.find((s) => s.crop === plotData.crop)) {
             const summaryIndex = summaryData.findIndex(
@@ -189,6 +208,19 @@ export default function ListView({
             });
           }
 
+          const featureInfo = {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                plot?.coordinates.map((c: any) => [c.longitude, c.latitude]),
+              ],
+            },
+          };
+
+          features.push(featureInfo as any);
+
           const crop = product?.productTypes.find((p) => p.id === plot.crop.id);
 
           return {
@@ -265,6 +297,11 @@ export default function ListView({
         });
       }
 
+      setFeatureCollection({
+        type: 'FeatureCollection',
+        features,
+      });
+
       setData([...dataToDisplay, ...farmerPlots]);
     } catch (error) {
       console.error('Failed to load plots:', error);
@@ -322,49 +359,65 @@ export default function ListView({
   };
 
   const exportPlots = async () => {
-    Alert.alert(i18n.t('plots.exportTitle'), i18n.t('plots.exportMessage'), [
-      {
-        text: i18n.t('plots.cancel'),
-        style: 'cancel',
-      },
-      {
-        text: i18n.t('plots.export'),
-        onPress: async () => {
-          try {
-            // Step 1: Prepare plots data
-            const plots = data.map((plot) => {
-              const plotData = plot.items.reduce((acc, item) => {
-                acc[item.name] = item.value;
-                return acc;
-              }, {} as any);
-              return plotData;
-            });
+    const filePath = `${RNFS.DocumentDirectoryPath}/${selectedFarmer.id}_plots.json`;
 
-            const plotsJson = JSON.stringify(plots, null, 2);
+    try {
+      const plotsJson = JSON.stringify(featureCollection);
 
-            // Step 2: Define the file path
-            const filePath = `${RNFS.DocumentDirectoryPath}/plots.json`;
+      await RNFS.writeFile(filePath, plotsJson, 'utf8');
 
-            // Step 3: Write JSON data to the file
-            await RNFS.writeFile(filePath, plotsJson, 'utf8');
-            console.log(`File saved to: ${filePath}`);
-
-            // Step 4: Share the file using react-native-share
+      Alert.alert(i18n.t('plots.exportTitle'), i18n.t('plots.exportMessage'), [
+        {
+          text: i18n.t('plots.cancel'),
+          style: 'cancel',
+          onPress: async () => {
+            await RNFS.unlink(filePath);
+          },
+        },
+        {
+          text: i18n.t('plots.share'),
+          onPress: async () => {
             const shareOptions = {
               title: i18n.t('plots.exportTitle'),
               url: `file://${filePath}`,
               type: 'application/json',
-              filename: 'plots.json', // Optional
-              subject: i18n.t('plots.exportSubject'),
+              filename: `${selectedFarmer.id}_plots.json`,
             };
-
             await Share.open(shareOptions);
-          } catch (error) {
-            console.error('Failed to export plots:', error);
-          }
+          },
         },
-      },
-    ]);
+        {
+          text: i18n.t('plots.copyContent'),
+          onPress: async () => {
+            try {
+              Clipboard.setString(plotsJson);
+              Alert.alert(
+                i18n.t('plots.copySuccessTitle'),
+                i18n.t('plots.copySuccessMessage')
+              );
+            } catch (error) {
+              console.error('Failed to copy content:', error);
+              await RNFS.unlink(filePath);
+              Alert.alert(
+                i18n.t('plots.exportError'),
+                i18n.t('plots.copyErrorMessage')
+              );
+            }
+          },
+        },
+      ]);
+    } catch (error) {
+      try {
+        await RNFS.unlink(filePath);
+      } catch (unlinkError) {
+        console.error('Failed to delete file:', unlinkError);
+
+        Alert.alert(
+          i18n.t('plots.exportError'),
+          i18n.t('plots.exportErrorMessage')
+        );
+      }
+    }
   };
 
   return (

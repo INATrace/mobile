@@ -140,9 +140,11 @@
       "saveFarmer": "Bauern speichern",
       "success": "Erfolg",
       "successMessage": "Bauer erfolgreich erstellt",
+      "successEditMessage": "Bauer erfolgreich bearbeitet",
       "ok": "OK",
       "error": "Fehler",
-      "errorMessage": "Beim Erstellen des Bauern ist ein Fehler aufgetreten"
+      "errorMessage": "Beim Erstellen des Bauern ist ein Fehler aufgetreten",
+      "errorEditMessage": "Beim Bearbeiten des Bauern ist ein Fehler aufgetreten"
     }
   },
   "plots": {
@@ -216,7 +218,17 @@
     "export": "Exportieren",
     "exportTitle": "Diagramme exportieren",
     "exportMessage": "Möchten Sie die Diagramme exportieren?",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "share": "Teilen",
+    "shareErrorMessage": "Fehler beim Teilen der Datei.",
+    "copyContent": "Inhalt kopieren",
+    "copySuccessTitle": "Kopiert",
+    "copySuccessMessage": "Der Inhalt wurde in die Zwischenablage kopiert.",
+    "copyErrorMessage": "Fehler beim Kopieren des Inhalts.",
+    "exportError": "Exportfehler",
+    "exportErrorMessage": "Beim Exportieren der Plots ist ein Fehler aufgetreten.",
+    "exportOptionsTitle": "Aktion wählen",
+    "exportOptionsMessage": "Wählen Sie aus, wie Sie mit der exportierten Datei fortfahren möchten."
   },
   "synced": {
     "itemNotSynced": "Element nicht synchronisiert",

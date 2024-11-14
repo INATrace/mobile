@@ -140,9 +140,11 @@
       "saveFarmer": "Guardar agricultor",
       "success": "Éxito",
       "successMessage": "Agricultor creado con éxito",
+      "successEditMessage": "Agricultor editado con éxito",
       "ok": "OK",
       "error": "Error",
-      "errorMessage": "Hubo un error al crear el agricultor"
+      "errorMessage": "Hubo un error al crear el agricultor",
+      "errorEditMessage": "Hubo un error al editar el agricultor"
     }
   },
   "plots": {
@@ -216,7 +218,17 @@
     "export": "Exportar",
     "exportTitle": "Exportar gráficos",
     "exportMessage": "¿Desea exportar los gráficos?",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "share": "Compartir",
+    "shareErrorMessage": "Error al compartir el archivo.",
+    "copyContent": "Copiar contenido",
+    "copySuccessTitle": "Copiado",
+    "copySuccessMessage": "El contenido se ha copiado al portapapeles.",
+    "copyErrorMessage": "Error al copiar el contenido.",
+    "exportError": "Error de exportación",
+    "exportErrorMessage": "Ocurrió un error al exportar los plots.",
+    "exportOptionsTitle": "Elija una acción",
+    "exportOptionsMessage": "Seleccione cómo desea proceder con el archivo exportado."
   },
   "synced": {
     "itemNotSynced": "Elemento no sincronizado",

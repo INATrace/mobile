@@ -140,9 +140,11 @@
       "saveFarmer": "Bika Umuhinzi",
       "success": "Byagenze Neza",
       "successMessage": "Umuhinzi yararemwe neza",
+      "successEditMessage": "Umuhinzi yahindutse neza",
       "ok": "OK",
       "error": "Ikosa",
-      "errorMessage": "Habaye ikibazo mu kurema umuhinzi"
+      "errorMessage": "Habaye ikibazo mu kurema umuhinzi",
+      "errorEditMessage": "Habaye ikosa mu kuhindura umuhinzi"
     }
   },
   "plots": {
@@ -216,7 +218,17 @@
     "export": "Eksporta",
     "exportTitle": "Ohereza ibishushanyo",
     "exportMessage": "Urashaka kohereza ibishushanyo?",
-    "cancel": "Hagarika"
+    "cancel": "Hagarika",
+    "share": "Sangira",
+    "shareErrorMessage": "Ikosa ryo gusangiza ifayili.",
+    "copyContent": "Gukoporora Ibirimo",
+    "copySuccessTitle": "Byakoporowe",
+    "copySuccessMessage": "Ibirimo byakoporowe mu kubika kopi.",
+    "copyErrorMessage": "Ikosa ryo gukoporora ibirimo.",
+    "exportError": "Ikosa ryo kohereza",
+    "exportErrorMessage": "Habayeho ikosa mu kohereza plots.",
+    "exportOptionsTitle": "Hitamo Igikorwa",
+    "exportOptionsMessage": "Hitamo uburyo ushaka gukoresha ifayili yoherejwe."
   },
   "synced": {
     "itemNotSynced": "Igikoresho kitahuje",

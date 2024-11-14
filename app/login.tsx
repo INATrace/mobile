@@ -83,7 +83,7 @@ export default function Login() {
     Keyboard.dismiss();
 
     try {
-      logInGuest();
+      await logInGuest();
     } catch (error) {
       console.error('Error logging in as guest:', error);
     }

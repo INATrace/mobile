@@ -44,14 +44,18 @@ export function useStorageState<T extends StorageValue>(
 
   useEffect(() => {
     (async () => {
-      let value: string | null = null;
-      if (storageType === 'secureStore') {
-        value = await getItemAsync(key);
-      } else {
-        value = await AsyncStorage.getItem(key);
+      try {
+        let value: string | null = null;
+        if (storageType === 'secureStore') {
+          value = await getItemAsync(key);
+        } else {
+          value = await AsyncStorage.getItem(key);
+        }
+        const parsedValue = value ? JSON.parse(value) : 'none';
+        setState(parsedValue);
+      } catch (error) {
+        console.error(error);
       }
-      const parsedValue = value ? JSON.parse(value) : 'none';
-      setState(parsedValue);
     })();
   }, [key, storageType, initialValue]);
 

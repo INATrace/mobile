@@ -1,31 +1,15 @@
 import { View, Text, Pressable } from 'react-native';
 import { Farmer } from '@/types/farmer';
 import i18n from '@/locales/i18n';
-import { ChevronLeft, Pen } from 'lucide-react-native';
-import { router, useNavigation } from 'expo-router';
-import { useContext, useEffect } from 'react';
+import { Pen } from 'lucide-react-native';
+import { router } from 'expo-router';
+import { useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 
 export default function EditFarmerInfo() {
   const { selectedFarmer } = useContext(AuthContext) as {
     selectedFarmer: Farmer;
   };
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    navigation.setOptions({
-      title: `${selectedFarmer?.name ?? ''} ${selectedFarmer?.surname}`,
-      headerLeft: () => (
-        <Pressable
-          onPress={() => navigation.goBack()}
-          className="flex flex-row items-center justify-center mr-3"
-        >
-          <ChevronLeft className="text-Orange" />
-          <Text className="font-medium text-Orange text-[18px]">Back</Text>
-        </Pressable>
-      ),
-    });
-  }, [selectedFarmer]);
 
   return (
     <>

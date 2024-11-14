@@ -140,9 +140,11 @@
       "saveFarmer": "Save farmer",
       "success": "Success",
       "successMessage": "Farmer successfully created",
+      "successEditMessage": "Farmer successfully edited",
       "ok": "OK",
       "error": "Error",
-      "errorMessage": "There was an error creating the farmer"
+      "errorMessage": "There was an error creating the farmer",
+      "errorEditMessage": "There was an error editing the farmer"
     }
   },
   "plots": {
@@ -216,7 +218,17 @@
     "export": "Export",
     "exportTitle": "Export plots",
     "exportMessage": "Do you want to export the plots?",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "share": "Share",
+    "shareErrorMessage": "Failed to share the file.",
+    "copyContent": "Copy Content",
+    "copySuccessTitle": "Copied",
+    "copySuccessMessage": "The content has been copied to your clipboard.",
+    "copyErrorMessage": "Failed to copy the content.",
+    "exportError": "Export Error",
+    "exportErrorMessage": "An error occurred while exporting the plots.",
+    "exportOptionsTitle": "Choose an action",
+    "exportOptionsMessage": "Select how you want to proceed with the exported file."
   },
   "synced": {
     "itemNotSynced": "Item not synced",
