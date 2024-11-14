@@ -14,7 +14,7 @@ import { Plot } from '@/types/plot';
 import { User } from '@/types/user';
 import { RequestParams } from '@/types/auth';
 import cn from '@/utils/cn';
-import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
+import { useSelectedFarmerState } from '@/state/state';
 
 type PlotInto = {
   plotName: string;

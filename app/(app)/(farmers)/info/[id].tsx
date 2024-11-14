@@ -5,7 +5,7 @@ import { AuthContext } from '@/context/AuthContext';
 import { ChevronLeft, User2 } from 'lucide-react-native';
 import FarmerInformationGuest from '@/components/farmers/info/FarmerInformationGuest';
 import FarmerInformation from '@/components/farmers/info/FarmerInformation';
-import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
+import { useSelectedFarmerState } from '@/state/state';
 import cn from '@/utils/cn';
 
 export default function FarmersInfo() {

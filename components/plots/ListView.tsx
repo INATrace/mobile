@@ -24,7 +24,7 @@ import { User } from '@/types/user';
 import { RequestParams } from '@/types/auth';
 import cn from '@/utils/cn';
 import { FileUp } from 'lucide-react-native';
-import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
+import { useSelectedFarmerState } from '@/state/state';
 
 type SummaryData = {
   crop: string;

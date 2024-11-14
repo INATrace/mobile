@@ -35,7 +35,7 @@ import i18n from '@/locales/i18n';
 import QRCode from 'react-native-qrcode-svg';
 import { captureRef } from 'react-native-view-shot';
 import Share from 'react-native-share';
-import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
+import { useSelectedFarmerState } from '@/state/state';
 
 export type CardProps = {
   id?: number;

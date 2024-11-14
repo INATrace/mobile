@@ -58,8 +58,8 @@ export default function Topbar(props: TopbarProps) {
         </View>
       </View>
       {guestAccess && (
-        <View className="flex flex-row items-center justify-center w-full h-5 -mt-2 bg-purple-300">
-          <Text>{i18n.t('guestAccess')}</Text>
+        <View className="flex flex-row items-center justify-center w-full h-5 -mt-2 bg-black/50">
+          <Text className="text-White">{i18n.t('guestAccess')}</Text>
         </View>
       )}
     </View>

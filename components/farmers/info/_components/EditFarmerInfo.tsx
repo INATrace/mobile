@@ -2,7 +2,7 @@ import { View, Text, Pressable } from 'react-native';
 import i18n from '@/locales/i18n';
 import { Pen } from 'lucide-react-native';
 import { router } from 'expo-router';
-import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
+import { useSelectedFarmerState } from '@/state/state';
 
 export default function EditFarmerInfo() {
   const { selectedFarmer } = useSelectedFarmerState();

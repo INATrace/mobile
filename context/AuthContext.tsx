@@ -17,7 +17,7 @@ import { FarmerSchema, PlotSchema } from '@/realm/schemas';
 
 import guestCountries from '@/context/guestCountries.json';
 import guestProductTypes from '@/context/guestProductTypes.json';
-import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
+import { useSelectedFarmerState } from '@/state/state';
 
 let creatingImageCacheDir: any = null;
 

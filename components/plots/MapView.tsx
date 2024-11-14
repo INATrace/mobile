@@ -38,7 +38,7 @@ import { User } from '@/types/user';
 import Card, { CardProps } from '../common/Card';
 import * as turf from '@turf/turf';
 import MarkerPlotSvg from '../svg/MarkerPlotSvg';
-import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
+import { useSelectedFarmerState } from '@/state/state';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? '');
 

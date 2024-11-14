@@ -25,7 +25,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import realm from '@/realm/useRealm';
 import { FarmerSchema } from '@/realm/schemas';
 import { FullWindowOverlay } from 'react-native-screens';
-import { useSelectedFarmerState } from '@/state/selectedFarmer-state';
+import { useSelectedFarmerState } from '@/state/state';
 import cn from '@/utils/cn';
 
 type NewFarmerErrors = {
@@ -96,6 +96,8 @@ export default function EditGuestFarmer() {
   );
 
   useEffect(() => {
+    console.log('productTypes', productTypes);
+    console.log('countries', countries);
     setProductTypesSelect(productTypes as any);
   }, [productTypes]);
 
@@ -450,8 +452,8 @@ export default function EditGuestFarmer() {
 
   return (
     <>
-      <View className="flex flex-row items-center justify-center w-full h-5 bg-purple-300">
-        <Text>{i18n.t('guestAccess')}</Text>
+      <View className="flex flex-row items-center justify-center w-full h-5 bg-black/50">
+        <Text className="text-white">{i18n.t('guestAccess')}</Text>
       </View>
       <KeyboardAwareScrollView
         extraScrollHeight={52}

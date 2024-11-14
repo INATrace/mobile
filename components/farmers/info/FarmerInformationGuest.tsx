@@ -13,8 +13,8 @@ export default function FarmerInformationGuest() {
 
   return (
     <>
-      <View className="flex flex-row items-center justify-center w-full h-5 bg-purple-300">
-        <Text>{i18n.t('guestAccess')}</Text>
+      <View className="flex flex-row items-center justify-center w-full h-5 bg-black/50">
+        <Text className="text-white">{i18n.t('guestAccess')}</Text>
       </View>
       {viewType === 'list' ? (
         <ScrollView className="h-full border-t bg-White border-t-LightGray">

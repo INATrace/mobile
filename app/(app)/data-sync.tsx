@@ -80,6 +80,26 @@ export default function DataSync() {
         `synced == false AND userId == '${user?.id}'`
       )) as any;
 
+      const guestFarmers = (await realm.realmRead(
+        FarmerSchema,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        `synced == false AND userId == '0' AND companyId == '0'`
+      )) as any;
+      const guestPlots = (await realm.realmRead(
+        PlotSchema,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        `synced == false AND userId == '0' AND companyId == '0'`
+      )) as any;
+
+      console.log('guestFarmers', guestFarmers);
+      console.log('guestPlots', guestPlots);
+
       let farmersData: any = [];
       let plotsData: any = [];
 
