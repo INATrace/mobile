@@ -5,7 +5,7 @@ import { useReducer, useEffect, useCallback } from 'react';
 type StorageValue = string | object | number | null | boolean;
 type StorageType = 'secureStore' | 'asyncStorage';
 
-type UseStateHook<T> = [T, (value: T) => void];
+type UseStateHook<T> = [T, (value: T) => Promise<void>];
 
 function useAsyncState<T>(initialValue: T): UseStateHook<T> {
   return useReducer(

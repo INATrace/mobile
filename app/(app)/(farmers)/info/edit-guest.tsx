@@ -51,7 +51,7 @@ type NewFarmerErrors = {
 export default function EditGuestFarmer() {
   const { countries, productTypes } = useContext(AuthContext) as {
     countries: Country[];
-    productTypes: ProductTypeWithCompanyId[];
+    productTypes: ProductType[];
   };
 
   const { selectedFarmer, setSelectedFarmer } = useSelectedFarmerState();
@@ -63,9 +63,7 @@ export default function EditGuestFarmer() {
   const [farmer, setFarmer] = useState<Farmer>(
     selectedFarmer ?? ({} as Farmer)
   );
-  const [productTypesSelect, setProductTypesSelect] = useState<ProductType[]>(
-    []
-  );
+
   const [errors, setErrors] = useState<NewFarmerErrors>({} as NewFarmerErrors);
   const [customAddress, setCustomAddress] = useState<string>('No');
 
@@ -94,12 +92,6 @@ export default function EditGuestFarmer() {
     (props: any) => <FullWindowOverlay>{props.children}</FullWindowOverlay>,
     []
   );
-
-  useEffect(() => {
-    console.log('productTypes', productTypes);
-    console.log('countries', countries);
-    setProductTypesSelect(productTypes as any);
-  }, [productTypes]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -760,7 +752,7 @@ export default function EditGuestFarmer() {
           >
             <BottomSheetScrollView className="rounded-t-md">
               <SelectorMultiple
-                items={productTypesSelect.map((productType: ProductType) => ({
+                items={productTypes.map((productType: ProductType) => ({
                   label: productType.name,
                   value: productType.id,
                 }))}
@@ -772,7 +764,7 @@ export default function EditGuestFarmer() {
                     : []
                 }
                 setSelected={(selected: string | number) => {
-                  const productType = productTypesSelect.find(
+                  const productType = productTypes.find(
                     (productType) => productType.id === selected
                   );
                   if (productType) {

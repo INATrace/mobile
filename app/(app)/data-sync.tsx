@@ -97,9 +97,6 @@ export default function DataSync() {
         `synced == false AND userId == '0' AND companyId == '0'`
       )) as any;
 
-      console.log('guestFarmers', guestFarmers);
-      console.log('guestPlots', guestPlots);
-
       let farmersData: any = [];
       let plotsData: any = [];
 

@@ -273,6 +273,10 @@ export default function AddPlot() {
         await realm.realmWrite(PlotSchema, plotRealm);
       }
 
+      if (guestAccess) {
+        router.back();
+      }
+
       router.back();
       router.replace(
         `${guestAccess ? 'info' : 'view'}/${selectedFarmer?.id?.toString()}` as any

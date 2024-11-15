@@ -6,7 +6,7 @@ import axios from 'axios';
 import RNFetchBlob from 'rn-fetch-blob';
 
 import { LogInResponse, RequestParams } from '@/types/auth';
-import { Farmer, ProductTypeWithCompanyId } from '@/types/farmer';
+import { Farmer, ProductType, ProductTypeWithCompanyId } from '@/types/farmer';
 import { CompanyInfo } from '@/types/company';
 import { Country } from '@/types/country';
 import { uuid } from 'expo-modules-core';
@@ -36,7 +36,7 @@ export const AuthContext = createContext<{
   user: User | null;
   selectedCompany: number | string | null;
   companies: (CompanyInfo | undefined)[] | string | null;
-  productTypes: ProductTypeWithCompanyId[] | string | null;
+  productTypes: ProductTypeWithCompanyId[] | ProductType[] | string | null;
   countries: Country[] | string | null;
   guestAccess: boolean;
   isConnected: boolean;
@@ -91,7 +91,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
     (CompanyInfo | undefined)[] | string | null
   >('companies', null, 'asyncStorage');
   const [productTypes, setProductTypes] = useStorageState<
-    ProductTypeWithCompanyId[] | string | null
+    ProductTypeWithCompanyId[] | ProductType[] | string | null
   >('product_type', null, 'asyncStorage');
   const [countries, setCountries] = useStorageState<Country[] | string | null>(
     'countries',
@@ -113,6 +113,16 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   useEffect(() => {
     if (instance === 'none') setInstance(process.env.EXPO_PUBLIC_API_URI ?? '');
   }, [instance]);
+
+  useEffect(() => {
+    if (productTypes === null || productTypes === 'none') {
+      setProductTypes(guestProductTypes as ProductType[]);
+    }
+
+    if (countries === null || countries === 'none') {
+      setCountries(guestCountries as Country[]);
+    }
+  }, [productTypes, countries]);
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [newPlot, setNewPlot] = useState<Plot | null>(null);
@@ -147,7 +157,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           .split(';')[0]
           .split('=')[1];
 
-        setAccessToken(accessToken);
+        await setAccessToken(accessToken);
 
         const responseUserData = await axios.get(
           `${instance}/api/user/profile`
@@ -156,8 +166,8 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         if (responseUserData.data.status === 'OK') {
           setGuestAccess(false);
           const user = responseUserData.data.data as User;
-          setUser(user);
-          setSelectedCompany(user.companyIds[0]);
+          await setUser(user);
+          await setSelectedCompany(user.companyIds[0]);
 
           await fetchProductTypes(user);
           await fetchCountries();
@@ -197,7 +207,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
           );
           const companyDetailsResp = await Promise.all(companyDetails);
 
-          setCompanies(companyDetailsResp);
+          await setCompanies(companyDetailsResp);
 
           return { success: true, errorStatus: '' };
         }
@@ -214,18 +224,11 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   };
 
   const logOut = async () => {
-    if (guestAccess) {
-      await realm.realmDeleteAll(FarmerSchema, '');
-      await realm.realmDeleteAll(PlotSchema, '');
-    }
-
-    setAccessToken(null);
-    setUser(null);
-    setSelectedCompany(null);
-    setCompanies(null);
+    await setAccessToken(null);
+    await setUser(null);
+    await setSelectedCompany(null);
+    await setCompanies(null);
     setSelectedFarmer(null);
-    setProductTypes(null);
-    setCountries(null);
     setNewPlot(null);
     setGuestAccess(false);
 
@@ -236,12 +239,12 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
 
   const logInGuest = async () => {
     setGuestAccess(true);
-    setUser(null);
-    setSelectedCompany(null);
-    setCompanies(null);
+    await setUser(null);
+    await setSelectedCompany(null);
+    await setCompanies(null);
     setSelectedFarmer(null);
-    setCountries(guestCountries as Country[]);
-    setProductTypes(guestProductTypes as any);
+    await setCountries(guestCountries as Country[]);
+    await setProductTypes(guestProductTypes as any);
 
     const defaultFarmer = (await realm.realmRead(
       FarmerSchema,
@@ -363,7 +366,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
 
     const productTypesResp = await Promise.all(productTypes);
 
-    setProductTypes(productTypesResp as any);
+    await setProductTypes(productTypesResp as any);
   };
 
   const fetchCountries = async () => {
@@ -371,7 +374,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
       `${instance}/api/common/countries?requestType=FETCH&limit=500&sort=ASC`
     );
     const countriesResp = countriesResponse.data.data.items as Country[];
-    setCountries(countriesResp);
+    await setCountries(countriesResp);
   };
 
   const fetchFarmers = async (user: User) => {
