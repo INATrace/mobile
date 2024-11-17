@@ -30,6 +30,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { FullWindowOverlay } from 'react-native-screens';
 import Selector from '@/components/common/Selector';
+import { User } from '@/types/user';
 
 export default function DataSync() {
   const navigation = useNavigation();
@@ -40,6 +41,7 @@ export default function DataSync() {
     user,
     guestAccess,
     instance,
+    refreshFarmers,
   } = useContext(AuthContext) as {
     isConnected: boolean;
     makeRequest: any;
@@ -47,6 +49,7 @@ export default function DataSync() {
     user: any;
     guestAccess: boolean;
     instance: string;
+    refreshFarmers: (user: User) => Promise<void>;
   };
 
   const [farmersSynced, setFarmersSynced] = useState<any>([]);
@@ -281,6 +284,11 @@ export default function DataSync() {
     }
   };
 
+  const farmerRefresh = async () => {
+    await refreshFarmers(user);
+    await getItemsToSync();
+  };
+
   return (
     <View>
       {guestAccess ? (
@@ -439,6 +447,14 @@ export default function DataSync() {
             }
           >
             <BottomSheetScrollView className="rounded-t-md">
+              <Pressable
+                onPress={farmerRefresh}
+                className="self-start px-4 py-2 mx-5 rounded-md bg-Orange"
+              >
+                <Text className="text-white">
+                  {i18n.t('farmers.refreshFarmers')}
+                </Text>
+              </Pressable>
               <Selector
                 items={
                   [...farmersSynced, ...farmersToSync]?.map((f) => ({

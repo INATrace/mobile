@@ -59,6 +59,7 @@
     "newFarmer": "Neuer Bauer",
     "search": "Suche",
     "noData": "Keine Bauern gefunden",
+    "refreshFarmers": "Bauern aktualisieren",
     "sort": {
       "sortBy": "Sortieren nach",
       "name": "Name",

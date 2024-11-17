@@ -59,6 +59,7 @@
     "newFarmer": "Nuevo agricultor",
     "search": "Buscar",
     "noData": "No se encontraron agricultores",
+    "refreshFarmers": "Actualizar agricultores",
     "sort": {
       "sortBy": "Ordenar por",
       "name": "Nombre",

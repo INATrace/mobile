@@ -7,6 +7,7 @@ import {
   Image,
   Platform,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import {
   useCallback,
@@ -49,7 +50,10 @@ export default function UserSettings() {
     selectCompany,
     instance,
     guestAccess,
+    refreshFarmers,
   } = useContext(AuthContext);
+
+  const [loading, setLoading] = useState(false);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['75%'], []);
@@ -104,6 +108,12 @@ export default function UserSettings() {
     }
   };
 
+  const handleRefreshFarmers = async () => {
+    setLoading(true);
+    await refreshFarmers(user as any);
+    setLoading(false);
+  };
+
   return (
     <ScrollView className="h-full p-5 border-t bg-White border-t-LightGray">
       <Text className="text-[18px] font-medium">
@@ -151,6 +161,18 @@ export default function UserSettings() {
               editable={false}
             />
           </View>
+          <Pressable
+            onPress={handleRefreshFarmers}
+            className="flex flex-row items-center justify-center py-3.5 mt-5 rounded-md bg-Orange"
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text className="text-white text-[16px] font-medium">
+                {i18n.t('farmers.refreshFarmers')}
+              </Text>
+            )}
+          </Pressable>
           <Text className="text-[18px] font-medium mt-5">
             {i18n.t('userSettings.companyInformation')}
           </Text>

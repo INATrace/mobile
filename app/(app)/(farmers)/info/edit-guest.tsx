@@ -27,6 +27,7 @@ import { FarmerSchema } from '@/realm/schemas';
 import { FullWindowOverlay } from 'react-native-screens';
 import { useSelectedFarmerState } from '@/state/state';
 import cn from '@/utils/cn';
+import { isEqual } from 'lodash';
 
 type NewFarmerErrors = {
   lastName: boolean;
@@ -432,7 +433,7 @@ export default function EditGuestFarmer() {
   };
 
   const isDisabled = useMemo(() => {
-    if (JSON.stringify(farmer) === JSON.stringify(oldFarmer)) {
+    if (isEqual(farmer, oldFarmer)) {
       return true;
     }
     if (!validateFields()) {

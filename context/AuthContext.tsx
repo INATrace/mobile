@@ -30,6 +30,7 @@ export const AuthContext = createContext<{
   setNewPlot: (plot: Plot) => void;
   setInstance: (instance: string) => void;
   setDocumentationModal: (value: boolean) => void;
+  refreshFarmers: (user: User) => Promise<void>;
   instance: string;
   makeRequest: ({ url, method, body, headers }: RequestParams) => Promise<any>;
   accessToken: string | null;
@@ -52,6 +53,7 @@ export const AuthContext = createContext<{
   setNewPlot: () => null,
   setInstance: () => null,
   setDocumentationModal: () => null,
+  refreshFarmers: async () => void 0,
   instance: process.env.EXPO_PUBLIC_API_URI ?? '',
   accessToken: null,
   user: null,
@@ -296,7 +298,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         },
         farm: {
           areaUnit: 'ha',
-          totalCultivatedArea: 0,
+          totalCultivatedArea: 10,
           farmPlantInformationList: [],
           organic: false,
           areaOrganicCertified: 0,
@@ -451,6 +453,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
         setInstance,
         setDocumentationModal,
         documentationModal,
+        refreshFarmers: fetchFarmers,
       }}
     >
       {props.children}
