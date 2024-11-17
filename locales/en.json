@@ -237,6 +237,9 @@
     "noPlots": "No plots to sync",
     "name": "Name",
     "title": "Title",
+    "syncToFarmer": "Sync to farmer",
+    "guestMode": "Guest mode",
+    "offlineMode": "Offline mode",
     "syncedTitle": "Synced",
     "syncedMessage": "Data successfully synced",
     "guestWarning": "You need to have an account to sync data, click on the button below to get started"

@@ -237,6 +237,9 @@
     "noPlots": "Nta bibanza byo guhuza",
     "name": "Izina",
     "title": "Umutwe",
+    "syncToFarmer": "Hujuje na umuhinzi",
+    "guestMode": "Modi y'umushyitsi",
+    "offlineMode": "Modi y'uburiri",
     "syncedTitle": "Byahuje",
     "syncedMessage": "Imyirondoro yahuje neza",
     "guestWarning": "Ugomba kugira konti kugira ngo ushobore guhuza amakuru, kanda ku buto buri hasi kugira ngo utangire"

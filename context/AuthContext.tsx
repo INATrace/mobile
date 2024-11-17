@@ -115,11 +115,11 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
   }, [instance]);
 
   useEffect(() => {
-    if (productTypes === null || productTypes === 'none') {
+    if (!guestAccess && (productTypes === null || productTypes === 'none')) {
       setProductTypes(guestProductTypes as ProductType[]);
     }
 
-    if (countries === null || countries === 'none') {
+    if (!guestAccess && (countries === null || countries === 'none')) {
       setCountries(guestCountries as Country[]);
     }
   }, [productTypes, countries]);

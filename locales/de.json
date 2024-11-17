@@ -237,6 +237,9 @@
     "noPlots": "Keine Parzellen zu synchronisieren",
     "name": "Name",
     "title": "Titel",
+    "syncToFarmer": "Mit Bauer sync",
+    "guestMode": "Gastmodus",
+    "offlineMode": "Offline-Modus",
     "syncedTitle": "Synchronisiert",
     "syncedMessage": "Daten erfolgreich synchronisiert",
     "guestWarning": "Sie müssen ein Konto haben, um Daten zu synchronisieren. Klicken Sie auf den unten stehenden Button, um zu beginnen"

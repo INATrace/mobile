@@ -1,6 +1,5 @@
-import { Farmer } from '@/types/farmer';
 import { useNavigation } from 'expo-router';
-import { ChevronLeft, RefreshCw } from 'lucide-react-native';
+import { ChevronLeft, Pencil, RefreshCw } from 'lucide-react-native';
 import { useContext, useEffect, useState } from 'react';
 import {
   View,
@@ -13,10 +12,10 @@ import {
 import { ScrollView } from 'react-native-gesture-handler';
 import realm from '@/realm/useRealm';
 import { FarmerSchema, PlotSchema } from '@/realm/schemas';
-import Card, { ItemProps } from '@/components/common/Card';
 import i18n from '@/locales/i18n';
 import cn from '@/utils/cn';
 import { AuthContext } from '@/context/AuthContext';
+import { Farmer } from '@/types/farmer';
 
 export default function DataSync() {
   const navigation = useNavigation();
@@ -36,10 +35,10 @@ export default function DataSync() {
     instance: string;
   };
 
-  const [farmersToSync, setFarmersToSync] = useState<ItemProps[]>([]);
-  const [plotsToSync, setPlotsToSync] = useState<ItemProps[]>([]);
-  const [farmersToSyncData, setFarmersToSyncData] = useState<any>([]);
-  const [plotsToSyncData, setPlotsToSyncData] = useState<any>([]);
+  const [farmersSynced, setFarmersSynced] = useState<any>([]);
+
+  const [farmersToSync, setFarmersToSync] = useState<any>([]);
+  const [plotsToSync, setPlotsToSync] = useState<any>([]);
 
   const [loading, setLoading] = useState<boolean>(true);
   const [syncing, setSyncing] = useState<boolean>(false);
@@ -69,7 +68,7 @@ export default function DataSync() {
         undefined,
         undefined,
         undefined,
-        `synced == false AND userId == '${user?.id}'`
+        `(userId == '${user?.id}' OR userId == '0')`
       )) as any;
       const plots = (await realm.realmRead(
         PlotSchema,
@@ -77,59 +76,34 @@ export default function DataSync() {
         undefined,
         undefined,
         undefined,
-        `synced == false AND userId == '${user?.id}'`
+        `(synced == false) AND (userId == '${user?.id}' OR userId == '0')`
       )) as any;
 
-      const guestFarmers = (await realm.realmRead(
-        FarmerSchema,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        `synced == false AND userId == '0' AND companyId == '0'`
-      )) as any;
-      const guestPlots = (await realm.realmRead(
-        PlotSchema,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        `synced == false AND userId == '0' AND companyId == '0'`
-      )) as any;
-
+      let farmersDataSynced: any = [];
       let farmersData: any = [];
       let plotsData: any = [];
 
-      const farmersToSync = farmers.map((farmer: any) => {
+      for (const farmer of farmers) {
         const data = JSON.parse(farmer.data);
+        if (farmer.synced) {
+          farmersDataSynced.push({ ...farmer, data });
+        } else {
+          farmersData.push({ ...farmer, data });
+        }
+      }
 
-        farmersData.push({ ...farmer, data });
-
-        return {
-          type: 'view',
-          name: i18n.t('synced.name'),
-          value: farmer.name + ' ' + farmer.surname,
-          editable: false,
-        } as ItemProps;
-      });
-      const plotsToSync = plots.map((plot: any) => {
+      for (const plot of plots) {
         const data = JSON.parse(plot.data);
 
         plotsData.push({ ...plot, data });
+      }
 
-        return {
-          type: 'view',
-          name: i18n.t('synced.title'),
-          value: data.plotName,
-          editable: false,
-        } as ItemProps;
-      });
+      setFarmersToSync(farmersData);
+      setPlotsToSync(plotsData);
+      setFarmersSynced(farmersDataSynced);
 
-      setFarmersToSync(farmersToSync);
-      setPlotsToSync(plotsToSync);
-
-      setFarmersToSyncData(farmersData);
-      setPlotsToSyncData(plotsData);
+      console.log(farmersData);
+      console.log(JSON.stringify(plotsData, null, 2));
     } catch (error) {
       console.error(error);
     } finally {
@@ -146,58 +120,55 @@ export default function DataSync() {
 
     try {
       let farmerPlots: any = [];
-      const farmerPromises = await farmersToSyncData.map(
-        async (farmer: any) => {
-          const fp = plotsToSyncData.filter(
-            (plot: any) => plot.farmerId === farmer.id
-          );
+      const farmerPromises = await farmersToSync.map(async (farmer: any) => {
+        const fp = plotsToSync.filter(
+          (plot: any) => plot.farmerId === farmer.id
+        );
 
-          const farmerBody = {
-            ...farmer.data,
-            id: null,
-            plots:
-              fp?.map((plot: any) => {
-                return {
-                  plotName: plot.data.plotName,
-                  crop: { id: parseInt(plot.data.crop, 10) },
-                  numberOfPlants: plot.data.numberOfPlants
-                    ? parseInt(plot.data.numberOfPlants, 10)
-                    : null,
-                  unit: plot.data.size.split(' ')[1],
-                  size: parseFloat(plot.data.size.split(' ')[0]),
-                  geoId: '',
-                  organicStartOfTransition: plot.data.organicStartOfTransition
-                    ? plot.data.organicStartOfTransition
-                    : null,
-                  certification: plot.data.certification
-                    ? plot.data.certification
-                    : null,
-                  coordinates:
-                    plot.data.featureInfo.geometry.coordinates[0].map(
-                      (coordinate: number[]) => {
-                        return {
-                          latitude: coordinate[1],
-                          longitude: coordinate[0],
-                        };
-                      }
-                    ),
-                };
-              }) ?? [],
-          };
+        const farmerBody = {
+          ...farmer.data,
+          id: null,
+          plots:
+            fp?.map((plot: any) => {
+              return {
+                plotName: plot.data.plotName,
+                crop: { id: parseInt(plot.data.crop, 10) },
+                numberOfPlants: plot.data.numberOfPlants
+                  ? parseInt(plot.data.numberOfPlants, 10)
+                  : null,
+                unit: plot.data.size.split(' ')[1],
+                size: parseFloat(plot.data.size.split(' ')[0]),
+                geoId: '',
+                organicStartOfTransition: plot.data.organicStartOfTransition
+                  ? plot.data.organicStartOfTransition
+                  : null,
+                certification: plot.data.certification
+                  ? plot.data.certification
+                  : null,
+                coordinates: plot.data.featureInfo.geometry.coordinates[0].map(
+                  (coordinate: number[]) => {
+                    return {
+                      latitude: coordinate[1],
+                      longitude: coordinate[0],
+                    };
+                  }
+                ),
+              };
+            }) ?? [],
+        };
 
-          farmerPlots = [...farmerPlots, ...fp];
+        farmerPlots = [...farmerPlots, ...fp];
 
-          return makeRequest({
-            url: `/api/company/userCustomers/add/${selectedCompany}`,
-            method: 'POST',
-            body: farmerBody,
-          }).then((result: any) => ({
-            result,
-            farmerId: farmer.id,
-            plotIds: fp.map((plot: any) => plot.id),
-          }));
-        }
-      );
+        return makeRequest({
+          url: `/api/company/userCustomers/add/${selectedCompany}`,
+          method: 'POST',
+          body: farmerBody,
+        }).then((result: any) => ({
+          result,
+          farmerId: farmer.id,
+          plotIds: fp.map((plot: any) => plot.id),
+        }));
+      });
 
       const farmerPromiseResults = await Promise.all(farmerPromises);
 
@@ -210,7 +181,7 @@ export default function DataSync() {
         }
       }
 
-      const plotsLeft = plotsToSyncData.filter(
+      const plotsLeft = plotsToSync.filter(
         (plot: any) => !farmerPlots.includes(plot)
       );
 
@@ -302,7 +273,42 @@ export default function DataSync() {
                 </Text>
               </View>
             ) : farmersToSync.length > 0 ? (
-              <Card items={farmersToSync} />
+              <View className="flex flex-col mx-5 mt-5 border rounded-md border-LightGray bg-White">
+                {farmersToSync.map((f: any, index: number) => (
+                  <View
+                    className={cn(
+                      'border-b border-b-LightGray',
+                      index === farmersToSync.length - 1 && 'border-b-0'
+                    )}
+                    key={index}
+                  >
+                    <View className="flex flex-row items-center justify-between py-4 pr-4 ml-4">
+                      <View className="max-w-[45%]">
+                        <Text className="font-bold">
+                          {i18n.t('synced.name')}
+                        </Text>
+                        <Text>
+                          {f?.name ?? ''}
+                          {f?.name ? ' ' : ''}
+                          {f?.surname}
+                        </Text>
+                      </View>
+                      <Text
+                        className={cn(
+                          'text-[12px] max-w-[50%]',
+                          f.userId === '0'
+                            ? 'text-Orange rounded-full bg-Orange/20 border border-Orange py-0.5 px-1.5'
+                            : 'text-Green rounded-full bg-Green/20 border border-Green py-0.5 px-1.5'
+                        )}
+                      >
+                        {f.userId === '0'
+                          ? i18n.t('synced.guestMode')
+                          : i18n.t('synced.offlineMode')}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
             ) : (
               <View className="flex flex-row items-center justify-center p-5 py-10">
                 <Text className="text-[16px] font-medium">
@@ -311,7 +317,7 @@ export default function DataSync() {
               </View>
             )}
 
-            <Text className="text-[18px] font-medium mx-5">
+            <Text className="text-[18px] font-medium mx-5 mt-5">
               {i18n.t('plots.title')}
             </Text>
             {loading ? (
@@ -321,7 +327,60 @@ export default function DataSync() {
                 </Text>
               </View>
             ) : plotsToSync.length > 0 ? (
-              <Card items={plotsToSync} />
+              <View className="flex flex-col mx-5 mt-5 border rounded-md border-LightGray bg-White">
+                {plotsToSync.map((p: any, index: number) => {
+                  const farmerDisplay = [
+                    ...farmersToSync,
+                    ...farmersSynced,
+                  ].find((fds: any) => fds.id === p.farmerId);
+
+                  return (
+                    <View
+                      className={cn(
+                        'border-b border-b-LightGray py-4',
+                        index === plotsToSync.length - 1 && 'border-b-0'
+                      )}
+                      key={index}
+                    >
+                      <View className="flex flex-row items-center justify-between pr-4 ml-4">
+                        <View className="max-w-[45%]">
+                          <Text className="font-bold">
+                            {i18n.t('synced.name')}
+                          </Text>
+                          <Text>{p.data.plotName}</Text>
+                        </View>
+                        <Text
+                          className={cn(
+                            'text-[12px] max-w-[50%]',
+                            p.userId === '0'
+                              ? 'text-Orange rounded-full bg-Orange/20 border border-Orange py-0.5 px-1.5'
+                              : 'text-Green rounded-full bg-Green/20 border border-Green py-0.5 px-1.5'
+                          )}
+                        >
+                          {p.userId === '0'
+                            ? i18n.t('synced.guestMode')
+                            : i18n.t('synced.offlineMode')}
+                        </Text>
+                      </View>
+                      <View className="flex flex-row items-center justify-between pr-4 mt-2 ml-4">
+                        <View className="max-w-[45%]">
+                          <Text className="font-bold">
+                            {i18n.t('synced.syncToFarmer')}
+                          </Text>
+                          <Text>
+                            {farmerDisplay?.name ?? ''}
+                            {farmerDisplay?.name ? ' ' : ''}
+                            {farmerDisplay?.surname}
+                          </Text>
+                        </View>
+                        <Pressable>
+                          <Pencil className="text-Orange" size={18} />
+                        </Pressable>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
             ) : (
               <View className="flex flex-row items-center justify-center p-5 py-10">
                 <Text className="text-[16px] font-medium">

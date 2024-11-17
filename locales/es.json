@@ -237,6 +237,9 @@
     "noPlots": "No hay parcelas para sincronizar",
     "name": "Nombre",
     "title": "Título",
+    "syncToFarmer": "Sincronizar con agricultor",
+    "guestMode": "Modo invitado",
+    "offlineMode": "Modo sin conexión",
     "syncedTitle": "Sincronizado",
     "syncedMessage": "Datos sincronizados con éxito",
     "guestWarning": "Necesitas tener una cuenta para sincronizar datos, haz clic en el botón de abajo para comenzar"
