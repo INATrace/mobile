@@ -1,6 +1,13 @@
 import { useNavigation } from 'expo-router';
 import { ChevronLeft, Pencil, RefreshCw } from 'lucide-react-native';
-import { useContext, useEffect, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   View,
   Text,
@@ -8,6 +15,7 @@ import {
   ActivityIndicator,
   Alert,
   Linking,
+  Platform,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import realm from '@/realm/useRealm';
@@ -15,7 +23,13 @@ import { FarmerSchema, PlotSchema } from '@/realm/schemas';
 import i18n from '@/locales/i18n';
 import cn from '@/utils/cn';
 import { AuthContext } from '@/context/AuthContext';
-import { Farmer } from '@/types/farmer';
+import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
+import { FullWindowOverlay } from 'react-native-screens';
+import Selector from '@/components/common/Selector';
 
 export default function DataSync() {
   const navigation = useNavigation();
@@ -42,6 +56,15 @@ export default function DataSync() {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [syncing, setSyncing] = useState<boolean>(false);
+
+  const [editingPlot, setEditingPlot] = useState<any>(null);
+
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ['75%'], []);
+  const containerComponent = useCallback(
+    (props: any) => <FullWindowOverlay>{props.children}</FullWindowOverlay>,
+    []
+  );
 
   useEffect(() => {
     navigation.setOptions({
@@ -101,9 +124,6 @@ export default function DataSync() {
       setFarmersToSync(farmersData);
       setPlotsToSync(plotsData);
       setFarmersSynced(farmersDataSynced);
-
-      console.log(farmersData);
-      console.log(JSON.stringify(plotsData, null, 2));
     } catch (error) {
       console.error(error);
     } finally {
@@ -234,6 +254,19 @@ export default function DataSync() {
       setSyncing(false);
       await getItemsToSync();
       Alert.alert(i18n.t('synced.syncedTitle'), i18n.t('synced.syncedMessage'));
+    }
+  };
+
+  const handleEditPlot = (plot: any) => {
+    setEditingPlot(plot);
+    bottomSheetRef.current?.present();
+  };
+
+  const updatePlotFarmerId = async (farmerId: number) => {
+    if (editingPlot) {
+      await realm.realmUpdate(PlotSchema, editingPlot.id, 'farmerId', farmerId);
+      setEditingPlot({ ...editingPlot, farmerId });
+      await getItemsToSync();
     }
   };
 
@@ -373,7 +406,7 @@ export default function DataSync() {
                             {farmerDisplay?.surname}
                           </Text>
                         </View>
-                        <Pressable>
+                        <Pressable onPress={() => handleEditPlot(p)}>
                           <Pencil className="text-Orange" size={18} />
                         </Pressable>
                       </View>
@@ -389,6 +422,35 @@ export default function DataSync() {
               </View>
             )}
           </ScrollView>
+          <BottomSheetModal
+            ref={bottomSheetRef}
+            index={0}
+            snapPoints={snapPoints}
+            backdropComponent={(props) => (
+              <BottomSheetBackdrop
+                {...props}
+                onPress={() => bottomSheetRef.current?.close()}
+                disappearsOnIndex={-1}
+              />
+            )}
+            enableDismissOnClose={true}
+            containerComponent={
+              Platform.OS === 'ios' ? containerComponent : undefined
+            }
+          >
+            <BottomSheetScrollView className="rounded-t-md">
+              <Selector
+                items={
+                  [...farmersSynced, ...farmersToSync]?.map((f) => ({
+                    label: `${f?.name ?? ''}${f?.name ? ' ' : ''}${f?.surname}`,
+                    value: f?.id,
+                  })) ?? []
+                }
+                selected={editingPlot?.farmerId}
+                setSelected={updatePlotFarmerId}
+              />
+            </BottomSheetScrollView>
+          </BottomSheetModal>
           <Pressable
             className="bg-White"
             onPress={syncData}

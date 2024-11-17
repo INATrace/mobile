@@ -4,7 +4,7 @@ import { ShadowButtonStyle } from '@/constants/Shadow';
 import { AuthContext } from '@/context/AuthContext';
 import i18n from '@/locales/i18n';
 import { Country } from '@/types/country';
-import { Farmer, ProductType, ProductTypeWithCompanyId } from '@/types/farmer';
+import { Farmer, ProductType } from '@/types/farmer';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
