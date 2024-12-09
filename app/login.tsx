@@ -36,6 +36,7 @@ export default function Login() {
   const instances = [
     process.env.EXPO_PUBLIC_API_URI,
     process.env.EXPO_PUBLIC_API_TEST_URI,
+    process.env.EXPO_PUBLIC_API_RW_URI,
   ];
 
   const { logIn, instance, setInstance, logInGuest } = useContext(AuthContext);
@@ -150,7 +151,7 @@ export default function Login() {
             position={'center'}
             backdropPressToClose={true}
             style={{
-              height: 236,
+              height: instances.length * 60 + 100,
               width: '90%',
               marginRight: 250,
               borderRadius: 8,

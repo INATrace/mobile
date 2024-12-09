@@ -878,7 +878,7 @@ export default function MapView({
                 </Pressable>
               </View>
             </View>
-            <View className="w-full p-5 bg-White rounded-t-md">
+            <View className="w-full p-5 pb-10 bg-White rounded-t-md">
               {/* Add location button */}
               {manualMode ? (
                 <View className="flex flex-row items-center justify-center mt-2">

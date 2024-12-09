@@ -265,7 +265,7 @@ export default function UserSettings() {
         {i18n.t('userSettings.language')}
       </Text>
       <LanguageSwitcher />
-      <View className="flex flex-row items-center justify-between mt-5 mb-10">
+      <View className="flex flex-row items-center justify-between mt-5 mb-16">
         <Pressable
           onPress={() => resetPassword()}
           className={cn(

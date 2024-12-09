@@ -334,18 +334,25 @@ export default function DataSync() {
                           {f?.surname}
                         </Text>
                       </View>
-                      <Text
+                      <View
                         className={cn(
-                          'text-[12px] max-w-[50%]',
+                          'py-0.5 px-1.5 border rounded-full',
                           f.userId === '0'
-                            ? 'text-Orange rounded-full bg-Orange/20 border border-Orange py-0.5 px-1.5'
-                            : 'text-Green rounded-full bg-Green/20 border border-Green py-0.5 px-1.5'
+                            ? 'bg-Orange/20 border-Orange'
+                            : 'bg-Green/20 border-Green'
                         )}
                       >
-                        {f.userId === '0'
-                          ? i18n.t('synced.guestMode')
-                          : i18n.t('synced.offlineMode')}
-                      </Text>
+                        <Text
+                          className={cn(
+                            'text-[12px]',
+                            f.userId === '0' ? 'text-Orange' : 'text-Green'
+                          )}
+                        >
+                          {f.userId === '0'
+                            ? i18n.t('synced.guestMode')
+                            : i18n.t('synced.offlineMode')}
+                        </Text>
+                      </View>
                     </View>
                   </View>
                 ))}
@@ -390,18 +397,25 @@ export default function DataSync() {
                           </Text>
                           <Text>{p.data.plotName}</Text>
                         </View>
-                        <Text
+                        <View
                           className={cn(
-                            'text-[12px] max-w-[50%]',
+                            'py-0.5 px-1.5 border rounded-full',
                             p.userId === '0'
-                              ? 'text-Orange rounded-full bg-Orange/20 border border-Orange py-0.5 px-1.5'
-                              : 'text-Green rounded-full bg-Green/20 border border-Green py-0.5 px-1.5'
+                              ? 'bg-Orange/20 border-Orange'
+                              : 'bg-Green/20 border-Green'
                           )}
                         >
-                          {p.userId === '0'
-                            ? i18n.t('synced.guestMode')
-                            : i18n.t('synced.offlineMode')}
-                        </Text>
+                          <Text
+                            className={cn(
+                              'text-[12px]',
+                              p.userId === '0' ? 'text-Orange' : 'text-Green'
+                            )}
+                          >
+                            {p.userId === '0'
+                              ? i18n.t('synced.guestMode')
+                              : i18n.t('synced.offlineMode')}
+                          </Text>
+                        </View>
                       </View>
                       <View className="flex flex-row items-center justify-between pr-4 mt-2 ml-4">
                         <View className="max-w-[45%]">
@@ -468,7 +482,7 @@ export default function DataSync() {
             </BottomSheetScrollView>
           </BottomSheetModal>
           <Pressable
-            className="bg-White"
+            className="pb-5 bg-White"
             onPress={syncData}
             disabled={
               !isConnected ||

@@ -6,17 +6,25 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URI": "${EXPO_PUBLIC_API_URI}",
+        "EXPO_PUBLIC_API_TEST_URI": "${EXPO_PUBLIC_API_TEST_URI}",
+        "EXPO_PUBLIC_API_RW_URI": "${EXPO_PUBLIC_API_RW_URI}",
+        "EXPO_PUBLIC_DOCUMENTATION_URI": "${EXPO_PUBLIC_DOCUMENTATION_URI}",
+        "EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN": "${EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN}"
+      }
     },
     "preview": {
       "distribution": "internal"
     },
     "production": {
       "env": {
-        "EXPO_PUBLIC_API_URI": "https://inatrace.org",
-        "EXPO_PUBLIC_API_TEST_URI": "https://test.inatrace.org",
-        "EXPO_PUBLIC_DOCUMENTATION_URI": "https://inatrace-docs.vercel.app",
-        "EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN": "pk.eyJ1IjoicGlub2tva29sIiwiYSI6ImNsdTVzdmdmaDFvbXoyaXFzZjVtb2xrbHUifQ.loX_4cGYQz1H9Op_HzslFQ"
+        "EXPO_PUBLIC_API_URI": "${EXPO_PUBLIC_API_URI}",
+        "EXPO_PUBLIC_API_TEST_URI": "${EXPO_PUBLIC_API_TEST_URI}",
+        "EXPO_PUBLIC_API_RW_URI": "${EXPO_PUBLIC_API_RW_URI}",
+        "EXPO_PUBLIC_DOCUMENTATION_URI": "${EXPO_PUBLIC_DOCUMENTATION_URI}",
+        "EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN": "${EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN}"
       },
       "android": {
         "buildType": "app-bundle"

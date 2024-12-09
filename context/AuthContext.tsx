@@ -167,6 +167,7 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
 
         if (responseUserData.data.status === 'OK') {
           setGuestAccess(false);
+          await deleteGuestFarmerIfNecessary();
           const user = responseUserData.data.data as User;
           await setUser(user);
           await setSelectedCompany(user.companyIds[0]);
@@ -326,6 +327,32 @@ export function SessionProvider(props: React.PropsWithChildren<any>) {
       setSelectedFarmer(farmerBody);
     } else {
       setSelectedFarmer(JSON.parse(defaultFarmer[0].data));
+    }
+  };
+
+  const deleteGuestFarmerIfNecessary = async () => {
+    const farmers = (await realm.realmRead(
+      FarmerSchema,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'synced == false'
+    )) as any;
+
+    if (farmers.length === 1) {
+      const plots = (await realm.realmRead(
+        PlotSchema,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        'synced == false'
+      )) as any;
+
+      if (plots.length === 0) {
+        await realm.realmDeleteOne(FarmerSchema, 'id == "0"');
+      }
     }
   };
 
