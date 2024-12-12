@@ -47,3 +47,10 @@ ios/
 %ProgramData%/
 
 *.env
+/.idea
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/inatrace-mobile.iml
+/.idea/modules.xml
+/.idea/codeStyles/Project.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
