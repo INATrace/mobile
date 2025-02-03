@@ -5,7 +5,7 @@ export default ({ config }) => ({
     ...config.expo,
     name: 'INATrace',
     slug: 'inatrace-mobile',
-    version: '1.8.0',
+    version: '1.9.0',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
     scheme: 'myapp',
@@ -80,7 +80,8 @@ export default ({ config }) => ({
       EXPO_PUBLIC_DOCUMENTATION_URI: process.env.EXPO_PUBLIC_DOCUMENTATION_URI,
       EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN:
         process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN,
-      RN_MAPBOX_MAPS_DOWNLOAD_TOKEN: process.env.RN_MAPBOX_MAPS_DOWNLOAD_TOKEN,
+      RN_MAPBOX_MAPS_DOWNLOAD_TOKEN:
+        'sk.eyJ1IjoicGlub2tva29sIiwiYSI6ImNsdnRtNHR4dzE3bHEyanBhY2s4Mm85MjYifQ.r69QfS_HUDDnR2X5L2YYDA',
     },
   },
 });
