@@ -28,6 +28,9 @@ export default ({ config }) => ({
           },
         ],
       },
+      infoPlist: {
+        ITSAppUsesNonExemptEncryption: false,
+      },
     },
     android: {
       adaptiveIcon: {
